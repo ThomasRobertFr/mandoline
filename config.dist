@@ -1,0 +1,5 @@
+#Configuration of the database
+dbhost=localhost
+dbport=8080
+dbuser=myuser
+dbpasswd=password
