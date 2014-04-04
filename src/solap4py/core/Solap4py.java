@@ -1,36 +1,39 @@
 package solap4py.core;
 
-import java.io.StringReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Properties;
 
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonException;
 import javax.json.JsonObject;
-import javax.json.JsonObjectBuilder;
 import javax.json.JsonValue;
 
+import org.json.simple.JSONObject;
 import org.olap4j.Axis;
-import org.olap4j.Cell;
 import org.olap4j.CellSet;
 import org.olap4j.OlapConnection;
 import org.olap4j.OlapException;
 import org.olap4j.Position;
+import org.olap4j.PreparedOlapStatement;
 import org.olap4j.mdx.IdentifierNode;
 import org.olap4j.metadata.Catalog;
 import org.olap4j.metadata.Cube;
 import org.olap4j.metadata.Hierarchy;
+import org.olap4j.metadata.Member;
 import org.olap4j.metadata.NamedList;
 import org.olap4j.metadata.Schema;
 import org.olap4j.query.Query;
 import org.olap4j.query.QueryDimension;
+import org.olap4j.query.Selection;
 
 public class Solap4py {
 
@@ -213,38 +216,54 @@ public class Solap4py {
         }
 
     }
+    
+	/**
+	 * Execute a query and format the result to get a normalized JsonObject
+	 * @param myQuery query to be executed
+	 * @return normalized JsonObject
+	 * @throws OlapException  If something goes sour, an OlapException will be thrown to the caller. It could be caused by many things, like a stale connection. Look at the root cause for more details.
+	 */
+	@SuppressWarnings("unchecked")
+	private JsonObject executeSelect(Query myQuery) throws OlapException {
+		
+		PreparedOlapStatement statement = olapConnection.prepareOlapStatement(myQuery.getSelect().toString());
+		CellSet resultCellSet = statement.executeQuery();
+		JSONObject result = new JSONObject();
+		
+		List<QueryDimension> c = myQuery.getAxis(Axis.COLUMNS).getDimensions();
+		List<QueryDimension> d = myQuery.getAxis(Axis.ROWS).getDimensions();
+		List<Selection> m = c.get(0).getInclusions();
+	
+		final int DIMENSION_NUMBER = d.size();
+		String[] members = new String[DIMENSION_NUMBER];
+		JSONObject[] dimensions = new JSONObject[DIMENSION_NUMBER + 1];
+		dimensions[0] = new JSONObject();
+		
+		for (Position axis_0 : resultCellSet.getAxes().get(Axis.ROWS.axisOrdinal()).getPositions()) {
+		    int i;
+		    for (i = 0; i < DIMENSION_NUMBER; i++) {
+			Member currentMember = axis_0.getMembers().get(i);
+			if (!(currentMember.getUniqueName().equals(members[i]))) {
+			    dimensions[i + 1] = new JSONObject();
+			    members[i] = currentMember.getUniqueName();
+			    dimensions[i].put(currentMember.getUniqueName(), dimensions[i + 1]);
+			}
+		    }
+		    for (Position axis_1 : resultCellSet.getAxes().get(Axis.COLUMNS.axisOrdinal()).getPositions()) {
+			if (resultCellSet.getCell(axis_1, axis_0).getValue() != null) {
+			    dimensions[i].put(m.get(axis_1.getOrdinal()).getUniqueName(), resultCellSet.getCell(axis_1, axis_0).getDoubleValue());
+			} else {
+			    dimensions[i].put(m.get(axis_1.getOrdinal()).getUniqueName(), 0.0);
+			}
+		    }
+		}
 
-    /**
-     * Execute a query and format the result to get a normalized JsonObject
-     * 
-     * @param myQuery
-     *            query to be executed
-     * @return normalized JsonObject
-     * @throws OlapException
-     *             If something goes sour, an OlapException will be thrown to
-     *             the caller. It could be caused by many things, like a stale
-     *             connection. Look at the root cause for more details.
-     */
-    private JsonObject executeSelect(Query myQuery) throws OlapException {
-        CellSet resultCellSet = myQuery.execute();
+		result.put("error", "OK");
+		result.put("data", dimensions[0]);
+		System.out.println(result.toJSONString());
 
-        JsonObjectBuilder result = Json.createObjectBuilder();
-        result.add("error", "OK");
-        JsonObjectBuilder data = Json.createObjectBuilder();
-
-        // TODO get the data and format the returned Json
-        for (Position axis_rows : resultCellSet.getAxes().get(Axis.ROWS.axisOrdinal()).getPositions()) {
-            for (Position axis_columns : resultCellSet.getAxes().get(Axis.COLUMNS.axisOrdinal()).getPositions()) {
-                // Just an exemple of how we browse the CellSet...
-                Cell currentCell = resultCellSet.getCell(axis_rows, axis_columns);
-
-            }
-        }
-
-        result.add("data", data.build());
-
-        return result.build();
-    }
+		return Json.createObjectBuilder().build();
+	}
 
     public String getMetadata(String param) throws Exception {
 
