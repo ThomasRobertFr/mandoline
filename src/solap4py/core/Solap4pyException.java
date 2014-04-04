@@ -1,8 +1,7 @@
 package solap4py.core;
 
-import javax.json.Json;
-import javax.json.JsonObject;
-import javax.json.JsonObjectBuilder;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 enum ErrorType {
     BAD_REQUEST,
@@ -25,17 +24,12 @@ public class Solap4pyException extends Exception {
 
     }
 
-    public JsonObject getJSON() {
+    public JSONObject getJSON() throws JSONException {
 
-        JsonObjectBuilder objectJsonBuilder = Json.createObjectBuilder();
-
-        objectJsonBuilder.add("error", type.toString());
-        objectJsonBuilder.add("data", description);
-
-        JsonObject objectJson = objectJsonBuilder.build();
-
+        JSONObject objectJson = new JSONObject();
+        objectJson.put("error", type.toString());
+        objectJson.put("data", description);
         return objectJson;
-
     }
 
     public static void controle() throws Solap4pyException {
