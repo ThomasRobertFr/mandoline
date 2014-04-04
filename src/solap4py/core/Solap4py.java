@@ -132,7 +132,12 @@ public class Solap4py {
                 throw new Solap4pyException(ErrorType.SERVER_ERROR, ex.getMessage());
             }
         } catch (Solap4pyException err) {
-            result = err.getJSON().toString();
+            try {
+		result = err.getJSON().toString();
+	    } catch (JSONException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	    }
         }
 
         return result;

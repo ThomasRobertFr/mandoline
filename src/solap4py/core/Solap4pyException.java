@@ -25,7 +25,6 @@ public class Solap4pyException extends Exception {
     }
 
     public JSONObject getJSON() throws JSONException {
-
         JSONObject objectJson = new JSONObject();
         objectJson.put("error", type.toString());
         objectJson.put("data", description);
