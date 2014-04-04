@@ -1,13 +1,10 @@
 package solap4py.core;
 
-import java.lang.reflect.Method;
 import java.util.List;
-import javax.json.Json;
-import javax.json.JsonArray;
-import javax.json.JsonArrayBuilder;
-import javax.json.JsonObject;
-import javax.json.JsonObjectBuilder;
-import javax.json.JsonString;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.olap4j.OlapConnection;
 import org.olap4j.OlapException;
 import org.olap4j.metadata.Catalog;
@@ -32,12 +29,12 @@ public class Metadata {
         }
     }
 
-    public JsonObject query(JsonObject query) throws OlapException {
+    public JSONObject query(JSONObject query) throws OlapException, JSONException {
 
-        JsonObjectBuilder result = Json.createObjectBuilder();
-        result.add("error", "OK");
-        JsonArray data = null;
-        JsonArray from = query.getJsonArray("from");
+        JSONObject result = new JSONObject();
+        result.put("error", "OK");
+        JSONArray data = null;
+        JSONArray from = query.getJSONArray("from");
 
         switch (query.getString("get")) {
         case "schema":
@@ -68,126 +65,125 @@ public class Metadata {
 
         }
 
-        result.add("data", data);
-        return result.build();
+        result.put("data", data);
+        return result;
     }
 
-    private JsonArray getSchemas() throws OlapException {
+    private JSONArray getSchemas() throws OlapException, JSONException {
         List<Schema> schemas = this.catalog.getSchemas();
-        JsonArrayBuilder builder = Json.createArrayBuilder();
-
+        JSONArray array = new JSONArray();
         for (Schema schema : schemas) {
-            JsonObjectBuilder s = Json.createObjectBuilder();
-            s.add("name", schema.getName());
-            builder.add(s.build());
+            JSONObject s = new JSONObject();
+            s.put("name", schema.getName());
+            array.put(s);
         }
 
-        return builder.build();
+        return array;
     }
 
-    private JsonArray getCubes(JsonArray from) throws OlapException {
+    private JSONArray getCubes(JSONArray from) throws OlapException, JSONException {
         List<Cube> cubes = this.catalog.getSchemas().get(from.getString(0)).getCubes();
-        JsonArrayBuilder builder = Json.createArrayBuilder();
+        JSONArray array = new JSONArray();
 
         for (Cube cube : cubes) {
-            JsonObjectBuilder s = Json.createObjectBuilder();
-            s.add("id", cube.getName());
-            s.add("caption", cube.getCaption());
-            builder.add(s.build());
+            JSONObject s = new JSONObject();
+            s.put("id", cube.getName());
+            s.put("caption", cube.getCaption());
+            array.put(s);
         }
 
-        return builder.build();
+        return array;
     }
 
-    private JsonArray getDimensions(JsonArray from) throws OlapException {
+    private JSONArray getDimensions(JSONArray from) throws OlapException, JSONException {
         List<Dimension> dimensions = this.catalog.getSchemas().get(from.getString(0)).getCubes().get(from.getString(1)).getDimensions();
-        JsonArrayBuilder builder = Json.createArrayBuilder();
+        JSONArray array = new JSONArray();
 
         for (Dimension dimension : dimensions) {
-            JsonObjectBuilder s = Json.createObjectBuilder();
-            s.add("id", dimension.getUniqueName());
-            s.add("caption", dimension.getCaption());
-            s.add("type", dimension.getDimensionType().toString());
-            builder.add(s.build());
+            JSONObject s = new JSONObject();
+            s.put("id", dimension.getUniqueName());
+            s.put("caption", dimension.getCaption());
+            s.put("type", dimension.getDimensionType().toString());
+            array.put(s);
         }
 
-        return builder.build();
+        return array;
     }
 
-    private JsonArray getMeasures(JsonArray from) throws OlapException {
+    private JSONArray getMeasures(JSONArray from) throws OlapException, JSONException {
         List<Measure> measures = this.catalog.getSchemas().get(from.getString(0)).getCubes().get(from.getString(1)).getMeasures();
-        JsonArrayBuilder builder = Json.createArrayBuilder();
+        JSONArray array = new JSONArray();
 
         for (Measure measure : measures) {
-            JsonObjectBuilder s = Json.createObjectBuilder();
-            s.add("id", measure.getName());
-            s.add("caption", measure.getCaption());
-            s.add("aggregator", measure.getAggregator().toString());
-            builder.add(s.build());
+            JSONObject s = new JSONObject();
+            s.put("id", measure.getName());
+            s.put("caption", measure.getCaption());
+            s.put("aggregator", measure.getAggregator().toString());
+            array.put(s);
         }
 
-        return builder.build();
+        return array;
     }
 
-    private JsonArray getHierarchies(JsonArray from) throws OlapException {
+    private JSONArray getHierarchies(JSONArray from) throws OlapException, JSONException {
         List<Hierarchy> hierarchies = this.catalog.getSchemas().get(from.getString(0)).getCubes().get(from.getString(1)).getDimensions()
                                                   .get(from.getString(2)).getHierarchies();
-        JsonArrayBuilder builder = Json.createArrayBuilder();
+        JSONArray array = new JSONArray();
 
         for (Hierarchy hierarchy : hierarchies) {
-            JsonObjectBuilder s = Json.createObjectBuilder();
-            s.add("id", hierarchy.getName());
-            s.add("caption", hierarchy.getCaption());
-            builder.add(s.build());
+            JSONObject s = new JSONObject();
+            s.put("id", hierarchy.getName());
+            s.put("caption", hierarchy.getCaption());
+            array.put(s);
         }
 
-        return builder.build();
+        return array;
     }
 
-    private JsonArray getLevels(JsonArray from) throws OlapException {
+    private JSONArray getLevels(JSONArray from) throws OlapException, JSONException {
         List<Level> levels = this.catalog.getSchemas().get(from.getString(0)).getCubes().get(from.getString(1)).getDimensions()
                                          .get(from.getString(2)).getHierarchies().get(from.getString(3)).getLevels();
-        JsonArrayBuilder builder = Json.createArrayBuilder();
+        JSONArray array = new JSONArray();
 
         for (Level level : levels) {
-            JsonObjectBuilder s = Json.createObjectBuilder();
-            s.add("id", level.getName());
-            s.add("caption", level.getCaption());
-            builder.add(s.build());
+            JSONObject s = new JSONObject();
+            s.put("id", level.getName());
+            s.put("caption", level.getCaption());
+            array.put(s);
         }
 
-        return builder.build();
+        return array;
     }
 
-    private JsonArray getMembers(JsonArray from) throws OlapException {
+    private JSONArray getMembers(JSONArray from) throws OlapException, JSONException {
         List<Member> members = this.catalog.getSchemas().get(from.getString(0)).getCubes().get(from.getString(1)).getDimensions()
                                            .get(from.getString(2)).getHierarchies().get(from.getString(3)).getLevels()
                                            .get(from.getString(4)).getMembers();
-        JsonArrayBuilder builder = Json.createArrayBuilder();
+        JSONArray array = new JSONArray();
 
         for (Member member : members) {
-            JsonObjectBuilder s = Json.createObjectBuilder();
-            s.add("id", member.getUniqueName());
-            s.add("caption", member.getCaption());
-            builder.add(s.build());
+            JSONObject s = new JSONObject();
+            s.put("id", member.getUniqueName());
+            s.put("caption", member.getCaption());
+            array.put(s);
         }
 
-        return builder.build();
+        return array;
     }
 
-    private JsonArray getProperties(JsonArray from) throws OlapException {
+    private JSONArray getProperties(JSONArray from) throws OlapException, JSONException {
         List<Property> properties = this.catalog.getSchemas().get(from.getString(0)).getCubes().get(from.getString(1)).getDimensions()
                                                 .get(from.getString(2)).getHierarchies().get(from.getString(3)).getLevels()
                                                 .get(from.getString(4)).getProperties();
-        JsonArrayBuilder builder = Json.createArrayBuilder();
+        JSONArray array = new JSONArray();
 
         for (Property property : properties) {
-            JsonObjectBuilder s = Json.createObjectBuilder();
-            s.add("id", property.getUniqueName());
-            s.add("caption", property.getCaption());
-            builder.add(s.build());
+            JSONObject s = new JSONObject();
+            s.put("id", property.getUniqueName());
+            s.put("caption", property.getCaption());
+            array.put(s);
         }
 
-        return builder.build();
+        return array;
     }
 }

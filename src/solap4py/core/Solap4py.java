@@ -4,20 +4,15 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringReader;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Properties;
 
-import javax.json.Json;
-import javax.json.JsonArray;
-import javax.json.JsonException;
-import javax.json.JsonObject;
-import javax.json.JsonValue;
-
-import org.json.simple.JSONObject;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.olap4j.Axis;
 import org.olap4j.CellSet;
 import org.olap4j.OlapConnection;
@@ -34,6 +29,12 @@ import org.olap4j.metadata.Schema;
 import org.olap4j.query.Query;
 import org.olap4j.query.QueryDimension;
 import org.olap4j.query.Selection;
+//import javax.json.Json;
+//import javax.json.JsonArray;
+//import javax.json.JsonException;
+//import javax.json.JsonObject;
+//import javax.json.JsonValue;
+
 
 public class Solap4py {
 
@@ -58,7 +59,13 @@ public class Solap4py {
 
     public String select(String input) {
         String result = null;
-        JsonObject inputJson = Json.createReader(new StringReader(input)).readObject();
+        JSONObject inputJson = null;
+	try {
+	    inputJson = new JSONObject(input);
+	} catch (JSONException e) {
+	    // TODO Auto-generated catch block
+	    e.printStackTrace();
+	}
 
         Schema schema = null;
         Cube cubeObject = null;
@@ -68,21 +75,21 @@ public class Solap4py {
         try {
             try {
                 // If not, result stays "null"
-                if (inputJson.containsKey("schema")) {
+                if (inputJson.has("schema")) {
                     // If not, result stays "null"
-                    if (inputJson.containsKey("cube")) {
+                    if (inputJson.has("cube")) {
                         schema = this.catalog.getSchemas().get(inputJson.getString("schema"));
-                        JsonObject cubeJson = inputJson.getJsonObject("cube");
-                        JsonArray measuresJson;
-                        if (cubeJson.containsKey("name") && schema.getCubes().get(cubeJson.getString("name")) != null) {
+                        JSONObject cubeJson =  inputJson.getJSONObject("cube");
+                        JSONArray measuresJson;
+                        if (cubeJson.has("name") && schema.getCubes().get(cubeJson.getString("name")) != null) {
                             // Get the Cube object (Olap4J) associated with this
                             // name
                             cubeObject = schema.getCubes().get(cubeJson.getString("name"));
                             // Initialize the query to be executed
                             myQuery = new Query("Select Query", cubeObject);
 
-                            if (cubeJson.containsKey("measures")) {
-                                measuresJson = cubeJson.getJsonArray("measures");
+                            if (cubeJson.has("measures")) {
+                                measuresJson = cubeJson.getJSONArray("measures");
                                 // Measures from array
                                 QueryDimension measuresDim = myQuery.getDimension("Measures");
                                 // Put the "Measures" dimension on columns of
@@ -91,11 +98,12 @@ public class Solap4py {
 
                                 // Add each measures on columns
                                 System.out.println(myQuery.getSelect().toString());
-                                for (JsonValue measureJson : measuresJson) {
-                                    System.out.println(cubeObject.lookupMember(IdentifierNode.ofNames("Measures", measureJson.toString())
+                                for (int i = 0; i < measuresJson.length(); i++) {
+                                    String measure = measuresJson.get(i).toString();
+                                    System.out.println(cubeObject.lookupMember(IdentifierNode.ofNames("Measures", measure)
                                                                                              .getSegmentList()));
                                     myQuery.getDimension("Measures")
-                                           .include(cubeObject.lookupMember(IdentifierNode.ofNames("Measures", measureJson.toString())
+                                           .include(cubeObject.lookupMember(IdentifierNode.ofNames("Measures", measure)
                                                                                           .getSegmentList()));
                                     System.out.println("passed");
                                 }
@@ -104,9 +112,9 @@ public class Solap4py {
                             }
 
                             // TODO by Pierre.
-                            if (cubeJson.containsKey("dimension")) {
+                            if (cubeJson.has("dimension")) {
                                 // Not implemented
-                                selectDimension(cubeJson.getJsonObject("dimension"), cubeObject, myQuery);
+                                selectDimension(cubeJson.getJSONObject("dimension"), cubeObject, myQuery);
                             } else {
                                 // All the dimensions are aggregated
                             }
@@ -130,7 +138,7 @@ public class Solap4py {
         return result;
     }
 
-    private void selectDimension(JsonObject dimension, Cube cubeObject, Query myQuery) throws Solap4pyException {
+    private void selectDimension(JSONObject dimension, Cube cubeObject, Query myQuery) throws Solap4pyException {
         String dimensionName;
         try {
             dimensionName = dimension.getString("name");
@@ -140,11 +148,11 @@ public class Solap4py {
             boolean range;
             try {
                 range = dimension.getBoolean("range");
-            } catch (JsonException e) {
+            } catch (JSONException e) {
                 range = false;
             }
 
-            JsonArray ids;
+            JSONArray ids;
             try {
                 String hierarchyName;
                 NamedList<Hierarchy> allHierarchies = dimObject.getDimension().getHierarchies();
@@ -162,12 +170,12 @@ public class Solap4py {
                     }
                 }
 
-                ids = dimension.getJsonArray("id");
-                if (range && ids.size() != 2)
+                ids = dimension.getJSONArray("id");
+                if (range && ids.length() != 2)
                     throw new Solap4pyException(ErrorType.DIMENSION_ID_COUNT, "there should be 2 ID because of range = true");
-                else if (range && ids.size() == 2) {
+                else if (range && ids.length() == 2) {
                     // TODO todo
-                } else if (!range && ids.isEmpty()) {
+                } else if (!range && ids.length() == 0) {
                     try {
                         if (dimensionName.equals(hierarchyName)) {
                             myQuery.getDimension(dimensionName).include(cubeObject.lookupMember(IdentifierNode.ofNames(dimensionName)
@@ -182,16 +190,18 @@ public class Solap4py {
                     }
                 } else {
                     // Add each id on rows
-                    for (JsonValue idJson : ids) {
+                    for (int i = 0; i < ids.length(); i++) {
+                	String idJson = ids.get(i).toString();
                         try {
                             if (dimensionName.equals(hierarchyName)) {
+                        	
                                 myQuery.getDimension(dimensionName)
-                                       .include(cubeObject.lookupMember(IdentifierNode.ofNames(dimensionName, idJson.toString())
+                                       .include(cubeObject.lookupMember(IdentifierNode.ofNames(dimensionName, idJson)
                                                                                       .getSegmentList()));
                             } else {
                                 myQuery.getDimension(dimensionName)
                                        .include(cubeObject.lookupMember(IdentifierNode.ofNames(dimensionName, hierarchyName,
-                                                                                               idJson.toString()).getSegmentList()));
+                                                                                               idJson).getSegmentList()));
                             }
                         }
                         catch (Exception err) {
@@ -199,19 +209,19 @@ public class Solap4py {
                         }
                     }
                 }
-            } catch (JsonException e) {
+            } catch (JSONException e) {
 
             }
 
-        } catch (JsonException e) {
+        } catch (JSONException e) {
             throw new Solap4pyException(ErrorType.BAD_REQUEST, "name of dimension cannot be found");
         }
 
-        JsonObject subDimension;
+        JSONObject subDimension;
         try {
-            subDimension = dimension.getJsonObject("dimension");
+            subDimension = dimension.getJSONObject("dimension");
             selectDimension(subDimension, cubeObject, myQuery);
-        } catch (JsonException e) {
+        } catch (JSONException e) {
 
         }
 
@@ -222,9 +232,10 @@ public class Solap4py {
 	 * @param myQuery query to be executed
 	 * @return normalized JsonObject
 	 * @throws OlapException  If something goes sour, an OlapException will be thrown to the caller. It could be caused by many things, like a stale connection. Look at the root cause for more details.
+	 * @throws JSONException 
 	 */
 	@SuppressWarnings("unchecked")
-	private JsonObject executeSelect(Query myQuery) throws OlapException {
+	private JSONObject executeSelect(Query myQuery) throws OlapException, JSONException {
 		
 		PreparedOlapStatement statement = olapConnection.prepareOlapStatement(myQuery.getSelect().toString());
 		CellSet resultCellSet = statement.executeQuery();
@@ -246,7 +257,6 @@ public class Solap4py {
 			if (!(currentMember.getUniqueName().equals(members[i]))) {
 			    dimensions[i + 1] = new JSONObject();
 			    members[i] = currentMember.getUniqueName();
-			    dimensions[i].put(currentMember.getUniqueName(), dimensions[i + 1]);
 			}
 		    }
 		    for (Position axis_1 : resultCellSet.getAxes().get(Axis.COLUMNS.axisOrdinal()).getPositions()) {
@@ -260,14 +270,13 @@ public class Solap4py {
 
 		result.put("error", "OK");
 		result.put("data", dimensions[0]);
-		System.out.println(result.toJSONString());
 
-		return Json.createObjectBuilder().build();
+		return result;
 	}
 
     public String getMetadata(String param) throws Exception {
 
-        JsonObject query = (Json.createReader(new StringReader(param))).readObject();
+        JSONObject query = new JSONObject(param);
         Metadata m = new Metadata(this.olapConnection);
 
         return (m.query(query)).toString();
