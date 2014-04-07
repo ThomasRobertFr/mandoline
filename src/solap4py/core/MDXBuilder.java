@@ -151,23 +151,9 @@ public class MDXBuilder {
 
     public static void main(String[] args) throws SQLException, ClassNotFoundException, JSONException, Solap4pyException {
         // try{
-        String s = "{" 
-                + "onColumns:" 
-                + "[" 
-                + "\"[Measures].[Goods Quantity]\","
-                + "\"[Measures].[Max Quantity]\"" 
-                + "]," 
-                + " onRows:" 
-                + "{"
-                + "\"[Time]\":{\"members\":[\"[2000]\"],\"range\":false} " 
-                + "}," 
-                + " where:" 
-                + "{"
-                + "\"[Zone.Name]\":{\"members\":[\"[France]\"],\"range\":false} " 
-                + "}," 
-                + "from:"
-                + "\"[Traffic]\""
-                + "}";
+        String s = "{" + "onColumns:" + "[" + "\"[Measures].[Goods Quantity]\"," + "\"[Measures].[Max Quantity]\"" + "]," + " onRows:"
+                   + "{" + "\"[Time]\":{\"members\":[\"[2000]\"],\"range\":false} " + "}," + " where:" + "{"
+                   + "\"[Zone.Name]\":{\"members\":[\"[France]\"],\"range\":false} " + "}," + "from:" + "\"[Traffic]\"" + "}";
         JSONObject inputTest2 = new JSONObject(s);
         System.out.println(inputTest2.toString());
 
@@ -193,28 +179,28 @@ public class MDXBuilder {
             String dbport = prop.getProperty("dbport");
 
             Class.forName("org.olap4j.driver.xmla.XmlaOlap4jDriver");
-            Connection connection = DriverManager.getConnection("jdbc:xmla:Server=http://"+dbuser+":"+dbpasswd+"@"+dbhost+":"+dbport+"/geomondrian/xmla");
+            Connection connection = DriverManager.getConnection("jdbc:xmla:Server=http://" + dbuser + ":" + dbpasswd + "@" + dbhost + ":"
+                                                                + dbport + "/geomondrian/xmla");
             OlapConnection olapConnection = connection.unwrap(OlapConnection.class);
 
             // test initSelectNode
             SelectNode selectNodeTest = initSelectNode(olapConnection, inputTest2);
-            
+
             // test setColumns
             JSONArray onColumnsTest = inputTest2.getJSONArray("onColumns");
             setColumns(olapConnection, onColumnsTest, selectNodeTest);
-            
+
             // test setRows
             JSONObject onRowsTest = inputTest2.getJSONObject("onRows");
             setRows(olapConnection, onRowsTest, selectNodeTest);
-            
-            
-         // test setWhere
+
+            // test setWhere
             JSONObject whereTest = inputTest2.getJSONObject("where");
             setWhere(olapConnection, whereTest, selectNodeTest);
             System.out.println(selectNodeTest.toString());
-            
-            //test createSelectNode
-            
+
+            // test createSelectNode
+
             SelectNode selectNodeTest2 = createSelectNode(olapConnection, inputTest2);
             System.out.println(selectNodeTest2.toString());
 
@@ -230,11 +216,8 @@ public class MDXBuilder {
             }
         }
 
-        
-        
-        
         // test createSelectNode
-        
+
         /*
          * } catch(JSONException e){
          * 
