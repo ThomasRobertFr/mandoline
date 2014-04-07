@@ -16,7 +16,6 @@ import org.olap4j.Axis;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.JSONString;
 import org.olap4j.OlapConnection;
 import org.olap4j.mdx.AxisNode;
 import org.olap4j.mdx.CallNode;
@@ -109,10 +108,10 @@ public class MDXBuilder {
         ParseTreeNode previous = null;
         ParseTreeNode current = null;
 
-        Iterator<String> it = objectJSON.keys();
+        Iterator<?> it = objectJSON.keys();
         try {
             while (it.hasNext()) {
-                String key = it.next();
+                String key = it.next().toString();
                 JSONObject hierarchyJSON = objectJSON.getJSONObject(key);
                 if ((boolean) hierarchyJSON.get("range")) {
                     JSONArray members = hierarchyJSON.getJSONArray("members");

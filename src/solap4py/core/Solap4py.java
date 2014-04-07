@@ -138,7 +138,7 @@ public class Solap4py {
         } catch (OlapException oe) {
             throw new Solap4pyException(ErrorType.SERVER_ERROR, oe.getMessage());
         }
-        
+
         return result;
     }
 
