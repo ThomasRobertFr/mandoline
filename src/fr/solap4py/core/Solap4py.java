@@ -1,4 +1,4 @@
-package solap4py.core;
+package fr.solap4py.core;
 
 import java.io.File;
 import java.io.FileInputStream;

@@ -1,4 +1,4 @@
-package solap4py.core;
+package fr.solap4py.core;
 
 import py4j.GatewayServer;
 

@@ -9,7 +9,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Test;
 
-import solap4py.core.Solap4py;
+import fr.solap4py.core.Solap4py;
 
 public class TestSolap4py {
     @Test
