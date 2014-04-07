@@ -83,7 +83,7 @@ public class Solap4py {
                     }
                 }
             } catch (JSONException je) {
-                throw new Solap4pyException(ErrorType.BAD_REQUEST, je.getMessage());
+                throw new Solap4pyException(ErrorType.BAD_REQUEST, je);
             }
         } catch (Solap4pyException se) {
             try {
@@ -136,7 +136,7 @@ public class Solap4py {
             // TODO CellSet -> [createJSONResponse] -> JSONObject
             // result = ....createJSONResponse(cellSet);
         } catch (OlapException oe) {
-            throw new Solap4pyException(ErrorType.SERVER_ERROR, oe.getMessage());
+            throw new Solap4pyException(ErrorType.SERVER_ERROR, oe);
         }
 
         return result;
@@ -209,11 +209,11 @@ public class Solap4py {
                     }
                 }
             } catch (OlapException olapEx) {
-                throw new Solap4pyException(ErrorType.SERVER_ERROR, olapEx.getMessage());
+                throw new Solap4pyException(ErrorType.SERVER_ERROR, olapEx);
             } catch (SQLException sqlEx) {
-                throw new Solap4pyException(ErrorType.SERVER_ERROR, sqlEx.getMessage());
+                throw new Solap4pyException(ErrorType.SERVER_ERROR, sqlEx);
             } catch (Exception ex) {
-                throw new Solap4pyException(ErrorType.SERVER_ERROR, ex.getMessage());
+                throw new Solap4pyException(ErrorType.SERVER_ERROR, ex);
             }
         } catch (Solap4pyException err) {
             try {
@@ -275,7 +275,7 @@ public class Solap4py {
                                                                                                               .getSegmentList()));
                         }
                     } catch (OlapException e) {
-                        throw new Solap4pyException(ErrorType.SERVER_ERROR, e.getMessage());
+                        throw new Solap4pyException(ErrorType.SERVER_ERROR, e);
                     }
                 } else {
                     // Add each id on rows
@@ -294,7 +294,7 @@ public class Solap4py {
                                                                                                                   .getSegmentList()));
                             }
                         } catch (Exception err) {
-                            throw new Solap4pyException(ErrorType.SERVER_ERROR, err.getMessage());
+                            throw new Solap4pyException(ErrorType.SERVER_ERROR, err);
                         }
                     }
                 }

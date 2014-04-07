@@ -24,15 +24,15 @@ public class Solap4pyException extends Exception {
 
     }
 
+    public Solap4pyException(ErrorType type, Exception exception) {
+        this(type, exception.getMessage());
+    }
+
     public JSONObject getJSON() throws JSONException {
         JSONObject objectJson = new JSONObject();
         objectJson.put("error", type.toString());
         objectJson.put("data", description);
         return objectJson;
-    }
-
-    public static void controle() throws Solap4pyException {
-        throw new Solap4pyException(ErrorType.BAD_REQUEST, "Solap4pyException description");
     }
 
 }
