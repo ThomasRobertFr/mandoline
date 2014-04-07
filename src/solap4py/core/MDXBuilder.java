@@ -27,7 +27,13 @@ import org.olap4j.mdx.parser.MdxParser;
 import org.olap4j.mdx.parser.MdxParserFactory;
 
 public class MDXBuilder {
-
+/**
+ * 
+ * @param olapConnection Connection to the OLAP database.
+ * @param json JSONObject containing the request from which we want to create the selectNode. 
+ * @return The selectNode created from the request contained in the parameter json.
+ * @throws Solap4pyException Exception that is thrown if the request in objectJSON is bad.
+ */
     static SelectNode createSelectNode(OlapConnection olapConnection, JSONObject json) throws Solap4pyException {
 
         SelectNode selectNodeRequest = initSelectNode(olapConnection, json);
@@ -49,17 +55,35 @@ public class MDXBuilder {
         return selectNodeRequest;
 
     }
-
+/**
+ * 
+ * @param olapConnection Connection to the OLAP database.
+ * @param whereJSON JSONObject containing either data from the key "where".
+ * @param selectNodeRequest selectNode on which the Axis FILTER is being set.
+ * @throws Solap4pyException Exception that is thrown if the request in objectJSON is bad.
+ */
     private static void setWhere(OlapConnection olapConnection, JSONObject whereJSON, SelectNode selectNodeRequest)
                                                                                                                    throws Solap4pyException {
         setRowsOrWhere(olapConnection, whereJSON, selectNodeRequest, false);
     }
+/**
+ * 
+ * @param olapConnection Connection to the OLAP database.
+ * @param rowsJSON JSONObject containing either data from the key "onRows".
+ * @param selectNodeRequest selectNode on which the Axis ROWS is being set.
+ * @throws Solap4pyException Exception that is thrown if the request in objectJSON is bad.
+ */
+    private static void setRows(OlapConnection olapConnection, JSONObject rowsJSON, SelectNode selectNodeRequest) throws Solap4pyException {
 
-    private static void setRows(OlapConnection olapConnection, JSONObject whereJSON, SelectNode selectNodeRequest) throws Solap4pyException {
-
-        setRowsOrWhere(olapConnection, whereJSON, selectNodeRequest, true);
+        setRowsOrWhere(olapConnection, rowsJSON, selectNodeRequest, true);
     }
-
+/**
+ * 
+ * @param olapConnection Connection to the OLAP database.
+ * @param json JSONObject containing the request from which we want to create the selectNode.
+ * @return The selectNode initialize with its Cube and COLUMNS empty.
+ * @throws Solap4pyException Exception that is thrown if the request in objectJSON is bad.
+ */
     private static SelectNode initSelectNode(OlapConnection olapConnection, JSONObject json) throws Solap4pyException {
         MdxParserFactory pFactory = olapConnection.getParserFactory();
         MdxParser parser = pFactory.createMdxParser(olapConnection);
@@ -68,29 +92,39 @@ public class MDXBuilder {
         SelectNode sn = parser.parseSelect("SELECT {} on COLUMNS FROM " + cubeName);
         return sn;
     }
-
+/**
+ * 
+ * @param json JSONObject containing the request from which we want to create the selectNode.
+ * @return The cube's name.
+ * @throws Solap4pyException Exception that is thrown if the request in objectJSON is bad.
+ */
     private static String getJSONCubeName(JSONObject json) throws Solap4pyException {
         // TODO Auto-generated method stub
         String cubeJSON;
         try {
             cubeJSON = json.getString("from");
         } catch (JSONException e) {
-            System.err.println(e.getMessage());
-            throw new Solap4pyException(ErrorType.BAD_REQUEST, "From unreachable.");
+             throw new Solap4pyException(ErrorType.BAD_REQUEST, "From unreachable.");
 
         }
 
         return cubeJSON.toString();
     }
-
-    private static void setColumns(OlapConnection olapConnection, JSONArray jsonArayColumns, SelectNode selectNode)
+/**
+ * 
+ * @param olapConnection Connection to the OLAP database.
+ * @param jsonArrayColumns JSONOArray containing data from the key "onColumns".
+ * @param selectNode selectNode on which the Axis COLUMNS is being set according to the parameter jsonArrayColumns.
+ * @throws Solap4pyException Exception that is thrown if the request in objectJSON is bad.
+ */
+    private static void setColumns(OlapConnection olapConnection, JSONArray jsonArrayColumns, SelectNode selectNode)
                                                                                                                    throws Solap4pyException {
         List<ParseTreeNode> nodes = new ArrayList<ParseTreeNode>();
 
-        for (int i = 0; i < jsonArayColumns.length(); i++) {
+        for (int i = 0; i < jsonArrayColumns.length(); i++) {
 
             try {
-                nodes.add(IdentifierNode.parseIdentifier(jsonArayColumns.getString(i)));
+                nodes.add(IdentifierNode.parseIdentifier(jsonArrayColumns.getString(i)));
             } catch (JSONException e) {
                 throw new Solap4pyException(ErrorType.BAD_REQUEST, e.getMessage());
             }
@@ -101,7 +135,15 @@ public class MDXBuilder {
         selectNode.getAxisList().get(Axis.COLUMNS.axisOrdinal()).setExpression(callNodeColumns);
 
     }
-
+    
+    /**
+     * 
+     * @param olapConnection Connection to the OLAP database
+     * @param objectJSON data containing either data from the key "onRows" or "where"
+     * @param selectNode the selectNode on which the Axis FILTER or ROWS will be set according to the data in objectJSON.
+     * @param onRows boolean that specifies whether the Axis ROWS or FILTER is being set in the function.
+     * @throws Solap4pyException Exception that is thrown if the request in objectJSON is bad.
+     */
     private static void setRowsOrWhere(OlapConnection olapConnection, JSONObject objectJSON, SelectNode selectNode, boolean onRows)
                                                                                                                                    throws Solap4pyException {
 
