@@ -2,6 +2,7 @@ package solap4py.core;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
@@ -26,7 +27,10 @@ import org.olap4j.mdx.Syntax;
 import org.olap4j.mdx.parser.MdxParser;
 import org.olap4j.mdx.parser.MdxParserFactory;
 
-public class MDXBuilder {
+final class MDXBuilder {
+    MDXBuilder() {
+    }
+
     /**
      * 
      * @param olapConnection
@@ -48,7 +52,7 @@ public class MDXBuilder {
             JSONObject onRowsJSON = json.getJSONObject("onRows");
             JSONObject whereJSON = json.getJSONObject("where");
 
-            setColumns(olapConnection, onColumnsJSON, selectNodeRequest);
+            setColumns(onColumnsJSON, selectNodeRequest);
             setRows(olapConnection, onRowsJSON, selectNodeRequest);
             setWhere(olapConnection, whereJSON, selectNodeRequest);
 
@@ -74,7 +78,7 @@ public class MDXBuilder {
      */
     private static void setWhere(OlapConnection olapConnection, JSONObject whereJSON, SelectNode selectNodeRequest)
                                                                                                                    throws Solap4pyException {
-        setRowsOrWhere(olapConnection, whereJSON, selectNodeRequest, false);
+        setRowsOrWhere(whereJSON, selectNodeRequest, false);
     }
 
     /**
@@ -90,7 +94,7 @@ public class MDXBuilder {
      */
     private static void setRows(OlapConnection olapConnection, JSONObject rowsJSON, SelectNode selectNodeRequest) throws Solap4pyException {
 
-        setRowsOrWhere(olapConnection, rowsJSON, selectNodeRequest, true);
+        setRowsOrWhere(rowsJSON, selectNodeRequest, true);
     }
 
     /**
@@ -109,8 +113,7 @@ public class MDXBuilder {
         MdxParser parser = pFactory.createMdxParser(olapConnection);
 
         String cubeName = getJSONCubeName(json);
-        SelectNode sn = parser.parseSelect("SELECT {} on COLUMNS FROM " + cubeName);
-        return sn;
+        return parser.parseSelect("SELECT {} on COLUMNS FROM " + cubeName);
     }
 
     /**
@@ -131,7 +134,7 @@ public class MDXBuilder {
             throw new Solap4pyException(ErrorType.BAD_REQUEST, e);
         }
 
-        return cubeJSON.toString();
+        return cubeJSON;
     }
 
     /**
@@ -146,8 +149,7 @@ public class MDXBuilder {
      * @throws Solap4pyException
      *             Exception that is thrown if the request in objectJSON is bad.
      */
-    private static void setColumns(OlapConnection olapConnection, JSONArray jsonArrayColumns, SelectNode selectNode)
-                                                                                                                    throws Solap4pyException {
+    private static void setColumns(JSONArray jsonArrayColumns, SelectNode selectNode) throws Solap4pyException {
         List<ParseTreeNode> nodes = new ArrayList<ParseTreeNode>();
 
         for (int i = 0; i < jsonArrayColumns.length(); i++) {
@@ -180,8 +182,7 @@ public class MDXBuilder {
      * @throws Solap4pyException
      *             Exception that is thrown if the request in objectJSON is bad.
      */
-    private static void setRowsOrWhere(OlapConnection olapConnection, JSONObject objectJSON, SelectNode selectNode, boolean onRows)
-                                                                                                                                   throws Solap4pyException {
+    private static void setRowsOrWhere(JSONObject objectJSON, SelectNode selectNode, boolean onRows) throws Solap4pyException {
 
         ParseTreeNode previous = null;
         ParseTreeNode current = null;
@@ -226,8 +227,7 @@ public class MDXBuilder {
 
     }
 
-    public static void main(String[] args) throws SQLException, ClassNotFoundException, JSONException, Solap4pyException {
-        // try{
+    public static void main(String[] args) throws JSONException, IOException, ClassNotFoundException, SQLException, Solap4pyException {
         String s = "{" + "onColumns:" + "[" + "\"[Measures].[Goods Quantity]\"," + "\"[Measures].[Max Quantity]\"" + "]," + " onRows:"
                    + "{" + "\"[Time]\":{\"members\":[\"[2000]\"],\"range\":false} " + "}," + " where:" + "{"
                    + "\"[Zone.Name]\":{\"members\":[\"[France]\"],\"range\":false} " + "}," + "from:" + "\"[Traffic]\"" + "}";
@@ -238,68 +238,51 @@ public class MDXBuilder {
         Properties prop = new Properties();
         InputStream input = null;
 
-        try {
-            File f1 = new File("config.properties");
-            if (f1.exists() && !f1.isDirectory()) {
-                input = new FileInputStream(f1);
-            } else {
-                input = new FileInputStream("config.dist");
-            }
-
-            // load a properties file
-            prop.load(input);
-
-            // get the property value
-            String dbhost = prop.getProperty("dbhost");
-            String dbuser = prop.getProperty("dbuser");
-            String dbpasswd = prop.getProperty("dbpasswd");
-            String dbport = prop.getProperty("dbport");
-
-            Class.forName("org.olap4j.driver.xmla.XmlaOlap4jDriver");
-            Connection connection = DriverManager.getConnection("jdbc:xmla:Server=http://" + dbuser + ":" + dbpasswd + "@" + dbhost + ":"
-                                                                + dbport + "/geomondrian/xmla");
-            OlapConnection olapConnection = connection.unwrap(OlapConnection.class);
-
-            // test initSelectNode
-            SelectNode selectNodeTest = initSelectNode(olapConnection, inputTest2);
-
-            // test setColumns
-            JSONArray onColumnsTest = inputTest2.getJSONArray("onColumns");
-            setColumns(olapConnection, onColumnsTest, selectNodeTest);
-
-            // test setRows
-            JSONObject onRowsTest = inputTest2.getJSONObject("onRows");
-            setRows(olapConnection, onRowsTest, selectNodeTest);
-
-            // test setWhere
-            JSONObject whereTest = inputTest2.getJSONObject("where");
-            setWhere(olapConnection, whereTest, selectNodeTest);
-            System.out.println(selectNodeTest.toString());
-
-            // test createSelectNode
-
-            SelectNode selectNodeTest2 = createSelectNode(olapConnection, inputTest2);
-            System.out.println(selectNodeTest2.toString());
-
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        } finally {
-            if (input != null) {
-                try {
-                    input.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
+        File f1 = new File("config.properties");
+        if (f1.exists() && !f1.isDirectory()) {
+            input = new FileInputStream(f1);
+        } else {
+            input = new FileInputStream("config.dist");
         }
+
+        // load a properties file
+        prop.load(input);
+
+        // get the property value
+        String dbhost = prop.getProperty("dbhost");
+        String dbuser = prop.getProperty("dbuser");
+        String dbpasswd = prop.getProperty("dbpasswd");
+        String dbport = prop.getProperty("dbport");
+
+        Class.forName("org.olap4j.driver.xmla.XmlaOlap4jDriver");
+        Connection connection = DriverManager.getConnection("jdbc:xmla:Server=http://" + dbuser + ":" + dbpasswd + "@" + dbhost + ":"
+                                                            + dbport + "/geomondrian/xmla");
+        OlapConnection olapConnection = connection.unwrap(OlapConnection.class);
+
+        // test initSelectNode
+        SelectNode selectNodeTest = initSelectNode(olapConnection, inputTest2);
+
+        // test setColumns
+        JSONArray onColumnsTest = inputTest2.getJSONArray("onColumns");
+        setColumns(onColumnsTest, selectNodeTest);
+
+        // test setRows
+        JSONObject onRowsTest = inputTest2.getJSONObject("onRows");
+        setRows(olapConnection, onRowsTest, selectNodeTest);
+
+        // test setWhere
+        JSONObject whereTest = inputTest2.getJSONObject("where");
+        setWhere(olapConnection, whereTest, selectNodeTest);
+        System.out.println(selectNodeTest.toString());
 
         // test createSelectNode
 
-        /*
-         * } catch(JSONException e){
-         * 
-         * System.err.println(e.getMessage()); }
-         */
+        SelectNode selectNodeTest2 = createSelectNode(olapConnection, inputTest2);
+        System.out.println(selectNodeTest2.toString());
+
+        olapConnection.close();
+        connection.close();
+        input.close();
 
     }
 

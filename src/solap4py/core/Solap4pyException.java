@@ -14,13 +14,13 @@ enum ErrorType {
 @SuppressWarnings("serial")
 public class Solap4pyException extends Exception {
 
-    private String description;
-    private ErrorType type;
+    private final String DESCRIPTION;
+    private final ErrorType TYPE;
 
     public Solap4pyException(ErrorType type, String description) {
         super(description);
-        this.type = type;
-        this.description = description == null ? new String("null") : description;
+        this.TYPE = type;
+        this.DESCRIPTION = description == null ? "null" : description;
 
     }
 
@@ -30,8 +30,8 @@ public class Solap4pyException extends Exception {
 
     public JSONObject getJSON() throws JSONException {
         JSONObject objectJson = new JSONObject();
-        objectJson.put("error", type.toString());
-        objectJson.put("data", description);
+        objectJson.put("error", TYPE.toString());
+        objectJson.put("data", DESCRIPTION);
         return objectJson;
     }
 
