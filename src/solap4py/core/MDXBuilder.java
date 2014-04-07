@@ -45,7 +45,7 @@ public class MDXBuilder {
         } catch (JSONException je) {
             throw new Solap4pyException(ErrorType.BAD_REQUEST, je.getMessage());
         }
-        // solapExeption à catcher dans execute
+        // solapExeption will be caught in the function execute()
 
         return selectNodeRequest;
 
@@ -175,8 +175,6 @@ public class MDXBuilder {
         Properties prop = new Properties();
         InputStream input = null;
 
-        String query = "{ \"from\" : [\"Traffic\", \"Traffic\", \"Zone\", \"Zone.Name\", \"Name1\"], \"get\" : \"property\" }";
-
         try {
             File f1 = new File("config.properties");
             if (f1.exists() && !f1.isDirectory()) {
@@ -214,7 +212,11 @@ public class MDXBuilder {
             JSONObject whereTest = inputTest2.getJSONObject("where");
             setWhere(olapConnection, whereTest, selectNodeTest);
             System.out.println(selectNodeTest.toString());
-
+            
+            //test createSelectNode
+            
+            SelectNode selectNodeTest2 = createSelectNode(olapConnection, inputTest2);
+            System.out.println(selectNodeTest2.toString());
 
         } catch (IOException ex) {
             ex.printStackTrace();
