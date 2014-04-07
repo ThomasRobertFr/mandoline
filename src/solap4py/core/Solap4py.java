@@ -42,7 +42,7 @@ public class Solap4py {
     private OlapConnection olapConnection;
     private Catalog catalog;
 
-    public Solap4py(String host, String port, String user, String passwd) {
+    public Solap4py(String host, String port, String user, String passwd) throws ClassNotFoundException, SQLException {
         try {
             Class.forName("org.olap4j.driver.xmla.XmlaOlap4jDriver");
             Connection connection = DriverManager.getConnection("jdbc:xmla:Server=http://" + user + ":" + passwd + "@" + host + ":" + port

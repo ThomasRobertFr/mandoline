@@ -1,17 +1,19 @@
 package solap4py.core;
 
 import py4j.GatewayServer;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.SQLException;
 import java.util.Properties;
 
 public class Solap4pyEntryPoint {
 
     private Solap4py mySolap4py;
 
-    public Solap4pyEntryPoint(String host, String port, String user, String passwd) {
+    public Solap4pyEntryPoint(String host, String port, String user, String passwd) throws ClassNotFoundException, SQLException {
         mySolap4py = new Solap4py(host, port, user, passwd);
     }
 
@@ -43,7 +45,7 @@ public class Solap4pyEntryPoint {
             GatewayServer gatewayServer = new GatewayServer(new Solap4pyEntryPoint(dbhost, dbport, dbuser, dbpasswd), 25336);
             gatewayServer.start();
 
-        } catch (IOException ex) {
+        } catch (Exception ex) {
             ex.printStackTrace();
         } finally {
             if (input != null) {

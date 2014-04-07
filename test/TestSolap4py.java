@@ -61,7 +61,7 @@ public class TestSolap4py {
             System.out.println(query);
             String res = solap4py.select(query);
             System.out.println(res);
-        } catch (IOException ex) {
+        } catch (Exception ex) {
             ex.printStackTrace();
         } finally {
             if (input != null) {
