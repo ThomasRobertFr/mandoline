@@ -17,9 +17,11 @@ import org.olap4j.Axis;
 import org.olap4j.CellSet;
 import org.olap4j.OlapConnection;
 import org.olap4j.OlapException;
+import org.olap4j.OlapStatement;
 import org.olap4j.Position;
 import org.olap4j.PreparedOlapStatement;
 import org.olap4j.mdx.IdentifierNode;
+import org.olap4j.mdx.SelectNode;
 import org.olap4j.metadata.Catalog;
 import org.olap4j.metadata.Cube;
 import org.olap4j.metadata.Hierarchy;
@@ -57,75 +59,89 @@ public class Solap4py {
 
     /**
      * Process a query in a JSON format
-     * @param query the input query in JSON format
+     * 
+     * @param query
+     *            the input query in JSON format
      * @return the result of the query in JSON format
      */
     public String process(String query) {
         String result;
-        
+
         try {
             try {
                 /* Here, we process the query */
                 JSONObject jsonQuery = new JSONObject(query);
                 String function = jsonQuery.getString("queryType");
-        
+
                 if (function.equals("data")) {
                     result = execute(jsonQuery.getJSONObject("data")).toString();
-                }
-                else {
+                } else {
                     if (query.equals("metadata")) {
                         result = explore(jsonQuery.getJSONArray("metadata")).toString();
-                    }
-                    else {
+                    } else {
                         throw new Solap4pyException(ErrorType.NOT_SUPPORTED, "The query type " + function + " is not currently supported.");
                     }
                 }
-            }
-            catch ( JSONException je ) {
+            } catch (JSONException je) {
                 throw new Solap4pyException(ErrorType.BAD_REQUEST, je.getMessage());
             }
-        } catch ( Solap4pyException se ) {
+        } catch (Solap4pyException se) {
             try {
                 result = se.getJSON().toString();
-            } 
-            /* We have to catch a JSONException if an error occurred while formatting the output JSON */
+            }
+            /*
+             * We have to catch a JSONException if an error occurred while
+             * formatting the output JSON
+             */
             catch (JSONException je) {
                 return "{error: INTERNAL_ERROR, data: An internal error occurred while formatting the output JSON.}";
             }
         }
-        
+
         return result;
     }
-    
+
     /**
      * Execute a query to select metadata.
-     * @param jsonArray a JSON array which indicates which metadata we want to get
+     * 
+     * @param jsonArray
+     *            a JSON array which indicates which metadata we want to get
      * @return the result of the query in JSON format
      * @throws JSONException
      * @throws Solap4pyException
      */
     private JSONObject explore(JSONArray jsonArray) throws JSONException, Solap4pyException {
         JSONObject result = new JSONObject();
-        
+
         return result;
     }
 
     /**
      * Execute a query to select data.
-     * @param jsonObject a JSON text which indicates which data we want to select
+     * 
+     * @param jsonObject
+     *            a JSON text which indicates which data we want to select
      * @return the result of the query in JSON format
      * @throws Solap4pyException
      */
-    private JSONObject execute(JSONObject jsonObject) throws Solap4pyException  {
+    private JSONObject execute(JSONObject jsonObject) throws Solap4pyException {
         JSONObject result = new JSONObject();
 
-        
+        SelectNode sn = MDXBuilder.createSelectNode(olapConnection, jsonObject);
+
+        try {
+            OlapStatement os = olapConnection.createStatement();
+            CellSet cellSet = os.executeOlapQuery(sn);
+
+            // TODO CellSet -> [createJSONResponse] -> JSONObject
+            // result = ....createJSONResponse(cellSet);
+        } catch (OlapException oe) {
+            throw new Solap4pyException(ErrorType.SERVER_ERROR, oe.getMessage());
+        }
         
         return result;
     }
-    
-    
-    
+
     public String select(String input) {
         String result = null;
         JSONObject inputJson = null;
