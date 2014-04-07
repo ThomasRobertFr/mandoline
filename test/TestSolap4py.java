@@ -35,29 +35,28 @@ public class TestSolap4py {
             String dbport = prop.getProperty("dbport");
             Solap4py solap4py = new Solap4py(dbhost, dbport, dbuser, dbpasswd);
 
-            JSONObject model = new JSONObject(); //Json.createObjectBuilder()
-                                   model.put("schema", "Traffic")
-                                   .put("cube",
-                                        (new JSONObject())
-                                            .put("name", "Traffic")
-                                            .put("measures", (new JSONArray()).put("Quantity").put("Value"))
-                                            .put("dimension",
-                                                 (new JSONObject())
-                                                     .put("name", "Time")
-                                                     .put("range", false)
-                                                     .put("id", (new JSONArray()).put("2000").put("2009"))
-                                                     .put("aggregation", false)
-                                                     .put("dimension",
-                                                          (new JSONObject())
-                                                              .put("name", "Geo")
-                                                              .put("range", false)
-                                                              .put("id", (new JSONArray()).put("France"))
-                                                              .put("hierarchy", "Name")
-                                                              .put("aggregation", "region")
-                                                              .put("measure", true)
-                                                              .put("dimension",
-                                                                   (new JSONObject()).put("name", "Product").put("range", false)
-                                                                       .put("id", new JSONArray()).put("measure", true)))));
+            JSONObject model = new JSONObject(); // Json.createObjectBuilder()
+            model.put("schema", "Traffic")
+                 .put("cube",
+                      (new JSONObject()).put("name", "Traffic")
+                                        .put("measures", (new JSONArray()).put("Quantity").put("Value"))
+                                        .put("dimension",
+                                             (new JSONObject()).put("name", "Time")
+                                                               .put("range", false)
+                                                               .put("id", (new JSONArray()).put("2000").put("2009"))
+                                                               .put("aggregation", false)
+                                                               .put("dimension",
+                                                                    (new JSONObject()).put("name", "Geo")
+                                                                                      .put("range", false)
+                                                                                      .put("id", (new JSONArray()).put("France"))
+                                                                                      .put("hierarchy", "Name")
+                                                                                      .put("aggregation", "region")
+                                                                                      .put("measure", true)
+                                                                                      .put("dimension",
+                                                                                           (new JSONObject()).put("name", "Product")
+                                                                                                             .put("range", false)
+                                                                                                             .put("id", new JSONArray())
+                                                                                                             .put("measure", true)))));
             String query = model.toString();
             System.out.println(query);
             String res = solap4py.select(query);

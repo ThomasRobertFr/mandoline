@@ -40,7 +40,7 @@ public class Solap4pyEntryPoint {
             String dbpasswd = prop.getProperty("dbpasswd");
             String dbport = prop.getProperty("dbport");
 
-            GatewayServer gatewayServer = new GatewayServer(new Solap4pyEntryPoint(dbhost, dbport, dbuser, dbpasswd));
+            GatewayServer gatewayServer = new GatewayServer(new Solap4pyEntryPoint(dbhost, dbport, dbuser, dbpasswd), 25335);
             gatewayServer.start();
 
         } catch (IOException ex) {
