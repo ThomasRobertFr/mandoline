@@ -1,11 +1,16 @@
 package solap4py.core;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Properties;
 
 import org.olap4j.Axis;
 import org.json.JSONArray;
@@ -167,26 +172,64 @@ public class MDXBuilder {
         System.out.println(inputTest2.toString());
 
         // Connection to database
-        Class.forName("org.olap4j.driver.xmla.XmlaOlap4jDriver");
-        Connection connection = DriverManager.getConnection("jdbc:xmla:Server=http://postgres:westcoast@192.168.1.1:8080/geomondrian/xmla");
-        OlapConnection olapConnection = connection.unwrap(OlapConnection.class);
+        Properties prop = new Properties();
+        InputStream input = null;
 
-        // test initSelectNode
-        SelectNode selectNodeTest = initSelectNode(olapConnection, inputTest2);
+        String query = "{ \"from\" : [\"Traffic\", \"Traffic\", \"Zone\", \"Zone.Name\", \"Name1\"], \"get\" : \"property\" }";
+
+        try {
+            File f1 = new File("config.properties");
+            if (f1.exists() && !f1.isDirectory()) {
+                input = new FileInputStream(f1);
+            } else {
+                input = new FileInputStream("config.dist");
+            }
+
+            // load a properties file
+            prop.load(input);
+
+            // get the property value
+            String dbhost = prop.getProperty("dbhost");
+            String dbuser = prop.getProperty("dbuser");
+            String dbpasswd = prop.getProperty("dbpasswd");
+            String dbport = prop.getProperty("dbport");
+
+            Class.forName("org.olap4j.driver.xmla.XmlaOlap4jDriver");
+            Connection connection = DriverManager.getConnection("jdbc:xmla:Server=http://"+dbuser+":"+dbpasswd+"@"+dbhost+":"+dbport+"/geomondrian/xmla");
+            OlapConnection olapConnection = connection.unwrap(OlapConnection.class);
+
+            // test initSelectNode
+            SelectNode selectNodeTest = initSelectNode(olapConnection, inputTest2);
+            
+            // test setColumns
+            JSONArray onColumnsTest = inputTest2.getJSONArray("onColumns");
+            setColumns(olapConnection, onColumnsTest, selectNodeTest);
+            
+            // test setRows
+            JSONObject onRowsTest = inputTest2.getJSONObject("onRows");
+            setRows(olapConnection, onRowsTest, selectNodeTest);
+            
+            
+         // test setWhere
+            JSONObject whereTest = inputTest2.getJSONObject("where");
+            setWhere(olapConnection, whereTest, selectNodeTest);
+            System.out.println(selectNodeTest.toString());
+
+
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        } finally {
+            if (input != null) {
+                try {
+                    input.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
         
-        // test setColumns
-        JSONArray onColumnsTest = inputTest2.getJSONArray("onColumns");
-        setColumns(olapConnection, onColumnsTest, selectNodeTest);
         
-        // test setRows
-        JSONObject onRowsTest = inputTest2.getJSONObject("onRows");
-        setRows(olapConnection, onRowsTest, selectNodeTest);
-        
-        
-     // test setWhere
-        JSONObject whereTest = inputTest2.getJSONObject("where");
-        setWhere(olapConnection, whereTest, selectNodeTest);
-        System.out.println(selectNodeTest.toString());
         
         // test createSelectNode
         
