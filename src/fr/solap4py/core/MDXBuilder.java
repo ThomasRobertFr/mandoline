@@ -2,7 +2,6 @@ package fr.solap4py.core;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
@@ -13,10 +12,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 
-import org.olap4j.Axis;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.olap4j.Axis;
 import org.olap4j.OlapConnection;
 import org.olap4j.mdx.AxisNode;
 import org.olap4j.mdx.CallNode;

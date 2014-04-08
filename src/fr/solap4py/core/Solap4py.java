@@ -362,7 +362,7 @@ public class Solap4py {
         Properties prop = new Properties();
         InputStream input = null;
 
-        String query = "{ \"from\" : [\"Traffic\", \"Traffic\", \"Zone\", \"Zone.Name\", \"Name1\"], \"get\" : \"property\" }";
+        String query = "{ \"from\" : [\"Traffic\", \"[Traffic]\", \"[Time]\", \"[Time]\", \"[Time].[Year]\"], \"get\" : \"member\" }";
 
         try {
             File f1 = new File("config.properties");
