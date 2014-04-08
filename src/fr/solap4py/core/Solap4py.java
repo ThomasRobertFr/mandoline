@@ -50,6 +50,14 @@ public class Solap4py {
             System.err.println(e);
         }
     }
+    
+    /**
+     * Accessor to olapConnection attribute 
+     * @return the OlapConnection associated with this instance of Solap4py
+     */
+    public OlapConnection getOlapConnection() {
+        return this.olapConnection;
+    }
 
     /**
      * Process a query in a JSON format
@@ -441,5 +449,4 @@ public class Solap4py {
         }
 
     }
-
 }

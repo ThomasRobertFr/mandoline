@@ -1,8 +1,5 @@
 package fr.solap4py.core;
 
-import java.io.PrintWriter;
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 
 import org.json.JSONArray;
@@ -11,12 +8,9 @@ import org.json.JSONObject;
 import org.olap4j.Axis;
 import org.olap4j.Cell;
 import org.olap4j.CellSet;
-import org.olap4j.OlapConnection;
 import org.olap4j.OlapException;
 import org.olap4j.Position;
-import org.olap4j.layout.RectangularCellSetFormatter;
 import org.olap4j.metadata.Member;
-import org.olap4j.metadata.Property;
 
 final class JSONBuilder {
     private JSONBuilder() {}
