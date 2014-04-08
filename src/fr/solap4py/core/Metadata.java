@@ -96,7 +96,16 @@ public class Metadata {
     }
 
     private JSONArray getDimensions(JSONArray from) throws OlapException, JSONException {
-        List<Dimension> dimensions = this.catalog.getSchemas().get(from.getString(0)).getCubes().get(from.getString(1)).getDimensions();
+        List<Cube> cubes = this.catalog.getSchemas().get(from.getString(0)).getCubes();
+        Cube cube  = null;
+        for (Cube c : cubes) {
+            if (c.getUniqueName().equals(from.getString(1))) {
+                cube = c;
+                break;
+            }
+        }
+                
+        List<Dimension> dimensions = cube.getDimensions();
         JSONArray array = new JSONArray();
 
         for (Dimension dimension : dimensions) {
@@ -126,8 +135,23 @@ public class Metadata {
     }
 
     private JSONArray getHierarchies(JSONArray from) throws OlapException, JSONException {
-        List<Hierarchy> hierarchies = this.catalog.getSchemas().get(from.getString(0)).getCubes().get(from.getString(1)).getDimensions()
-                                                  .get(from.getString(2)).getHierarchies();
+        List<Cube> cubes = this.catalog.getSchemas().get(from.getString(0)).getCubes();
+        Cube cube  = null;
+        for (Cube c : cubes) {
+            if (c.getUniqueName().equals(from.getString(1))) {
+                cube = c;
+                break;
+            }
+        }
+        List<Dimension> dimensions = cube.getDimensions();
+        Dimension dimension = null;
+        for (Dimension d : dimensions) {
+            if (d.getUniqueName().equals(from.getString(2))) {
+                dimension = d;
+                break;
+            }
+        }
+        List<Hierarchy> hierarchies = dimension.getHierarchies();
         JSONArray array = new JSONArray();
 
         for (Hierarchy hierarchy : hierarchies) {
@@ -141,8 +165,32 @@ public class Metadata {
     }
 
     private JSONArray getLevels(JSONArray from) throws OlapException, JSONException {
-        List<Level> levels = this.catalog.getSchemas().get(from.getString(0)).getCubes().get(from.getString(1)).getDimensions()
-                                         .get(from.getString(2)).getHierarchies().get(from.getString(3)).getLevels();
+        List<Cube> cubes = this.catalog.getSchemas().get(from.getString(0)).getCubes();
+        Cube cube  = null;
+        for (Cube c : cubes) {
+            if (c.getUniqueName().equals(from.getString(1))) {
+                cube = c;
+                break;
+            }
+        }
+        List<Dimension> dimensions = cube.getDimensions();
+        Dimension dimension = null;
+        for (Dimension d : dimensions) {
+            if (d.getUniqueName().equals(from.getString(2))) {
+                dimension = d;
+                break;
+            }
+        }
+        List<Hierarchy> hierarchies= dimension.getHierarchies();
+        Hierarchy hierarchy = null;
+        for (Hierarchy h : hierarchies) {
+            if (h.getUniqueName().equals(from.getString(3))) {
+                hierarchy = h;
+                break;
+            }
+        }
+        
+        List<Level> levels = hierarchy.getLevels();
         JSONArray array = new JSONArray();
 
         for (Level level : levels) {
@@ -156,9 +204,41 @@ public class Metadata {
     }
 
     private JSONArray getMembers(JSONArray from) throws OlapException, JSONException {
-        List<Member> members = this.catalog.getSchemas().get(from.getString(0)).getCubes().get(from.getString(1)).getDimensions()
-                                           .get(from.getString(2)).getHierarchies().get(from.getString(3)).getLevels()
-                                           .get(from.getString(4)).getMembers();
+        List<Cube> cubes = this.catalog.getSchemas().get(from.getString(0)).getCubes();
+        Cube cube  = null;
+        for (Cube c : cubes) {
+            if (c.getUniqueName().equals(from.getString(1))) {
+                cube = c;
+                break;
+            }
+        }
+        List<Dimension> dimensions = cube.getDimensions();
+        Dimension dimension = null;
+        for (Dimension d : dimensions) {
+            if (d.getUniqueName().equals(from.getString(2))) {
+                dimension = d;
+                break;
+            }
+        }
+        List<Hierarchy> hierarchies= dimension.getHierarchies();
+        Hierarchy hierarchy = null;
+        for (Hierarchy h : hierarchies) {
+            if (h.getUniqueName().equals(from.getString(3))) {
+                hierarchy = h;
+                break;
+            }
+        }
+        
+        List<Level> levels = hierarchy.getLevels();
+        Level level  = null;
+        for (Level l : levels) {
+            if (l.getUniqueName().equals(from.getString(4))) {
+                level = l;
+                break;
+            }
+        }
+        
+        List<Member> members = level.getMembers();
         JSONArray array = new JSONArray();
 
         for (Member member : members) {
@@ -189,7 +269,7 @@ public class Metadata {
     
     public static void main(String[] args) throws ClassNotFoundException, SQLException, JSONException {
 
-        String param = "{ \"from\" : [\"Traffic\", \"Traffic\", \"Zone\", \"Zone.Name\", \"Name1\"], \"get\" : \"property\" }";
+        String param = "{ \"from\" : [\"Traffic\", \"[Traffic]\", \"[Zone]\", \"[Zone.Name]\", \"[Zone.Name].[Name1]\"], \"get\" : \"member\" }";
         
         Solap4py p = Solap4py.getSolap4Object();
         JSONObject query = new JSONObject(param);
