@@ -1,13 +1,7 @@
 package fr.solap4py.core;
 
 import py4j.GatewayServer;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.sql.SQLException;
-import java.util.Properties;
 
 public class Solap4pyEntryPoint {
 
@@ -21,42 +15,11 @@ public class Solap4pyEntryPoint {
         return mySolap4py;
     }
 
-    public static void main(String[] args) {
-        Properties prop = new Properties();
-        InputStream input = null;
+    public static void main(String[] args) throws ClassNotFoundException, SQLException {
+        Solap4py solap4py = Solap4py.getSolap4Object();
 
-        try {
-            File f1 = new File("config.properties");
-            if (f1.exists() && !f1.isDirectory()) {
-                input = new FileInputStream(f1);
-            } else {
-                input = new FileInputStream("config.dist");
-            }
-
-            // load a properties file
-            prop.load(input);
-
-            // get the property value
-            String dbhost = prop.getProperty("dbhost");
-            String dbuser = prop.getProperty("dbuser");
-            String dbpasswd = prop.getProperty("dbpasswd");
-            String dbport = prop.getProperty("dbport");
-
-            GatewayServer gatewayServer = new GatewayServer(new Solap4pyEntryPoint(dbhost, dbport, dbuser, dbpasswd), 25336);
-            gatewayServer.start();
-
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        } finally {
-            if (input != null) {
-                try {
-                    input.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
+        GatewayServer gatewayServer = new GatewayServer(solap4py, 25335);
+        gatewayServer.start();
     }
 
 }
