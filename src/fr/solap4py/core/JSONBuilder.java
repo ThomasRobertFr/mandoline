@@ -37,8 +37,8 @@ final class JSONBuilder {
     }
     
     public static void main(String[] args) throws ClassNotFoundException, SQLException {
-        String s = "{queryType: \"data\" , data : {" + "onColumns:" + "[" + "\"[Measures].[Goods Quantity]\"," + "\"[Measures].[Max Quantity]\"" + "]," + " onRows:" + "{" + "\"[Time]\":{\"members\":[\"[2000]\", \"[2010]\"],\"range\":false}, " + "\"[Zone.Name]\":{\"members\":[\"[France]\"],\"range\":false} " + "}," + "from:" + "\"[Traffic]\"" + "}}";
-
+        String s = "{\"queryType\": \"data\" , \"data\" : {" + "\"onColumns\":" + "[" + "\"[Measures].[Goods Quantity]\"," + "\"[Measures].[Max Quantity]\"" + "]," + " \"onRows\":" + "{" + "\"[Time]\":{\"members\":[\"[2000]\", \"[2010]\"],\"range\":\"false\"}, " + "\"[Zone.Name]\":{\"members\":[\"[France]\"],\"range\":\"false\"} " + "}," + "\"from\":" + "\"[Traffic]\"" + "}}";
+        System.out.println(s);
         Solap4py sp = Solap4py.getSolap4Object();
         String result = sp.process(s);
         System.out.println(result);
