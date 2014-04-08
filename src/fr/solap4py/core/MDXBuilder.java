@@ -206,7 +206,7 @@ final class MDXBuilder {
 			while (it.hasNext()) {
 				String key = it.next().toString();
 				JSONObject hierarchyJSON = objectJSON.getJSONObject(key);
-				if ((boolean) hierarchyJSON.get("range")) {
+				if ( hierarchyJSON.getBoolean("range")) {
 					JSONArray members = hierarchyJSON.getJSONArray("members");
 					if (members.length() == 2) {
 						current = new CallNode(null, ":", Syntax.Infix,
