@@ -2,6 +2,7 @@ package fr.solap4py.core;
 
 import java.sql.SQLException;
 import java.util.List;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -12,7 +13,6 @@ import org.olap4j.metadata.Cube;
 import org.olap4j.metadata.Dimension;
 import org.olap4j.metadata.Hierarchy;
 import org.olap4j.metadata.Level;
-import org.olap4j.metadata.Measure;
 import org.olap4j.metadata.Member;
 import org.olap4j.metadata.Property;
 import org.olap4j.metadata.Schema;
@@ -32,40 +32,46 @@ public class Metadata {
     public JSONObject query(JSONObject query) throws OlapException, JSONException {
 
         JSONObject result = new JSONObject();
-        result.put("error", "OK");
-        JSONArray data = null;
-        JSONArray from = query.getJSONArray("from");
-
-        switch (query.getString("get")) {
-        case "schema":
-            data = this.getSchemas();
-            break;
-        case "cube":
-            data = this.getCubes(from);
-            break;
-        case "dimension":
-            data = this.getDimensions(from);
-            break;
-        case "measure":
-            data = this.getMeasures(from);
-            break;
-        case "hierarchy":
-            data = this.getHierarchies(from);
-            break;
-        case "level":
-            data = this.getLevels(from);
-            break;
-        case "member":
-            data = this.getMembers(from);
-            break;
-        case "property":
-            data = this.getProperties(from);
-            break;
-        default:
-
+        JSONObject data = query.getJSONObject("data");
+        JSONArray root = data.getJSONArray("root");
+        boolean property = data.getBoolean("property");
+        JSONArray metadata = null;
+        
+        try {
+            switch (root.length()) {
+            case 0 :
+        	metadata = this.getSchemas();
+                break;
+            case 1 :
+        	metadata = this.getCubes(root);
+                break;
+            case 2 :
+        	metadata = this.getDimensions(root);
+                break;
+            case 3 :
+        	metadata = this.getHierarchies(root);
+                break;
+            case 4 :
+        	metadata = this.getLevels(root);
+                break;
+            case 5 :
+        	metadata = this.getMembers(root);
+                break;
+            default:
+        	
+            }
+            
+            if (property == true) {
+        	
+            }
+        } catch (OlapException e) {
+            
+        } catch (Exception e) {
+            
         }
 
-        result.put("data", data);
+        result.put("error", "OK");
+        result.put("data", metadata);
         return result;
     }
 
@@ -113,21 +119,6 @@ public class Metadata {
             s.put("id", dimension.getUniqueName());
             s.put("caption", dimension.getCaption());
             s.put("type", dimension.getDimensionType().toString());
-            array.put(s);
-        }
-
-        return array;
-    }
-
-    private JSONArray getMeasures(JSONArray from) throws OlapException, JSONException {
-        List<Measure> measures = this.catalog.getSchemas().get(from.getString(0)).getCubes().get(from.getString(1)).getMeasures();
-        JSONArray array = new JSONArray();
-
-        for (Measure measure : measures) {
-            JSONObject s = new JSONObject();
-            s.put("id", measure.getName());
-            s.put("caption", measure.getCaption());
-            s.put("aggregator", measure.getAggregator().toString());
             array.put(s);
         }
 
@@ -269,7 +260,7 @@ public class Metadata {
     
     public static void main(String[] args) throws ClassNotFoundException, SQLException, JSONException {
 
-        String param = "{ \"from\" : [\"Traffic\", \"[Traffic]\", \"[Zone]\", \"[Zone.Name]\", \"[Zone.Name].[Name1]\"], \"get\" : \"member\" }";
+        String param = "{ \"data\" : { \"root\" : [\"Traffic\", \"[Traffic]\", \"[Zone]\", \"[Zone.Name]\", \"[Zone.Name].[Name1]\"], \"property\" : true }}";
         
         Solap4py p = Solap4py.getSolap4Object();
         JSONObject query = new JSONObject(param);
