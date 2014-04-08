@@ -7,17 +7,30 @@ import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Properties;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.olap4j.Axis;
 import org.olap4j.CellSet;
 import org.olap4j.OlapConnection;
 import org.olap4j.OlapException;
 import org.olap4j.OlapStatement;
+import org.olap4j.Position;
+import org.olap4j.PreparedOlapStatement;
+import org.olap4j.mdx.IdentifierNode;
 import org.olap4j.mdx.SelectNode;
 import org.olap4j.metadata.Catalog;
+import org.olap4j.metadata.Cube;
+import org.olap4j.metadata.Hierarchy;
+import org.olap4j.metadata.Member;
+import org.olap4j.metadata.NamedList;
+import org.olap4j.metadata.Schema;
+import org.olap4j.query.Query;
+import org.olap4j.query.QueryDimension;
+import org.olap4j.query.Selection;
 
 public class Solap4py {
     private OlapConnection olapConnection;
@@ -133,7 +146,6 @@ public class Solap4py {
     public static Solap4py getSolap4Object() throws ClassNotFoundException, SQLException{
         Properties prop = new Properties();
         InputStream input = null;
-
 
         try {
             File f1 = new File("config.properties");
