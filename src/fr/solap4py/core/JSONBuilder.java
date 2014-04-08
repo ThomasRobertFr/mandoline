@@ -28,16 +28,11 @@ final class JSONBuilder {
                 final Cell cell = cellSet.getCell(axis1, axis0);
                 JSONObject result = new JSONObject();
                 
-                for (Member member : axis0.getMembers()) {
-                    System.out.println(member.getDimension().getUniqueName());
-                    System.out.println(member.getUniqueName());
-                    
+                for (Member member : axis0.getMembers()) {                    
                     result.append(member.getDimension().getUniqueName(), member.getUniqueName());
-                    
                 }
                 
                 for (Member member : axis1.getMembers()) {
-                    System.out.println(member.getUniqueName());
                     result.append(member.getUniqueName(), cell.getValue());
                 }
                 results.put(result);
