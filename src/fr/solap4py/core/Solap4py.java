@@ -114,18 +114,20 @@ public class Solap4py {
      *            a JSON text which indicates which data we want to select
      * @return the result of the query in JSON format
      * @throws Solap4pyException
+     * @throws JSONException 
      */
-    private JSONObject execute(JSONObject jsonObject) throws Solap4pyException {
-        JSONObject result = new JSONObject();
+    private JSONArray execute(JSONObject jsonObject) throws Solap4pyException, JSONException {
+        JSONArray result = new JSONArray();
 
         SelectNode sn = MDXBuilder.createSelectNode(olapConnection, jsonObject);
 
+        System.out.println(sn.toString());
         try {
             OlapStatement os = olapConnection.createStatement();
             CellSet cellSet = os.executeOlapQuery(sn);
 
             // TODO CellSet -> [createJSONResponse] -> JSONObject
-            // result = ....createJSONResponse(cellSet);
+            result = JSONBuilder.createJSONResponse(cellSet);
         } catch (OlapException oe) {
             throw new Solap4pyException(ErrorType.SERVER_ERROR, oe);
         }
@@ -133,6 +135,10 @@ public class Solap4py {
         return result;
     }
 
+    
+    
+    // The following code is deprecated
+    
     public String select(String input) {
         String result = null;
         JSONObject inputJson = null;
@@ -356,6 +362,42 @@ public class Solap4py {
         Metadata m = new Metadata(this.olapConnection);
 
         return (m.query(query)).toString();
+    }
+    
+    public static Solap4py getSolap4Object() throws ClassNotFoundException, SQLException{
+        Properties prop = new Properties();
+        InputStream input = null;
+
+        try {
+            File f1 = new File("config.properties");
+            if (f1.exists() && !f1.isDirectory()) {
+                input = new FileInputStream(f1);
+            } else {
+                input = new FileInputStream("config.dist");
+            }
+
+            // load a properties file
+            prop.load(input);
+
+            // get the property value
+            String dbhost = prop.getProperty("dbhost");
+            String dbuser = prop.getProperty("dbuser");
+            String dbpasswd = prop.getProperty("dbpasswd");
+            String dbport = prop.getProperty("dbport");
+
+            return new Solap4py(dbhost, dbport, dbuser, dbpasswd);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        } finally {
+            if (input != null) {
+                try {
+                    input.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return null;
     }
 
     public static void main(String[] args) throws ClassNotFoundException, SQLException, JSONException {
