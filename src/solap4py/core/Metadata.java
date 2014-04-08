@@ -17,6 +17,7 @@ import org.olap4j.metadata.Member;
 import org.olap4j.metadata.Property;
 import org.olap4j.metadata.Schema;
 
+
 public class Metadata {
 
     private Catalog catalog;
@@ -87,7 +88,7 @@ public class Metadata {
 
         for (Cube cube : cubes) {
             JSONObject s = new JSONObject();
-            s.put("id", cube.getName());
+            s.put("id", cube.getUniqueName());
             s.put("caption", cube.getCaption());
             array.put(s);
         }
@@ -116,7 +117,7 @@ public class Metadata {
 
         for (Measure measure : measures) {
             JSONObject s = new JSONObject();
-            s.put("id", measure.getName());
+            s.put("id", measure.getUniqueName());
             s.put("caption", measure.getCaption());
             s.put("aggregator", measure.getAggregator().toString());
             array.put(s);
@@ -132,7 +133,7 @@ public class Metadata {
 
         for (Hierarchy hierarchy : hierarchies) {
             JSONObject s = new JSONObject();
-            s.put("id", hierarchy.getName());
+            s.put("id", hierarchy.getUniqueName());
             s.put("caption", hierarchy.getCaption());
             array.put(s);
         }
@@ -147,7 +148,7 @@ public class Metadata {
 
         for (Level level : levels) {
             JSONObject s = new JSONObject();
-            s.put("id", level.getName());
+            s.put("id", level.getUniqueName());
             s.put("caption", level.getCaption());
             array.put(s);
         }
