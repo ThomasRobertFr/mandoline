@@ -1,4 +1,4 @@
-package solap4py.core;
+package fr.solap4py.core;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -48,8 +48,7 @@ public class UserStory13 {
                                                          + "].Properties(\"Geom\")' select {[Measures].[test]} ON COLUMNS from [Traffic]");
 
             Cell cell = cellSet.getCell(0);
-            geometry = cell.getFormattedValue();// .replace('(',
-                                                // '[').replace(')',']');
+            geometry = cell.getFormattedValue();
 
             FileWriter fw = new FileWriter(fileName, true);
 

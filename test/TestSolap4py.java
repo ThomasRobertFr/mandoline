@@ -9,7 +9,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Test;
 
-import solap4py.core.Solap4py;
+import fr.solap4py.core.Solap4py;
 
 public class TestSolap4py {
     @Test
@@ -61,7 +61,7 @@ public class TestSolap4py {
             System.out.println(query);
             String res = solap4py.select(query);
             System.out.println(res);
-        } catch (IOException ex) {
+        } catch (Exception ex) {
             ex.printStackTrace();
         } finally {
             if (input != null) {
