@@ -74,16 +74,19 @@ public class Solap4py {
                 /* Here, we process the query */
                 JSONObject jsonQuery = new JSONObject(query);
                 String function = jsonQuery.getString("queryType");
-
+                JSONObject jsonResult = new JSONObject();
+                jsonResult.put("error", "OK");
+                
                 if ("data".equals(function)) {
-                    result = execute(jsonQuery.getJSONObject("data")).toString();
+                    jsonResult.put("data", execute(jsonQuery.getJSONObject("data")));
                 } else {
-                    if ("metadata".equals(query)) {
-                        result = explore(jsonQuery.getJSONArray("metadata")).toString();
+                    if ("metadata".equals(function)) {
+                        jsonResult.put("data", explore(jsonQuery.getJSONArray("metadata")));
                     } else {
                         throw new Solap4pyException(ErrorType.NOT_SUPPORTED, "The query type " + function + " is not currently supported.");
                     }
                 }
+                result = jsonResult.toString();
             } catch (JSONException je) {
                 throw new Solap4pyException(ErrorType.BAD_REQUEST, je);
             }
@@ -109,8 +112,8 @@ public class Solap4py {
      * @throws JSONException
      * @throws Solap4pyException
      */
-    private JSONObject explore(JSONArray jsonArray) throws JSONException, Solap4pyException {
-        JSONObject result = new JSONObject();
+    private JSONArray explore(JSONArray jsonArray) throws JSONException, Solap4pyException {
+        JSONArray result = new JSONArray();
 
         return result;
     }
@@ -133,8 +136,6 @@ public class Solap4py {
         try {
             OlapStatement os = olapConnection.createStatement();
             CellSet cellSet = os.executeOlapQuery(sn);
-
-            // TODO CellSet -> [createJSONResponse] -> JSONObject
             result = JSONBuilder.createJSONResponse(cellSet);
         } catch (OlapException oe) {
             throw new Solap4pyException(ErrorType.SERVER_ERROR, oe);
