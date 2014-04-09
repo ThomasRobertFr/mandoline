@@ -3,6 +3,7 @@ package fr.solap4py.core;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Iterator;
 import java.util.List;
 
 import org.json.JSONArray;
@@ -136,10 +137,38 @@ public class Metadata {
                 
         List<Dimension> dimensions = cube.getDimensions();
         JSONObject result = new JSONObject();
+        String type;
         for (Dimension dimension : dimensions) {
             JSONObject s = new JSONObject();
             s.put("caption", dimension.getCaption());
-            s.put("type", dimension.getDimensionType().toString());
+            
+            switch(dimension.getDimensionType().toString()){
+            case "TIMEDIMENSION" :
+            	type = "Time";
+            	break;
+            	
+            case "MEASURES" :
+            	type = "Measure";
+            	break;
+            	
+            case "OTHER" :
+            	
+            	Iterator<Property> i = dimension.getDefaultHierarchy().getDefaultMember().getProperties().iterator();
+            	Boolean hasGeometry = false;
+            	while(i.hasNext() & !hasGeometry){
+            		hasGeometry = i.next().getCaption().substring(0,5).equals("Geom");     		
+            	}
+            	if(hasGeometry)
+            		type = "Geometry";
+            	else
+            		type = "Standard";
+            	break;
+            	
+            default : 
+            	type = "Standard";
+            }
+            s.put("type", type);
+            		
             result.put(dimension.getUniqueName(), s);
         }
 
@@ -306,7 +335,7 @@ public class Metadata {
     
     public static void main(String[] args) throws ClassNotFoundException, SQLException, JSONException {
 
-       /* String param = "{ \"queryType\" : \"metadata\"," +
+        String param = "{ \"queryType\" : \"metadata\"," +
         		"\"data\" : { \"root\" : [\"Traffic\", \"[Traffic]\", \"[Zone]\", \"[Zone.Name]\", \"[Zone.Name].[Name1]\"], \"withProperties\" : true, \"granularity\" : 0}}";
         
         Solap4py p = Solap4py.getSolap4Object();
@@ -317,13 +346,8 @@ public class Metadata {
             System.out.println((m.query(query)).toString());
         } catch (Solap4pyException e) {
             System.out.println(e.getJSON());
-        }*/
-    	Class.forName("org.olap4j.driver.xmla.XmlaOlap4jDriver");
-        Connection connection = DriverManager.getConnection("jdbc:xmla:Server=http://postgres:westcoast@192.168.1.1:8080/geomondrian/xmla");
-        Metadata meta = new Metadata(connection.unwrap(OlapConnection.class));
-        Catalog catalog = connection.unwrap(OlapConnection.class).getOlapCatalog();
-        System.out.println(catalog.getSchemas().get("Traffic").getCubes().get("Traffic").getDimensions().get("Zone").getHierarchies().get("Zone.Name").getLevels().get("Name0").getMembers().get(0).getUniqueName());
-        System.out.println("Done.");
+        }
+
     	
     }
 }
