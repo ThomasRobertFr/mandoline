@@ -265,6 +265,23 @@ public class Metadata {
         return result;
     }
     
+    private JSONObject getMemberProperties(JSONArray from) throws OlapException, JSONException {
+        List<Property> properties = this.catalog.getSchemas().get(from.getString(0)).getCubes().get(from.getString(1)).getDimensions()
+                                                .get(from.getString(2)).getHierarchies().get(from.getString(3)).getLevels()
+                                                .get(from.getString(4)).getProperties();
+        JSONObject result = new JSONObject();
+        for (Property property : properties) {
+            JSONObject s = new JSONObject();
+            //s.put("id", property.getUniqueName());
+            s.put("caption", property.getCaption());
+            result.put(property.getUniqueName(), s);
+        }
+
+        return result;
+    }
+    
+    
+    
     public static void main(String[] args) throws ClassNotFoundException, SQLException, JSONException {
 
         String param = "{ \"queryType\" : \"metadata\"," +
