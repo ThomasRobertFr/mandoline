@@ -8,7 +8,8 @@ enum ErrorType {
     NOT_SUPPORTED,
     SERVER_ERROR,
     NO_HIERARCHY,
-    DIMENSION_ID_COUNT
+    DIMENSION_ID_COUNT,
+    UNKNOWN_ERROR
 };
 
 @SuppressWarnings("serial")
