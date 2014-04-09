@@ -30,7 +30,6 @@ public class Metadata {
     }
 
     public JSONObject query(JSONObject query) throws OlapException, JSONException, Solap4pyException {
-
         JSONObject result = new JSONObject();
         JSONObject data = null;
         JSONArray root = null;
@@ -74,7 +73,6 @@ public class Metadata {
         	metadata = this.getMembers(root, withProperties, granularity);
                 break;
             case 6 :
-        	System.out.println("ok");
         	try {
         	    withProperties = data.getBoolean("withProperties");
         	} catch (JSONException e) {
@@ -111,10 +109,8 @@ public class Metadata {
     private JSONObject getCubes(JSONArray from) throws OlapException, JSONException {
         List<Cube> cubes = this.catalog.getSchemas().get(from.getString(0)).getCubes();
         JSONObject result = new JSONObject();
-
         for (Cube cube : cubes) {
             JSONObject s = new JSONObject();
-            //s.put("id", cube.getName());
             s.put("caption", cube.getCaption());
             result.put(cube.getUniqueName(), s);
         }
@@ -134,10 +130,8 @@ public class Metadata {
                 
         List<Dimension> dimensions = cube.getDimensions();
         JSONObject result = new JSONObject();
-
         for (Dimension dimension : dimensions) {
             JSONObject s = new JSONObject();
-            //s.put("id", dimension.getUniqueName());
             s.put("caption", dimension.getCaption());
             s.put("type", dimension.getDimensionType().toString());
             result.put(dimension.getUniqueName(), s);
@@ -165,10 +159,8 @@ public class Metadata {
         }
         List<Hierarchy> hierarchies = dimension.getHierarchies();
         JSONObject result = new JSONObject();
-
         for (Hierarchy hierarchy : hierarchies) {
             JSONObject s = new JSONObject();
-            //s.put("id", hierarchy.getName());
             s.put("caption", hierarchy.getCaption());
             result.put(hierarchy.getUniqueName(), s);
         }
@@ -201,13 +193,10 @@ public class Metadata {
                 break;
             }
         }
-        
         List<Level> levels = hierarchy.getLevels();
         JSONObject result = new JSONObject();
-
         for (Level level : levels) {
             JSONObject s = new JSONObject();
-            //s.put("id", level.getName());
             s.put("caption", level.getCaption());
             result.put(level.getUniqueName(), s);
         }
@@ -240,7 +229,6 @@ public class Metadata {
                 break;
             }
         }
-        
         List<Level> levels = hierarchy.getLevels();
         Level level  = null;
         for (Level l : levels) {
@@ -249,7 +237,6 @@ public class Metadata {
                 break;
             }
         }
-        
         List<Member> members = level.getMembers();
         JSONObject result = new JSONObject();
 
@@ -268,7 +255,6 @@ public class Metadata {
                                                 .get(from.getString(2)).getHierarchies().get(from.getString(3)).getLevels()
                                                 .get(from.getString(4)).getProperties();
         JSONObject result = new JSONObject();
-
         for (Property property : properties) {
             JSONObject s = new JSONObject();
             //s.put("id", property.getUniqueName());
