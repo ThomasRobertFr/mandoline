@@ -52,12 +52,12 @@ final class MDXBuilder {
 			setColumns(onColumnsJSON, selectNodeRequest);
 			if (json.has("onRows")) {
 				JSONObject onRowsJSON = json.getJSONObject("onRows");
-				setRows(olapConnection, onRowsJSON, selectNodeRequest);
+				setRows(onRowsJSON, selectNodeRequest);
 			}
 
 			if (json.has("where")) {
 				JSONObject whereJSON = json.getJSONObject("where");
-				setWhere(olapConnection, whereJSON, selectNodeRequest);
+				setWhere(whereJSON, selectNodeRequest);
 			}
 
 		} catch (JSONException je) {
@@ -80,9 +80,8 @@ final class MDXBuilder {
 	 * @throws Solap4pyException
 	 *             Exception that is thrown if the request in objectJSON is bad.
 	 */
-	private static void setWhere(OlapConnection olapConnection,
-			JSONObject whereJSON, SelectNode selectNodeRequest)
-			throws Solap4pyException {
+	private static void setWhere(JSONObject whereJSON,
+			SelectNode selectNodeRequest) throws Solap4pyException {
 		setRowsOrWhere(whereJSON, selectNodeRequest, false);
 	}
 
@@ -97,9 +96,8 @@ final class MDXBuilder {
 	 * @throws Solap4pyException
 	 *             Exception that is thrown if the request in objectJSON is bad.
 	 */
-	private static void setRows(OlapConnection olapConnection,
-			JSONObject rowsJSON, SelectNode selectNodeRequest)
-			throws Solap4pyException {
+	private static void setRows(JSONObject rowsJSON,
+			SelectNode selectNodeRequest) throws Solap4pyException {
 
 		setRowsOrWhere(rowsJSON, selectNodeRequest, true);
 	}
@@ -206,7 +204,7 @@ final class MDXBuilder {
 			while (it.hasNext()) {
 				String key = it.next().toString();
 				JSONObject hierarchyJSON = objectJSON.getJSONObject(key);
-				if ( hierarchyJSON.getBoolean("range")) {
+				if (hierarchyJSON.getBoolean("range")) {
 					JSONArray members = hierarchyJSON.getJSONArray("members");
 					if (members.length() == 2) {
 						current = new CallNode(null, ":", Syntax.Infix,
@@ -304,11 +302,11 @@ final class MDXBuilder {
 
 		// test setRows
 		JSONObject onRowsTest = inputTest2.getJSONObject("onRows");
-		setRows(olapConnection, onRowsTest, selectNodeTest);
+		setRows(onRowsTest, selectNodeTest);
 
 		// test setWhere
 		JSONObject whereTest = inputTest2.getJSONObject("where");
-		setWhere(olapConnection, whereTest, selectNodeTest);
+		setWhere(whereTest, selectNodeTest);
 		System.out.println(selectNodeTest.toString());
 
 		// test createSelectNode
