@@ -11,7 +11,7 @@
 	</path>
 	
     <target name="compile">
-		<javac destdir="bin">
+		<javac destdir="bin" includeantruntime="false">
 			<src path="src"/>
 			<classpath refid="master-classpath"/>
 		</javac>
