@@ -1,13 +1,18 @@
 package fr.solap4py.core;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Iterator;
 import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.olap4j.CellSet;
 import org.olap4j.OlapConnection;
 import org.olap4j.OlapException;
+import org.olap4j.OlapStatement;
 import org.olap4j.metadata.Catalog;
 import org.olap4j.metadata.Cube;
 import org.olap4j.metadata.Dimension;
@@ -20,10 +25,12 @@ import org.olap4j.metadata.Schema;
 public class Metadata {
 
     private Catalog catalog;
-
+    private OlapConnection olapConnection;
+    
     public Metadata(OlapConnection connection) {
         try {
             this.catalog = connection.getOlapCatalog();
+            this.olapConnection = connection;
         } catch (OlapException e) {
             e.printStackTrace();
         }
@@ -138,10 +145,38 @@ public class Metadata {
                 
         List<Dimension> dimensions = cube.getDimensions();
         JSONObject result = new JSONObject();
+        String type;
         for (Dimension dimension : dimensions) {
             JSONObject s = new JSONObject();
             s.put("caption", dimension.getCaption());
-            s.put("type", dimension.getDimensionType().toString());
+            
+            switch(dimension.getDimensionType().toString()){
+            case "TIMEDIMENSION" :
+            	type = "Time";
+            	break;
+            	
+            case "MEASURES" :
+            	type = "Measure";
+            	break;
+            	
+            case "OTHER" :
+            	
+            	Iterator<Property> i = dimension.getDefaultHierarchy().getDefaultMember().getProperties().iterator();
+            	Boolean hasGeometry = false;
+            	while(i.hasNext() & !hasGeometry){
+            		hasGeometry = i.next().getCaption().substring(0,5).equals("Geom");     		
+            	}
+            	if(hasGeometry)
+            		type = "Geometry";
+            	else
+            		type = "Standard";
+            	break;
+            	
+            default : 
+            	type = "Standard";
+            }
+            s.put("type", type);
+            		
             result.put(dimension.getUniqueName(), s);
         }
 
@@ -257,19 +292,52 @@ public class Metadata {
         return result;
     }
 
-    private JSONObject getProperties(JSONArray from) throws OlapException, JSONException {
+    private JSONObject getLevelProperties(JSONArray from) throws OlapException, JSONException {
         List<Property> properties = this.catalog.getSchemas().get(from.getString(0)).getCubes().get(from.getString(1)).getDimensions()
                                                 .get(from.getString(2)).getHierarchies().get(from.getString(3)).getLevels()
                                                 .get(from.getString(4)).getProperties();
         JSONObject result = new JSONObject();
         for (Property property : properties) {
             JSONObject s = new JSONObject();
-            //s.put("id", property.getUniqueName());
-            s.put("caption", property.getCaption());
+            s.put("caption",property.getCaption());
+            if(property.getCaption().substring(0,5).equals("Geom")) 
+            	s.put("type","Geometry");
+            else
+            	s.put("type","Standard");
+            result.put(property.getUniqueName(),s);
+        }
+
+        return result;
+    }
+    
+    private JSONObject getMemberProperties(JSONArray from, Member member) throws OlapException, JSONException {
+        
+        JSONObject result = new JSONObject();
+        result.put("caption",member.getCaption());
+        for (Property property : member.getProperties()) {
+            JSONObject s = new JSONObject();
+            if(property.getCaption().substring(0,5).equals("Geom")) 
+            	s.put(property.getUniqueName(),getGeometry(from,member,property.getCaption()));
+            else
+            	s.put(property.getUniqueName(),member.getPropertyFormattedValue(property));
             result.put(property.getUniqueName(), s);
         }
 
         return result;
+    }
+    
+    private String getGeometry(JSONArray from, Member member, String geometricProperty) throws OlapException, JSONException{
+        OlapStatement statement = this.olapConnection.createStatement();
+        
+        String nameCube = this.catalog.getSchemas().get(from.getString(0)).getCubes().get(from.getString(1)).getUniqueName();
+        String nameMember = member.getUniqueName();
+
+        CellSet cellSet = statement.executeOlapQuery("with member [Measures].[geo] as '" + nameMember + "].Properties(\" " + geometricProperty + " \")' select [Measures].[geo] ON COLUMNS from [" + 
+		nameCube + "]" );
+        
+        return cellSet.getCell(0).getFormattedValue();	
+    	
+    	
     }
     
     public static void main(String[] args) throws ClassNotFoundException, SQLException, JSONException {
@@ -286,5 +354,7 @@ public class Metadata {
         } catch (Solap4pyException e) {
             System.out.println(e.getJSON());
         }
+
+    	
     }
 }
