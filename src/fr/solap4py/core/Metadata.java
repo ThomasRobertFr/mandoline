@@ -24,6 +24,7 @@ import org.olap4j.metadata.Member;
 import org.olap4j.metadata.Property;
 import org.olap4j.metadata.Schema;
 
+
 public class Metadata {
 
     private Catalog catalog;
