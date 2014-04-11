@@ -101,13 +101,21 @@ public class Metadata {
         return result;
     }
 
-    private JSONObject getSchemas() throws OlapException, JSONException {
-        List<Schema> schemas = this.catalog.getSchemas();
-        JSONObject result = new JSONObject();
-        for (Schema schema : schemas) {
-            JSONObject s = new JSONObject();
-            s.put("caption", schema.getName());
-            result.put(schema.getName(), s);
+    private JSONObject getSchemas() throws Solap4pyException {
+	List<Schema> schemas = null;
+	JSONObject result = new JSONObject();
+	try {
+            schemas = this.catalog.getSchemas();
+            
+            for (Schema schema : schemas) {
+                JSONObject s = new JSONObject();
+                s.put("caption", schema.getName());
+                result.put(schema.getName(), s);
+            }
+        } catch (OlapException e) {
+            throw new Solap4pyException(ErrorType.UNKNOWN_ERROR, "An occured while trying to retrieve schemas");
+        } catch (JSONException e) {
+            
         }
 
         return result;
@@ -277,7 +285,6 @@ public class Metadata {
 
         for (Member member : members) {
             JSONObject s = new JSONObject();
-            //s.put("id", member.getUniqueName());
             s.put("caption", member.getCaption());
             result.put(member.getUniqueName(), s);
         }
@@ -336,7 +343,7 @@ public class Metadata {
     public static void main(String[] args) throws ClassNotFoundException, SQLException, JSONException {
 
         String param = "{ \"queryType\" : \"metadata\"," +
-        		"\"data\" : { \"root\" : [\"Traffic\", \"[Traffic]\", \"[Zone]\", \"[Zone.Name]\", \"[Zone.Name].[Name1]\"], \"withProperties\" : true, \"granularity\" : 0}}";
+        		"\"data\" : { \"root\" : [\"Traffic\", \"[Traffic]\", \"[Zone]\", \"[Zone.Name]\", \"[Zone.Name].[Name1]\"], \"withProperties\" : false, \"granularity\" : 0}}";
         
         Solap4py p = Solap4py.getSolap4Object();
         JSONObject query = new JSONObject(param);
