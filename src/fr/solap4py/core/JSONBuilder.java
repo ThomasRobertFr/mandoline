@@ -30,11 +30,11 @@ final class JSONBuilder {
                     JSONObject result = new JSONObject();
                     
                     for (Member member : axis1.getMembers()) {                    
-                        result.append(member.getDimension().getUniqueName(), member.getUniqueName());
+                        result.put(member.getDimension().getUniqueName(), member.getUniqueName());
                     }
                     
                     for (Member member : axis0.getMembers()) {
-                        result.append(member.getUniqueName(), cell.getValue());
+                        result.put(member.getUniqueName(), cell.getValue());
                     }
                     results.put(result);
                 }
@@ -43,8 +43,10 @@ final class JSONBuilder {
                 JSONObject result = new JSONObject();
                 
                 for (Member member : axis0.getMembers()) {                    
-                    result.append(member.getUniqueName(), cell.getValue());
+                    result.put(member.getUniqueName(), cell.getValue());
                 }
+                
+
                 
                 results.put(result);
             }
