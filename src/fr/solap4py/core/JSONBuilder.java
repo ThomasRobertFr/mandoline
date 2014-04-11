@@ -46,8 +46,6 @@ final class JSONBuilder {
                     result.put(member.getUniqueName(), cell.getValue());
                 }
                 
-
-                
                 results.put(result);
             }
         }
