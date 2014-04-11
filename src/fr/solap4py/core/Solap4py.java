@@ -81,7 +81,7 @@ public class Solap4py {
                     jsonResult.put("data", execute(jsonQuery.getJSONObject("data")));
                 } else {
                     if ("metadata".equals(function)) {
-                        jsonResult.put("data", explore(jsonQuery.getJSONArray("metadata")));
+                        jsonResult.put("data", explore(jsonQuery.getJSONObject("data")));
                     } else {
                         throw new Solap4pyException(ErrorType.NOT_SUPPORTED, "The query type " + function + " is not currently supported.");
                     }
@@ -106,13 +106,13 @@ public class Solap4py {
     /**
      * Execute a query to select metadata.
      * 
-     * @param jsonArray
-     *            a JSON array which indicates which metadata we want to get
+     * @param jsonObject
+     *            a JSON object which indicates which metadata we want to get
      * @return the result of the query in JSON format
      * @throws JSONException
      * @throws Solap4pyException
      */
-    private JSONArray explore(JSONArray jsonArray) throws JSONException, Solap4pyException {
+    private JSONArray explore(JSONObject jsonObject) throws JSONException, Solap4pyException {
         JSONArray result = new JSONArray();
 
         return result;
