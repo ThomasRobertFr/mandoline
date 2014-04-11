@@ -50,7 +50,7 @@ final class MDXBuilder {
 		try {
 			JSONArray onColumnsJSON = json.getJSONArray("onColumns");
 			setColumns(onColumnsJSON, selectNodeRequest);
-			if (json.has("onRows")) {
+			if (json.has("onRows") && json.getJSONObject("onRows").length() > 0) {
 				JSONObject onRowsJSON = json.getJSONObject("onRows");
 				setRows(onRowsJSON, selectNodeRequest);
 			}
