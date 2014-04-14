@@ -17,12 +17,13 @@ import org.olap4j.OlapConnection;
 import org.olap4j.OlapException;
 import org.olap4j.OlapStatement;
 import org.olap4j.mdx.SelectNode;
-import org.olap4j.metadata.Catalog;
+
+import com.sun.istack.internal.logging.Logger;
 
 public class Solap4py {
     private OlapConnection olapConnection;
-    private Catalog catalog;
     private Metadata metadata;
+    private static Logger LOGGER = Logger.getLogger(Solap4py.class);
 
     public Solap4py(String host, String port, String user, String passwd) throws ClassNotFoundException, SQLException {
         try {
@@ -30,18 +31,18 @@ public class Solap4py {
             Connection connection = DriverManager.getConnection("jdbc:xmla:Server=http://" + user + ":" + passwd + "@" + host + ":" + port
                                                                 + "/geomondrian/xmla");
             this.olapConnection = connection.unwrap(OlapConnection.class);
-            this.catalog = olapConnection.getOlapCatalog();
             this.metadata = new Metadata(this.olapConnection);
 
         } catch (ClassNotFoundException e) {
-            System.err.println(e);
+            LOGGER.logSevereException(e);
         } catch (SQLException e) {
-            System.err.println(e);
+            LOGGER.logSevereException(e);
         }
     }
-    
+
     /**
-     * Accessor to olapConnection attribute 
+     * Accessor to olapConnection attribute
+     * 
      * @return the OlapConnection associated with this instance of Solap4py
      */
     public OlapConnection getOlapConnection() {
@@ -65,7 +66,7 @@ public class Solap4py {
                 String function = jsonQuery.getString("queryType");
                 JSONObject jsonResult = new JSONObject();
                 jsonResult.put("error", "OK");
-                
+
                 if ("data".equals(function)) {
                     jsonResult.put("data", execute(jsonQuery.getJSONObject("data")));
                 } else {
@@ -77,16 +78,11 @@ public class Solap4py {
                 }
                 result = jsonResult.toString();
             } catch (JSONException | OlapException je) {
+                LOGGER.logException(je, java.util.logging.Level.SEVERE);
                 throw new Solap4pyException(ErrorType.BAD_REQUEST, je);
             }
         } catch (Solap4pyException se) {
-            //try {
-                result = se.getJSON();
-//            } catch (JSONException je) {
-//                // We have to catch a JSONException if an error occurred while
-//                // formatting the output JSON
-//                return "{error: INTERNAL_ERROR, data: An internal error occurred while formatting the output JSON.}";
-//            }
+            result = se.getJSON();
         }
 
         return result;
@@ -100,10 +96,10 @@ public class Solap4py {
      * @return the result of the query in JSON format
      * @throws JSONException
      * @throws Solap4pyException
-     * @throws OlapException 
+     * @throws OlapException
      */
     private JSONObject explore(JSONObject query, JSONObject result) throws JSONException, Solap4pyException, OlapException {
-	return this.metadata.query(query, result);
+        return this.metadata.query(query, result);
     }
 
     /**
@@ -113,14 +109,13 @@ public class Solap4py {
      *            a JSON text which indicates which data we want to select
      * @return the result of the query in JSON format
      * @throws Solap4pyException
-     * @throws JSONException 
+     * @throws JSONException
      */
     private JSONArray execute(JSONObject jsonObject) throws Solap4pyException, JSONException {
         JSONArray result = new JSONArray();
 
         SelectNode sn = MDXBuilder.createSelectNode(olapConnection, jsonObject);
 
-        System.out.println(sn.toString());
         try {
             OlapStatement os = olapConnection.createStatement();
             CellSet cellSet = os.executeOlapQuery(sn);
@@ -131,8 +126,8 @@ public class Solap4py {
 
         return result;
     }
-    
-    public static Solap4py getSolap4Object() throws ClassNotFoundException, SQLException{
+
+    public static Solap4py getSolap4Object() throws ClassNotFoundException, SQLException {
         Properties prop = new Properties();
         InputStream input = null;
 
@@ -161,7 +156,7 @@ public class Solap4py {
                 try {
                     input.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    LOGGER.logException(e, java.util.logging.Level.SEVERE);
                 }
             }
         }

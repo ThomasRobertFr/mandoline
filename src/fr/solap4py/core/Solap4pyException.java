@@ -1,6 +1,5 @@
 package fr.solap4py.core;
 
-
 enum ErrorType {
     BAD_REQUEST,
     NOT_SUPPORTED,
@@ -27,15 +26,8 @@ public class Solap4pyException extends Exception {
         this(type, exception.getMessage());
     }
 
-//    public JSONObject getJSON() throws JSONException {
-//        JSONObject objectJson = new JSONObject();
-//        objectJson.put("error", TYPE.toString());
-//        objectJson.put("data", DESCRIPTION);
-//        return objectJson;
-//    }
-    
     public String getJSON() {
-	return "{\"error\":\"" + TYPE.toString() + "\",\"data\":\"" + DESCRIPTION + "\"}"; 
+        return "{\"error\":\"" + TYPE.toString() + "\",\"data\":\"" + DESCRIPTION + "\"}";
     }
 
 }
