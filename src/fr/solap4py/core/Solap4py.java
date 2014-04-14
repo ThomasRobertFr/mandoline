@@ -80,13 +80,13 @@ public class Solap4py {
                 throw new Solap4pyException(ErrorType.BAD_REQUEST, je);
             }
         } catch (Solap4pyException se) {
-            try {
+            //try {
                 result = se.getJSON().toString();
-            } catch (JSONException je) {
-                // We have to catch a JSONException if an error occurred while
-                // formatting the output JSON
-                return "{error: INTERNAL_ERROR, data: An internal error occurred while formatting the output JSON.}";
-            }
+//            } catch (JSONException je) {
+//                // We have to catch a JSONException if an error occurred while
+//                // formatting the output JSON
+//                return "{error: INTERNAL_ERROR, data: An internal error occurred while formatting the output JSON.}";
+//            }
         }
 
         return result;

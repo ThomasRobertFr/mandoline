@@ -85,9 +85,8 @@ public class Metadata {
         	    try {
         		withProperties = data.getBoolean("withProperties");
         	    } catch (JSONException e) {
-        		return (new Solap4pyException(ErrorType.BAD_REQUEST,
-        			"'withProperties' field not specified or invalid")
-        			.getJSON());
+        		throw new Solap4pyException(ErrorType.BAD_REQUEST,
+        			"'withProperties' field not specified or invalid");
         	    }
         	    jsonResult.put("data", this.getLevels(root, withProperties));
         	    break;
@@ -95,9 +94,8 @@ public class Metadata {
         	    try {
         		withProperties = data.getBoolean("withProperties");
         	    } catch (JSONException e) {
-        		return (new Solap4pyException(ErrorType.BAD_REQUEST,
-        			"'withProperties' field not specified or invalid")
-        			.getJSON());
+        		throw new Solap4pyException(ErrorType.BAD_REQUEST,
+        			"'withProperties' field not specified or invalid");
         	    }
         	    jsonResult.put("data", this.getMembers(root, withProperties, 0));
         	    break;
@@ -105,28 +103,26 @@ public class Metadata {
         	    try {
         		withProperties = data.getBoolean("withProperties");
         	    } catch (JSONException e) {
-        		return (new Solap4pyException(ErrorType.BAD_REQUEST,
-        			"'withProperties' field not specified or invalid")
-        			.getJSON());
+        		throw new Solap4pyException(ErrorType.BAD_REQUEST,
+        			"'withProperties' field not specified or invalid");
         	    }
         	    int granularity;
         	    try {
         		granularity = data.getInt("granularity");
         	    } catch (JSONException e) {
-        		return (new Solap4pyException(ErrorType.BAD_REQUEST,
-        			"'granularity' field not specified or invalid")
-        			.getJSON());
+        		throw new Solap4pyException(ErrorType.BAD_REQUEST,
+        			"'granularity' field not specified or invalid");
         	    }
         	    if (granularity < 0) {
-        		return (new Solap4pyException(ErrorType.BAD_REQUEST,
-        			"'granulaity' must be a positive integer'").getJSON());
+        		throw new Solap4pyException(ErrorType.BAD_REQUEST,
+        			"'granulaity' must be a positive integer'");
         	    }
         	    jsonResult.put("data",
         		    this.getMembers(root, withProperties, granularity));
         	    break;
         	default:
-        	    return (new Solap4pyException(ErrorType.BAD_REQUEST,
-        		    "Too many parameters in array 'root'").getJSON());
+        	    throw new Solap4pyException(ErrorType.BAD_REQUEST,
+        		    "Too many parameters in array 'root'");
         	}
 	} catch (JSONException e) {
 	    throw new Solap4pyException(ErrorType.BAD_REQUEST, "An error occured while building json result");
@@ -483,7 +479,7 @@ public class Metadata {
 	    SQLException, JSONException {
 
 	String param = "{ \"queryType\" : \"metadata\","
-		+ "\"data\" : { \"root\" : [\"Traffic\", \"[Traffic]\"], \"withProperties\" : false, \"granularity\" : 1}}";
+		+ "\"data\" : { \"root\" : [\"wrong\"], \"withProperties\" : false, \"granularity\" : 1}}";
 
 	Solap4py p = Solap4py.getSolap4Object();
 	JSONObject query = new JSONObject(param);
