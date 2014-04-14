@@ -23,7 +23,7 @@ import org.olap4j.mdx.SelectNode;
 public class Solap4py {
     private OlapConnection olapConnection;
     private Metadata metadata;
-    private static Logger LOGGER = Logger.getLogger(Solap4py.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(Solap4py.class.getName());
 
     public Solap4py(String host, String port, String user, String passwd) throws ClassNotFoundException, SQLException {
         try {
@@ -150,7 +150,7 @@ public class Solap4py {
 
             return new Solap4py(dbhost, dbport, dbuser, dbpasswd);
         } catch (IOException ex) {
-            ex.printStackTrace();
+            LOGGER.log(Level.SEVERE, ex.getMessage());
         } finally {
             if (input != null) {
                 try {

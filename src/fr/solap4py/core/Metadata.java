@@ -40,7 +40,7 @@ public class Metadata {
                                                                                                "DESCRIPTION", "$visible", "MEMBER_KEY",
                                                                                                "IS_PLACEHOLDERMEMBER", "IS_DATAMEMBER",
                                                                                                "DEPTH", "DISPLAY_INFO", "VALUE"));
-    private static Logger LOGGER = Logger.getLogger(Metadata.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(Metadata.class.getName());
 
     public Metadata(OlapConnection connection) {
         try {
