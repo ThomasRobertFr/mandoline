@@ -20,6 +20,8 @@ public class MetadataTest {
 
     private Solap4py solap4py;
     private OlapConnection olapConnection;
+
+    private JSONObject inputTest;
     private Metadata metadata;
     
     private Method query;
@@ -38,7 +40,9 @@ public class MetadataTest {
         
         solap4py = Solap4py.getSolap4Object();
         olapConnection = solap4py.getOlapConnection();
+
         metadata = new Metadata(olapConnection);
+
         
         query = Metadata.class.getDeclaredMethod("query", JSONObject.class, JSONObject.class);
         query.setAccessible(true);
@@ -334,6 +338,42 @@ public class MetadataTest {
         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | JSONException | OlapException e) {
                 e.printStackTrace();
         } 
+    }
+    
+    @Test
+    public void testgetMembers() {
+        
+        String param = "{ \"queryType\" : \"metadata\","
+        		+ "\"data\" : { \"root\" : [\"Traffic\", \"[Traffic]\", \"[Zone]\", \"[Zone.Name]\", \"[Zone.Name].[Name0]\"], \"withProperties\" : false, \"granularity\" : 1}}";
+        try {
+        	JSONObject query = new JSONObject(param);
+        	JSONObject data = query.getJSONObject("data");
+        	JSONArray root = data.getJSONArray("root");
+        	
+        	JSONObject result = new JSONObject();
+        	result = (JSONObject)(getMembers.invoke(metadata, root,false,1));
+        	
+        	
+        	assertTrue("the result does not contain the first member",result.has("[Zone.Name].[All Zone.Names].[Croatia]"));
+        	assertTrue("the result does not contain the last member",result.has("[Zone.Name].[All Zone.Names].[Spain]"));
+        	
+        	result = (JSONObject)(getMembers.invoke(metadata, root,true,1));
+        	assertTrue("the result does not contain the first member's properties",result.getJSONObject("[Zone.Name].[All Zone.Names].[Croatia]").has("Traffic Cube - Zone.Name Hierarchy - Name0 Level - Geom Property"));
+        	assertTrue(" the result does not contain the last member's properties  ", result.getJSONObject("[Zone.Name].[All Zone.Names].[Spain]").has("Traffic Cube - Zone.Name Hierarchy - Name0 Level - Geom Property"));
+        	        	
+        	
+        	} catch (JSONException e) {
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				e.printStackTrace();
+			} catch (IllegalArgumentException e) {
+				e.printStackTrace();
+			} catch (InvocationTargetException e) {
+				e.printStackTrace();
+			}
+            
+        
+        
     }
 
 }
