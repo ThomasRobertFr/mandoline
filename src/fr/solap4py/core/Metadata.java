@@ -191,6 +191,10 @@ public class Metadata {
 		    result.put(dimension.getUniqueName(), s);
 		    break;
 		case "MEASURE":
+		    s.put("type", "Measure");
+	            s.put("caption", dimension.getCaption());
+	            result.put(dimension.getUniqueName(), s);
+	       
 		    break;
 		case "OTHER":
 		    Iterator<Property> i = dimension.getHierarchies().get(1)
@@ -215,14 +219,6 @@ public class Metadata {
 		    s.put("caption", dimension.getCaption());
 		    result.put(dimension.getUniqueName(), s);
 		}
-	    }
-
-	    for (Measure m : cube.getMeasures()) {
-		JSONObject s = new JSONObject();
-		s.put("type", "Measure");
-		s.put("caption", m.getCaption());
-		s.put("aggregator", m.getAggregator().toString());
-		result.put(m.getUniqueName(), s);
 	    }
 	} catch (OlapException | NullPointerException e) {
 	    throw new Solap4pyException(ErrorType.BAD_REQUEST,
