@@ -9,10 +9,13 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.olap4j.Axis;
 import org.olap4j.OlapConnection;
 import org.olap4j.mdx.SelectNode;
@@ -22,6 +25,7 @@ public class MDXBuilderTest {
 	private Solap4py solap4py;
 	private OlapConnection olapConnection;
 	private JSONObject inputTest;
+	private JSONObject inputTest2;
 	
 	private Method getJSONCubeName;
 	private Method  initSelectNode;
@@ -40,6 +44,21 @@ public class MDXBuilderTest {
 		solap4py = Solap4py.getSolap4Object();
 		olapConnection = solap4py.getOlapConnection();
 		
+		String s2 = "{"
+				+ "onColumns:"
+				+ "["
+				+ "\"[Measures].[Goods Quantity]\","
+				+ "\"[Measures].[Max Quantity]\""
+				+ "],"
+				+ " onRows:"
+				+ "{"
+				+ "\"[Time]\":{\"members\":[\"[2000]\"],\"range\":false} "
+				+ "},"
+				+ " where:"
+				+ "{"
+				+ "\"[Zone.Name]\":{\"members\":[\"[France]\"],\"range\":false} "
+				+ "}," + "from:" + "\"\"" + "}";
+		
 		String s = "{"
 				+ "onColumns:"
 				+ "["
@@ -55,15 +74,13 @@ public class MDXBuilderTest {
 				+ "\"[Zone.Name]\":{\"members\":[\"[France]\"],\"range\":false} "
 				+ "}," + "from:" + "\"[Traffic]\"" + "}";
 	inputTest = new JSONObject(s);
+	inputTest2 = new JSONObject(s2);
 	
 	columnsTest = inputTest.getJSONArray("onColumns");
 	rowsTest = inputTest.getJSONObject("onRows");
 	whereTest = inputTest.getJSONObject("where");
 	
-	/*selectNode = MDXBuilder.createSelectNode(olapConnection, inputTest);
-	
-	/*os = olapConnection.createStatement();
-	cellSetTest = os.executeOlapQuery(selectNodeTest); A METTRE DANS DAUTRE TESTER*/
+
 	
 	getJSONCubeName = MDXBuilder.class.getDeclaredMethod("getJSONCubeName", JSONObject.class);
 	getJSONCubeName.setAccessible(true); 
@@ -91,23 +108,45 @@ public class MDXBuilderTest {
 		olapConnection.close();
 	}
 
-	@Test
-	public void testGetJSONCubeName() {
+	
+	@Rule public ExpectedException thrown= ExpectedException.none();
+	
+	@Test (expected = Solap4pyException.class)
+	public void testGetJSONCubeName() throws Throwable {
 		String cubeNameTest;
 		try {
 			cubeNameTest = (String)(getJSONCubeName.invoke(null, inputTest));
 		
-	
-			assertTrue("getJSONCubeName did not return a String",cubeNameTest instanceof String);
 			assertEquals("getJSONCube did not get the cube name properly ","[Traffic]",cubeNameTest);
 		} catch (IllegalAccessException | IllegalArgumentException
 				| InvocationTargetException e) {
 			e.printStackTrace();
 		}	
+		
+				
+					 
+			 //thrown.expectMessage("Cube not specified");
+			 try {
+				 //thrown.expect(Solap4pyException.class );
+				String cubeName2 = (String)(getJSONCubeName.invoke(null,inputTest2));
+			} catch (IllegalAccessException | IllegalArgumentException
+					| InvocationTargetException e) {
+				throw e.getCause();
+			}
+		
+		
+		
+		 
+		
+		
+		
 	}
 	
-	@Test
-	public void testInitSelectNode(){
+	
+	
+	@Test (expected = Solap4pyException.class)
+	public void testInitSelectNode() throws Throwable{
+		
 		
 		try {
 			SelectNode selectNodeTest = (SelectNode)(initSelectNode.invoke(null, olapConnection,inputTest));
@@ -119,6 +158,14 @@ public class MDXBuilderTest {
 				| InvocationTargetException e) {
 			e.printStackTrace();
 		}
+		
+		try {
+			SelectNode selectNodeTest = (SelectNode)(initSelectNode.invoke(null, olapConnection,inputTest2));
+		} catch (IllegalAccessException | IllegalArgumentException
+				| InvocationTargetException e) {
+			throw e.getCause();
+		}
+	
 		
 		
 		
