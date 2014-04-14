@@ -8,6 +8,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -18,12 +20,10 @@ import org.olap4j.OlapException;
 import org.olap4j.OlapStatement;
 import org.olap4j.mdx.SelectNode;
 
-import com.sun.istack.internal.logging.Logger;
-
 public class Solap4py {
     private OlapConnection olapConnection;
     private Metadata metadata;
-    private static Logger LOGGER = Logger.getLogger(Solap4py.class);
+    private static Logger LOGGER = Logger.getLogger(Solap4py.class.getName());
 
     public Solap4py(String host, String port, String user, String passwd) throws ClassNotFoundException, SQLException {
         try {
@@ -34,9 +34,9 @@ public class Solap4py {
             this.metadata = new Metadata(this.olapConnection);
 
         } catch (ClassNotFoundException e) {
-            LOGGER.logSevereException(e);
+            LOGGER.log(Level.SEVERE, e.getMessage());
         } catch (SQLException e) {
-            LOGGER.logSevereException(e);
+            LOGGER.log(Level.SEVERE, e.getMessage());
         }
     }
 
@@ -78,7 +78,7 @@ public class Solap4py {
                 }
                 result = jsonResult.toString();
             } catch (JSONException | OlapException je) {
-                LOGGER.logException(je, java.util.logging.Level.SEVERE);
+                LOGGER.log(Level.SEVERE, je.getMessage());
                 throw new Solap4pyException(ErrorType.BAD_REQUEST, je);
             }
         } catch (Solap4pyException se) {
@@ -156,7 +156,7 @@ public class Solap4py {
                 try {
                     input.close();
                 } catch (IOException e) {
-                    LOGGER.logException(e, java.util.logging.Level.SEVERE);
+                    LOGGER.log(Level.SEVERE, e.getMessage());
                 }
             }
         }

@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -23,8 +24,6 @@ import org.olap4j.metadata.Member;
 import org.olap4j.metadata.Property;
 import org.olap4j.metadata.Schema;
 
-import com.sun.istack.internal.logging.Logger;
-
 public class Metadata {
 
     private Catalog catalog;
@@ -41,14 +40,14 @@ public class Metadata {
                                                                                                "DESCRIPTION", "$visible", "MEMBER_KEY",
                                                                                                "IS_PLACEHOLDERMEMBER", "IS_DATAMEMBER",
                                                                                                "DEPTH", "DISPLAY_INFO", "VALUE"));
-    private static Logger LOGGER = Logger.getLogger(Metadata.class);
+    private static Logger LOGGER = Logger.getLogger(Metadata.class.getName());
 
     public Metadata(OlapConnection connection) {
         try {
             this.catalog = connection.getOlapCatalog();
             this.olapConnection = connection;
         } catch (OlapException e) {
-            LOGGER.logException(e, java.util.logging.Level.SEVERE);
+            LOGGER.log(java.util.logging.Level.SEVERE, e.getMessage());
         }
     }
 
@@ -59,7 +58,7 @@ public class Metadata {
         try {
             root = query.getJSONArray("root");
         } catch (JSONException e) {
-            LOGGER.logException(e, java.util.logging.Level.SEVERE);
+            LOGGER.log(java.util.logging.Level.SEVERE, e.getMessage());
             throw new Solap4pyException(ErrorType.BAD_REQUEST, "'root' field not specified or invalid");
         }
 
@@ -81,7 +80,7 @@ public class Metadata {
                 try {
                     withProperties = query.getBoolean("withProperties");
                 } catch (JSONException e) {
-                    LOGGER.logException(e, java.util.logging.Level.SEVERE);
+                    LOGGER.log(java.util.logging.Level.SEVERE, e.getMessage());
                     throw new Solap4pyException(ErrorType.BAD_REQUEST, "'withProperties' field not specified or invalid");
                 }
                 jsonResult.put("data", this.getLevels(root, withProperties));
@@ -90,7 +89,7 @@ public class Metadata {
                 try {
                     withProperties = query.getBoolean("withProperties");
                 } catch (JSONException e) {
-                    LOGGER.logException(e, java.util.logging.Level.SEVERE);
+                    LOGGER.log(java.util.logging.Level.SEVERE, e.getMessage());
                     throw new Solap4pyException(ErrorType.BAD_REQUEST, "'withProperties' field not specified or invalid");
                 }
                 jsonResult.put("data", this.getMembers(root, withProperties, 0));
@@ -99,14 +98,14 @@ public class Metadata {
                 try {
                     withProperties = query.getBoolean("withProperties");
                 } catch (JSONException e) {
-                    LOGGER.logException(e, java.util.logging.Level.SEVERE);
+                    LOGGER.log(java.util.logging.Level.SEVERE, e.getMessage());
                     throw new Solap4pyException(ErrorType.BAD_REQUEST, "'withProperties' field not specified or invalid");
                 }
                 int granularity;
                 try {
                     granularity = query.getInt("granularity");
                 } catch (JSONException e) {
-                    LOGGER.logException(e, java.util.logging.Level.SEVERE);
+                    LOGGER.log(java.util.logging.Level.SEVERE, e.getMessage());
                     throw new Solap4pyException(ErrorType.BAD_REQUEST, "'granularity' field not specified or invalid");
                 }
                 if (granularity < 0) {
@@ -118,7 +117,7 @@ public class Metadata {
                 throw new Solap4pyException(ErrorType.BAD_REQUEST, "Too many parameters in array 'root'");
             }
         } catch (JSONException e) {
-            LOGGER.logException(e, java.util.logging.Level.SEVERE);
+            LOGGER.log(java.util.logging.Level.SEVERE, e.getMessage());
             throw new Solap4pyException(ErrorType.BAD_REQUEST, "An error occured while building json result");
         }
         return jsonResult;
@@ -136,10 +135,10 @@ public class Metadata {
                 result.put(schema.getName(), s);
             }
         } catch (OlapException | NullPointerException e) {
-            LOGGER.logException(e, java.util.logging.Level.SEVERE);
+            LOGGER.log(java.util.logging.Level.SEVERE, e.getMessage());
             throw new Solap4pyException(ErrorType.UNKNOWN_ERROR, "An error occured while trying to retrieve schemas");
         } catch (JSONException e) {
-            LOGGER.logException(e, java.util.logging.Level.SEVERE);
+            LOGGER.log(java.util.logging.Level.SEVERE, e.getMessage());
             throw new Solap4pyException(ErrorType.UNKNOWN_ERROR, "An error occured while building json result");
         }
 
@@ -157,10 +156,10 @@ public class Metadata {
                 result.put(cube.getUniqueName(), s);
             }
         } catch (OlapException | NullPointerException e) {
-            LOGGER.logException(e, java.util.logging.Level.SEVERE);
+            LOGGER.log(java.util.logging.Level.SEVERE, e.getMessage());
             throw new Solap4pyException(ErrorType.BAD_REQUEST, "Invalid schema identifier");
         } catch (JSONException e) {
-            LOGGER.logException(e, java.util.logging.Level.SEVERE);
+            LOGGER.log(java.util.logging.Level.SEVERE, e.getMessage());
             throw new Solap4pyException(ErrorType.UNKNOWN_ERROR, "An error occured while building json result");
         }
         return result;
@@ -219,10 +218,10 @@ public class Metadata {
                 }
             }
         } catch (OlapException | NullPointerException e) {
-            LOGGER.logException(e, java.util.logging.Level.SEVERE);
+            LOGGER.log(java.util.logging.Level.SEVERE, e.getMessage());
             throw new Solap4pyException(ErrorType.BAD_REQUEST, "Invalid identifier");
         } catch (JSONException e) {
-            LOGGER.logException(e, java.util.logging.Level.SEVERE);
+            LOGGER.log(java.util.logging.Level.SEVERE, e.getMessage());
             throw new Solap4pyException(ErrorType.UNKNOWN_ERROR, "An error occured while building json result");
         }
 
@@ -255,10 +254,10 @@ public class Metadata {
                 result.put(hierarchy.getUniqueName(), s);
             }
         } catch (OlapException | NullPointerException e) {
-            LOGGER.logException(e, java.util.logging.Level.SEVERE);
+            LOGGER.log(java.util.logging.Level.SEVERE, e.getMessage());
             throw new Solap4pyException(ErrorType.BAD_REQUEST, "Invalid identifier");
         } catch (JSONException e) {
-            LOGGER.logException(e, java.util.logging.Level.SEVERE);
+            LOGGER.log(java.util.logging.Level.SEVERE, e.getMessage());
             throw new Solap4pyException(ErrorType.UNKNOWN_ERROR, "An error occured while building json result");
         }
 
@@ -303,10 +302,10 @@ public class Metadata {
                 result.put(level.getDepth(), s);
             }
         } catch (OlapException | NullPointerException e) {
-            LOGGER.logException(e, java.util.logging.Level.SEVERE);
+            LOGGER.log(java.util.logging.Level.SEVERE, e.getMessage());
             throw new Solap4pyException(ErrorType.BAD_REQUEST, "Invalid identifier");
         } catch (JSONException e) {
-            LOGGER.logException(e, java.util.logging.Level.SEVERE);
+            LOGGER.log(java.util.logging.Level.SEVERE, e.getMessage());
             throw new Solap4pyException(ErrorType.UNKNOWN_ERROR, "An error occured while building json result");
         }
 
@@ -386,10 +385,10 @@ public class Metadata {
                 result.put(member.getUniqueName(), s);
             }
         } catch (OlapException | NullPointerException e) {
-            LOGGER.logException(e, java.util.logging.Level.SEVERE);
+            LOGGER.log(java.util.logging.Level.SEVERE, e.getMessage());
             throw new Solap4pyException(ErrorType.BAD_REQUEST, "Invalid identifier");
         } catch (JSONException e) {
-            LOGGER.logException(e, java.util.logging.Level.SEVERE);
+            LOGGER.log(java.util.logging.Level.SEVERE, e.getMessage());
             throw new Solap4pyException(ErrorType.UNKNOWN_ERROR, "An error occured while building json result");
         }
 
@@ -413,7 +412,7 @@ public class Metadata {
                 }
             }
         } catch (JSONException e) {
-            LOGGER.logException(e, java.util.logging.Level.SEVERE);
+            LOGGER.log(java.util.logging.Level.SEVERE, e.getMessage());
             throw new Solap4pyException(ErrorType.UNKNOWN_ERROR, "An error occured while building json result");
         }
         return result;
@@ -431,10 +430,10 @@ public class Metadata {
                 }
             }
         } catch (OlapException | NullPointerException e) {
-            LOGGER.logException(e, java.util.logging.Level.SEVERE);
+            LOGGER.log(java.util.logging.Level.SEVERE, e.getMessage());
             throw new Solap4pyException(ErrorType.BAD_REQUEST, "Invalid identifier");
         } catch (JSONException e) {
-            LOGGER.logException(e, java.util.logging.Level.SEVERE);
+            LOGGER.log(java.util.logging.Level.SEVERE, e.getMessage());
             throw new Solap4pyException(ErrorType.UNKNOWN_ERROR, "An error occured while building json result");
         }
     }
@@ -447,10 +446,10 @@ public class Metadata {
             cellSet = statement.executeOlapQuery("with member [Measures].[geo] as " + nameMember + ".Properties(\"" + geometricProperty
                                                  + "\") select [Measures].[geo] ON COLUMNS from " + from.getString(1));
         } catch (OlapException | NullPointerException e) {
-            LOGGER.logException(e, java.util.logging.Level.SEVERE);
+            LOGGER.log(java.util.logging.Level.SEVERE, e.getMessage());
             throw new Solap4pyException(ErrorType.BAD_REQUEST, "Invalid identifier");
         } catch (JSONException e) {
-            LOGGER.logException(e, java.util.logging.Level.SEVERE);
+            LOGGER.log(java.util.logging.Level.SEVERE, e.getMessage());
             throw new Solap4pyException(ErrorType.UNKNOWN_ERROR, "An error occured while building json result");
         }
         return cellSet.getCell(0).getFormattedValue();
@@ -468,7 +467,7 @@ public class Metadata {
             result = m.query(query, result);
             LOGGER.log(java.util.logging.Level.INFO, result.toString());
         } catch (Solap4pyException e) {
-            LOGGER.logException(e, java.util.logging.Level.SEVERE);
+            LOGGER.log(java.util.logging.Level.SEVERE, e.getMessage());
         }
     }
 
