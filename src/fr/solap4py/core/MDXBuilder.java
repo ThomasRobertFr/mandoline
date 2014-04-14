@@ -223,10 +223,8 @@ final class MDXBuilder {
 					JSONArray members = hierarchyJSON.getJSONArray("members");
 					if (members.length() == 2) {
 						current = new CallNode(null, ":", Syntax.Infix,
-								IdentifierNode.parseIdentifier(key + "."
-										+ members.getString(0)),
-								IdentifierNode.parseIdentifier(key + "."
-										+ members.getString(1)));
+								IdentifierNode.parseIdentifier(members.getString(0)),
+								IdentifierNode.parseIdentifier(members.getString(1)));
 					} else {
 						throw new Solap4pyException(ErrorType.BAD_REQUEST,
 								"If range is true, two members are required.");
@@ -238,8 +236,7 @@ final class MDXBuilder {
 
 					for (int i = 0; i < membersArray.length(); i++) {
 
-						nodes.add(IdentifierNode.parseIdentifier(key + "."
-								+ membersArray.getString(i)));
+						nodes.add(IdentifierNode.parseIdentifier(membersArray.getString(i)));
 					}
 					current = new CallNode(null, "{}", Syntax.Braces, nodes);
 				}
@@ -272,11 +269,11 @@ final class MDXBuilder {
 				+ "],"
 				+ " onRows:"
 				+ "{"
-				+ "\"[Time]\":{\"members\":[\"[2000]\"],\"range\":false} "
+				+ "\"[Time]\":{\"members\":[\"[Time].[2000]\"],\"range\":false} "
 				+ "},"
 				+ " where:"
 				+ "{"
-				+ "\"[Zone.Name]\":{\"members\":[\"[France]\"],\"range\":false} "
+				+ "\"[Zone.Name]\":{\"members\":[\"[Zone.Name].[France]\"],\"range\":false} "
 				+ "}," + "from:" + "\"[Traffic]\"" + "}";
 		JSONObject inputTest2 = new JSONObject(s);
 		System.out.println(inputTest2.toString());
@@ -325,11 +322,11 @@ final class MDXBuilder {
 		System.out.println(selectNodeTest.toString());
 
 		// test createSelectNode
-
+*/
 		SelectNode selectNodeTest2 = createSelectNode(olapConnection,
 				inputTest2);
 		System.out.println(selectNodeTest2.toString());
-*/
+
 		olapConnection.close();
 		connection.close();
 		input.close();
