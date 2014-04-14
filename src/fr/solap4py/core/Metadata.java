@@ -50,9 +50,7 @@ public class Metadata {
     }
 
     public JSONObject query(JSONObject query) throws OlapException,
-	    JSONException, Solap4pyException {
-	JSONObject result = new JSONObject();
-	result.put("error", "OK");
+		JSONException, Solap4pyException {
 	JSONObject metadata = null;
 	JSONObject data = null;
 	JSONArray root = null;
@@ -74,19 +72,15 @@ public class Metadata {
 	switch (root.length()) {
 	case 0:
 	    metadata = this.getSchemas();
-	    result.put("data", metadata);
 	    break;
 	case 1:
 	    metadata = this.getCubes(root);
-	    result.put("data", metadata);
 	    break;
 	case 2:
 	    metadata = this.getDimensions(root);
-	    result.put("data", metadata);
 	    break;
 	case 3:
 	    metadata = this.getHierarchies(root);
-	    result.put("data", metadata);
 	    break;
 	case 4:
 	    try {
@@ -97,7 +91,7 @@ public class Metadata {
 			.getJSON());
 	    }
 	    JSONArray array = this.getLevels(root, withProperties);
-	    result.put("data", array);
+	    //metadata.
 	    break;
 	case 5:
 	    try {
@@ -108,7 +102,6 @@ public class Metadata {
 			.getJSON());
 	    }
 	    metadata = this.getMembers(root, withProperties, 0);
-	    result.put("data", metadata);
 	    break;
 	case 6:
 	    try {
@@ -131,14 +124,13 @@ public class Metadata {
 			"'granulaity' must be a positive integer'").getJSON());
 	    }
 	    metadata = this.getMembers(root, withProperties, granularity);
-	    result.put("data", metadata);
 	    break;
 	default:
 	    return (new Solap4pyException(ErrorType.BAD_REQUEST,
 		    "Too many parameters in array 'root'").getJSON());
 	}
 
-	return result;
+	return metadata;
     }
 
     private JSONObject getSchemas() throws Solap4pyException {

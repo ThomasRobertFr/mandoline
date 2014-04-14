@@ -22,6 +22,7 @@ import org.olap4j.metadata.Catalog;
 public class Solap4py {
     private OlapConnection olapConnection;
     private Catalog catalog;
+    private Metadata metadata;
 
     public Solap4py(String host, String port, String user, String passwd) throws ClassNotFoundException, SQLException {
         try {
@@ -30,6 +31,7 @@ public class Solap4py {
                                                                 + "/geomondrian/xmla");
             this.olapConnection = connection.unwrap(OlapConnection.class);
             this.catalog = olapConnection.getOlapCatalog();
+            this.metadata = new Metadata(this.olapConnection);
 
         } catch (ClassNotFoundException e) {
             System.err.println(e);
@@ -74,7 +76,7 @@ public class Solap4py {
                     }
                 }
                 result = jsonResult.toString();
-            } catch (JSONException je) {
+            } catch (JSONException | OlapException je) {
                 throw new Solap4pyException(ErrorType.BAD_REQUEST, je);
             }
         } catch (Solap4pyException se) {
@@ -98,11 +100,10 @@ public class Solap4py {
      * @return the result of the query in JSON format
      * @throws JSONException
      * @throws Solap4pyException
+     * @throws OlapException 
      */
-    private JSONArray explore(JSONObject jsonObject) throws JSONException, Solap4pyException {
-        JSONArray result = new JSONArray();
-
-        return result;
+    private JSONObject explore(JSONObject jsonObject) throws JSONException, Solap4pyException, OlapException {
+	return this.metadata.query(jsonObject);
     }
 
     /**
