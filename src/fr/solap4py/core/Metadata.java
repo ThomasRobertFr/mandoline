@@ -49,7 +49,7 @@ public class Metadata {
 	}
     }
 
-    public JSONObject query(JSONObject jsonResult, JSONObject query) throws OlapException,
+    public JSONObject query(JSONObject query, JSONObject jsonResult) throws OlapException,
 		JSONException, Solap4pyException {
 	JSONObject data = null;
 	JSONArray root = null;
@@ -436,7 +436,7 @@ public class Metadata {
 	Solap4py p = Solap4py.getSolap4Object();
 	JSONObject query = new JSONObject(param);
 	Metadata m = new Metadata(p.getOlapConnection());
-	JSONObject result = null;
+	JSONObject result = new JSONObject();
 	try {
 	    result = m.query(query, result);
 	     //System.out.println(result.getJSONObject("data").getJSONObject("[Zone.Name].[All Zone.Names].[France]"));
