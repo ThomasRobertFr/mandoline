@@ -55,12 +55,6 @@ public class Metadata {
 	boolean withProperties;
 
 	try {
-	    data = query.getJSONObject("data");
-	} catch (JSONException e) {
-	    throw new Solap4pyException(ErrorType.BAD_REQUEST,
-		    "'data' field not specified or invalid");
-	}
-	try {
 	    root = data.getJSONArray("root");
 	} catch (JSONException e) {
 	    throw new Solap4pyException(ErrorType.BAD_REQUEST,
@@ -116,7 +110,7 @@ public class Metadata {
 		}
 		if (granularity < 0) {
 		    throw new Solap4pyException(ErrorType.BAD_REQUEST,
-			    "'granulaity' must be a positive integer'");
+			    "'granularity' must be a positive integer'");
 		}
 		jsonResult.put("data",
 			this.getMembers(root, withProperties, granularity));
@@ -490,7 +484,7 @@ public class Metadata {
 	    SQLException, JSONException {
 
 	String param = "{ \"queryType\" : \"metadata\","
-		+ "\"data\" : { \"root\" : [\"Traffic\", \"[Traffic]\", \"[Zone]\", \"[Zone.Name]\", \"[Zone.Name].[Name0]\"], \"withProperties\" : false, \"granularity\" : 1}}";
+		+ "\"data\" : { \"root\" : [\"Trafficv\"]}}";
 
 	Solap4py p = Solap4py.getSolap4Object();
 	JSONObject query = new JSONObject(param);
