@@ -70,7 +70,7 @@ public class Solap4py {
                     jsonResult.put("data", execute(jsonQuery.getJSONObject("data")));
                 } else {
                     if ("metadata".equals(function)) {
-                        jsonResult.put("data", explore(jsonQuery.getJSONObject("data")));
+                        this.explore(jsonQuery.getJSONObject("data"), jsonResult);
                     } else {
                         throw new Solap4pyException(ErrorType.NOT_SUPPORTED, "The query type " + function + " is not currently supported.");
                     }
@@ -102,8 +102,8 @@ public class Solap4py {
      * @throws Solap4pyException
      * @throws OlapException 
      */
-    private JSONObject explore(JSONObject jsonObject) throws JSONException, Solap4pyException, OlapException {
-	return this.metadata.query(jsonObject);
+    private JSONObject explore(JSONObject jsonObject, JSONObject result) throws JSONException, Solap4pyException, OlapException {
+	return this.metadata.query(jsonObject, result);
     }
 
     /**

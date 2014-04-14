@@ -49,9 +49,8 @@ public class Metadata {
 	}
     }
 
-    public JSONObject query(JSONObject query) throws OlapException,
+    public JSONObject query(JSONObject jsonResult, JSONObject query) throws OlapException,
 		JSONException, Solap4pyException {
-	JSONObject metadata = null;
 	JSONObject data = null;
 	JSONArray root = null;
 	boolean withProperties;
@@ -71,16 +70,16 @@ public class Metadata {
 
 	switch (root.length()) {
 	case 0:
-	    metadata = this.getSchemas();
+	    jsonResult.put("data", this.getSchemas());
 	    break;
 	case 1:
-	    metadata = this.getCubes(root);
+	    jsonResult.put("data", this.getCubes(root));
 	    break;
 	case 2:
-	    metadata = this.getDimensions(root);
+	    jsonResult.put("data", this.getDimensions(root));
 	    break;
 	case 3:
-	    metadata = this.getHierarchies(root);
+	    jsonResult.put("data", this.getHierarchies(root));
 	    break;
 	case 4:
 	    try {
@@ -90,8 +89,7 @@ public class Metadata {
 			"'withProperties' field not specified or invalid")
 			.getJSON());
 	    }
-	    JSONArray array = this.getLevels(root, withProperties);
-	    //metadata.
+	    jsonResult.put("data", this.getLevels(root, withProperties));
 	    break;
 	case 5:
 	    try {
@@ -101,7 +99,7 @@ public class Metadata {
 			"'withProperties' field not specified or invalid")
 			.getJSON());
 	    }
-	    metadata = this.getMembers(root, withProperties, 0);
+	    jsonResult.put("data", this.getMembers(root, withProperties, 0));
 	    break;
 	case 6:
 	    try {
@@ -123,14 +121,14 @@ public class Metadata {
 		return (new Solap4pyException(ErrorType.BAD_REQUEST,
 			"'granulaity' must be a positive integer'").getJSON());
 	    }
-	    metadata = this.getMembers(root, withProperties, granularity);
+	    jsonResult.put("data", this.getMembers(root, withProperties, granularity));
 	    break;
 	default:
 	    return (new Solap4pyException(ErrorType.BAD_REQUEST,
 		    "Too many parameters in array 'root'").getJSON());
 	}
 
-	return metadata;
+	return jsonResult;
     }
 
     private JSONObject getSchemas() throws Solap4pyException {
@@ -438,8 +436,9 @@ public class Metadata {
 	Solap4py p = Solap4py.getSolap4Object();
 	JSONObject query = new JSONObject(param);
 	Metadata m = new Metadata(p.getOlapConnection());
+	JSONObject result = null;
 	try {
-	    JSONObject result = m.query(query);
+	    result = m.query(query, result);
 	     //System.out.println(result.getJSONObject("data").getJSONObject("[Zone.Name].[All Zone.Names].[France]"));
 	    System.out.println(result);
 	} catch (Solap4pyException e) {
