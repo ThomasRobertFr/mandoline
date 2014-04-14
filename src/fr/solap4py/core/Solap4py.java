@@ -81,7 +81,7 @@ public class Solap4py {
             }
         } catch (Solap4pyException se) {
             //try {
-                result = se.getJSON().toString();
+                result = se.getJSON();
 //            } catch (JSONException je) {
 //                // We have to catch a JSONException if an error occurred while
 //                // formatting the output JSON
