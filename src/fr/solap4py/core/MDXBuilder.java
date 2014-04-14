@@ -48,9 +48,14 @@ final class MDXBuilder {
 		SelectNode selectNodeRequest = initSelectNode(olapConnection, json);
 
 		try {
-			JSONArray onColumnsJSON = json.getJSONArray("onColumns");
-			setColumns(onColumnsJSON, selectNodeRequest);
-			if (json.has("onRows")) {
+			if (json.has("onColumns")) {
+				JSONArray onColumnsJSON = json.getJSONArray("onColumns");
+				setColumns(onColumnsJSON, selectNodeRequest);
+			} else {
+				setColumns(new JSONArray(), selectNodeRequest);
+			}
+			
+			if (json.has("onRows") && json.getJSONObject("onRows").length() > 0) {
 				JSONObject onRowsJSON = json.getJSONObject("onRows");
 				setRows(onRowsJSON, selectNodeRequest);
 			}
@@ -133,10 +138,17 @@ final class MDXBuilder {
 	 */
 	private static String getJSONCubeName(JSONObject json)
 			throws Solap4pyException {
-		// TODO Auto-generated method stub
 		String cubeJSON;
 		try {
-			cubeJSON = json.getString("from");
+			if (json.get("from") instanceof String) {
+				cubeJSON = json.getString("from");
+				System.out.println(cubeJSON);
+				if ("null".equals(cubeJSON) || cubeJSON == null || cubeJSON.equals("") || "\"null\"".equals(cubeJSON)) {
+					throw new Solap4pyException(ErrorType.BAD_REQUEST, "Cube not specified");
+				}
+			} else {
+				throw new Solap4pyException(ErrorType.BAD_REQUEST, "Cube not specified");
+			}
 		} catch (JSONException e) {
 			throw new Solap4pyException(ErrorType.BAD_REQUEST, e);
 		}
@@ -160,13 +172,16 @@ final class MDXBuilder {
 			SelectNode selectNode) throws Solap4pyException {
 		List<ParseTreeNode> nodes = new ArrayList<ParseTreeNode>();
 
-		for (int i = 0; i < jsonArrayColumns.length(); i++) {
-
-			try {
-				nodes.add(IdentifierNode.parseIdentifier(jsonArrayColumns
-						.getString(i)));
-			} catch (JSONException e) {
-				throw new Solap4pyException(ErrorType.BAD_REQUEST, e);
+		if (jsonArrayColumns.length() == 0) {
+			nodes.add(IdentifierNode.parseIdentifier("[Measures]"));
+		} else {
+			for (int i = 0; i < jsonArrayColumns.length(); i++) {
+				try {
+					nodes.add(IdentifierNode.parseIdentifier(jsonArrayColumns
+							.getString(i)));
+				} catch (JSONException e) {
+					throw new Solap4pyException(ErrorType.BAD_REQUEST, e);
+				}
 			}
 		}
 
@@ -292,7 +307,7 @@ final class MDXBuilder {
 						+ dbpasswd + "@" + dbhost + ":" + dbport
 						+ "/geomondrian/xmla");
 		OlapConnection olapConnection = connection.unwrap(OlapConnection.class);
-
+/*
 		// test initSelectNode
 		SelectNode selectNodeTest = initSelectNode(olapConnection, inputTest2);
 
@@ -314,7 +329,7 @@ final class MDXBuilder {
 		SelectNode selectNodeTest2 = createSelectNode(olapConnection,
 				inputTest2);
 		System.out.println(selectNodeTest2.toString());
-
+*/
 		olapConnection.close();
 		connection.close();
 		input.close();

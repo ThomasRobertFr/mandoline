@@ -7,34 +7,22 @@ import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.List;
 import java.util.Properties;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.olap4j.Axis;
 import org.olap4j.CellSet;
 import org.olap4j.OlapConnection;
 import org.olap4j.OlapException;
 import org.olap4j.OlapStatement;
-import org.olap4j.Position;
-import org.olap4j.PreparedOlapStatement;
-import org.olap4j.mdx.IdentifierNode;
 import org.olap4j.mdx.SelectNode;
 import org.olap4j.metadata.Catalog;
-import org.olap4j.metadata.Cube;
-import org.olap4j.metadata.Hierarchy;
-import org.olap4j.metadata.Member;
-import org.olap4j.metadata.NamedList;
-import org.olap4j.metadata.Schema;
-import org.olap4j.query.Query;
-import org.olap4j.query.QueryDimension;
-import org.olap4j.query.Selection;
 
 public class Solap4py {
     private OlapConnection olapConnection;
     private Catalog catalog;
+    private Metadata metadata;
 
     public Solap4py(String host, String port, String user, String passwd) throws ClassNotFoundException, SQLException {
         try {
@@ -43,6 +31,7 @@ public class Solap4py {
                                                                 + "/geomondrian/xmla");
             this.olapConnection = connection.unwrap(OlapConnection.class);
             this.catalog = olapConnection.getOlapCatalog();
+            this.metadata = new Metadata(this.olapConnection);
 
         } catch (ClassNotFoundException e) {
             System.err.println(e);
@@ -81,13 +70,13 @@ public class Solap4py {
                     jsonResult.put("data", execute(jsonQuery.getJSONObject("data")));
                 } else {
                     if ("metadata".equals(function)) {
-                        jsonResult.put("data", explore(jsonQuery.getJSONArray("metadata")));
+                        this.explore(jsonQuery.getJSONObject("data"), jsonResult);
                     } else {
                         throw new Solap4pyException(ErrorType.NOT_SUPPORTED, "The query type " + function + " is not currently supported.");
                     }
                 }
                 result = jsonResult.toString();
-            } catch (JSONException je) {
+            } catch (JSONException | OlapException je) {
                 throw new Solap4pyException(ErrorType.BAD_REQUEST, je);
             }
         } catch (Solap4pyException se) {
@@ -106,16 +95,15 @@ public class Solap4py {
     /**
      * Execute a query to select metadata.
      * 
-     * @param jsonArray
-     *            a JSON array which indicates which metadata we want to get
+     * @param jsonObject
+     *            a JSON object which indicates which metadata we want to get
      * @return the result of the query in JSON format
      * @throws JSONException
      * @throws Solap4pyException
+     * @throws OlapException 
      */
-    private JSONArray explore(JSONArray jsonArray) throws JSONException, Solap4pyException {
-        JSONArray result = new JSONArray();
-
-        return result;
+    private JSONObject explore(JSONObject query, JSONObject result) throws JSONException, Solap4pyException, OlapException {
+	return this.metadata.query(query, result);
     }
 
     /**
