@@ -35,7 +35,7 @@ public class Solap4pyException extends Exception {
 //    }
     
     public String getJSON() {
-	return "{ \"error\": \"" + TYPE.toString() + "\", \"data\": \"" + DESCRIPTION + "\"}"; 
+	return "{\"error\":\"" + TYPE.toString() + "\",\"data\":\"" + DESCRIPTION + "\"}"; 
     }
 
 }
