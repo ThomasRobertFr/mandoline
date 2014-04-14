@@ -68,64 +68,66 @@ public class Metadata {
 	}
 
 	try {
-        	switch (root.length()) {
-        	case 0:
-        	    jsonResult.put("data", this.getSchemas());
-        	    break;
-        	case 1:
-        	    jsonResult.put("data", this.getCubes(root));
-        	    break;
-        	case 2:
-        	    jsonResult.put("data", this.getDimensions(root));
-        	    break;
-        	case 3:
-        	    jsonResult.put("data", this.getHierarchies(root));
-        	    break;
-        	case 4:
-        	    try {
-        		withProperties = data.getBoolean("withProperties");
-        	    } catch (JSONException e) {
-        		throw new Solap4pyException(ErrorType.BAD_REQUEST,
-        			"'withProperties' field not specified or invalid");
-        	    }
-        	    jsonResult.put("data", this.getLevels(root, withProperties));
-        	    break;
-        	case 5:
-        	    try {
-        		withProperties = data.getBoolean("withProperties");
-        	    } catch (JSONException e) {
-        		throw new Solap4pyException(ErrorType.BAD_REQUEST,
-        			"'withProperties' field not specified or invalid");
-        	    }
-        	    jsonResult.put("data", this.getMembers(root, withProperties, 0));
-        	    break;
-        	case 6:
-        	    try {
-        		withProperties = data.getBoolean("withProperties");
-        	    } catch (JSONException e) {
-        		throw new Solap4pyException(ErrorType.BAD_REQUEST,
-        			"'withProperties' field not specified or invalid");
-        	    }
-        	    int granularity;
-        	    try {
-        		granularity = data.getInt("granularity");
-        	    } catch (JSONException e) {
-        		throw new Solap4pyException(ErrorType.BAD_REQUEST,
-        			"'granularity' field not specified or invalid");
-        	    }
-        	    if (granularity < 0) {
-        		throw new Solap4pyException(ErrorType.BAD_REQUEST,
-        			"'granulaity' must be a positive integer'");
-        	    }
-        	    jsonResult.put("data",
-        		    this.getMembers(root, withProperties, granularity));
-        	    break;
-        	default:
-        	    throw new Solap4pyException(ErrorType.BAD_REQUEST,
-        		    "Too many parameters in array 'root'");
-        	}
+	    switch (root.length()) {
+	    case 0:
+		jsonResult.put("data", this.getSchemas());
+		break;
+	    case 1:
+		jsonResult.put("data", this.getCubes(root));
+		break;
+	    case 2:
+		jsonResult.put("data", this.getDimensions(root));
+		break;
+	    case 3:
+		jsonResult.put("data", this.getHierarchies(root));
+		break;
+	    case 4:
+		try {
+		    withProperties = data.getBoolean("withProperties");
+		} catch (JSONException e) {
+		    throw new Solap4pyException(ErrorType.BAD_REQUEST,
+			    "'withProperties' field not specified or invalid");
+		}
+		jsonResult.put("data", this.getLevels(root, withProperties));
+		break;
+	    case 5:
+		try {
+		    withProperties = data.getBoolean("withProperties");
+		} catch (JSONException e) {
+		    throw new Solap4pyException(ErrorType.BAD_REQUEST,
+			    "'withProperties' field not specified or invalid");
+		}
+		jsonResult
+			.put("data", this.getMembers(root, withProperties, 0));
+		break;
+	    case 6:
+		try {
+		    withProperties = data.getBoolean("withProperties");
+		} catch (JSONException e) {
+		    throw new Solap4pyException(ErrorType.BAD_REQUEST,
+			    "'withProperties' field not specified or invalid");
+		}
+		int granularity;
+		try {
+		    granularity = data.getInt("granularity");
+		} catch (JSONException e) {
+		    throw new Solap4pyException(ErrorType.BAD_REQUEST,
+			    "'granularity' field not specified or invalid");
+		}
+		if (granularity < 0) {
+		    throw new Solap4pyException(ErrorType.BAD_REQUEST,
+			    "'granulaity' must be a positive integer'");
+		}
+		jsonResult.put("data",
+			this.getMembers(root, withProperties, granularity));
+		break;
+	    default:
+		throw new Solap4pyException(ErrorType.BAD_REQUEST,
+			"Too many parameters in array 'root'");
+	    }
 	} catch (JSONException e) {
-	    throw new Solap4pyException(ErrorType.BAD_REQUEST, "An error occured while building json result");
+	    throw new Solap4pyException(ErrorType.BAD_REQUEST,
+		    "An error occured while building json result");
 	}
 	return jsonResult;
     }
@@ -230,7 +232,8 @@ public class Metadata {
 		result.put(m.getUniqueName(), s);
 	    }
 	} catch (OlapException | NullPointerException e) {
-	    throw new Solap4pyException(ErrorType.BAD_REQUEST, "Invalid identifier");
+	    throw new Solap4pyException(ErrorType.BAD_REQUEST,
+		    "Invalid identifier");
 	} catch (JSONException e) {
 	    throw new Solap4pyException(ErrorType.UNKNOWN_ERROR,
 		    "An error occured while building json result");
@@ -266,7 +269,8 @@ public class Metadata {
 		result.put(hierarchy.getUniqueName(), s);
 	    }
 	} catch (OlapException | NullPointerException e) {
-	    throw new Solap4pyException(ErrorType.BAD_REQUEST, "Invalid identifier");
+	    throw new Solap4pyException(ErrorType.BAD_REQUEST,
+		    "Invalid identifier");
 	} catch (JSONException e) {
 	    throw new Solap4pyException(ErrorType.UNKNOWN_ERROR,
 		    "An error occured while building json result");
@@ -275,46 +279,48 @@ public class Metadata {
 	return result;
     }
 
-    private JSONArray getLevels(JSONArray from, boolean withProperties) throws Solap4pyException {
+    private JSONArray getLevels(JSONArray from, boolean withProperties)
+	    throws Solap4pyException {
 	JSONArray result = new JSONArray();
 	try {
-        	List<Cube> cubes = this.catalog.getSchemas().get(from.getString(0))
-        		.getCubes();
-        	Cube cube = null;
-        	for (Cube c : cubes) {
-        	    if (c.getUniqueName().equals(from.getString(1))) {
-        		cube = c;
-        		break;
-        	    }
-        	}
-        	List<Dimension> dimensions = cube.getDimensions();
-        	Dimension dimension = null;
-        	for (Dimension d : dimensions) {
-        	    if (d.getUniqueName().equals(from.getString(2))) {
-        		dimension = d;
-        		break;
-        	    }
-        	}
-        	List<Hierarchy> hierarchies = dimension.getHierarchies();
-        	Hierarchy hierarchy = null;
-        	for (Hierarchy h : hierarchies) {
-        	    if (h.getUniqueName().equals(from.getString(3))) {
-        		hierarchy = h;
-        		break;
-        	    }
-        	}
-        	List<Level> levels = hierarchy.getLevels();
-        	for (Level level : levels) {
-        	    JSONObject s = new JSONObject();
-        	    s.put("caption", level.getCaption());
-        	    s.put("id", level.getUniqueName());
-        	    if (withProperties == true) {
-        		s.put("list-properties", this.getLevelProperties(level));
-        	    }
-        	    result.put(level.getDepth(), s);
-        	}
+	    List<Cube> cubes = this.catalog.getSchemas().get(from.getString(0))
+		    .getCubes();
+	    Cube cube = null;
+	    for (Cube c : cubes) {
+		if (c.getUniqueName().equals(from.getString(1))) {
+		    cube = c;
+		    break;
+		}
+	    }
+	    List<Dimension> dimensions = cube.getDimensions();
+	    Dimension dimension = null;
+	    for (Dimension d : dimensions) {
+		if (d.getUniqueName().equals(from.getString(2))) {
+		    dimension = d;
+		    break;
+		}
+	    }
+	    List<Hierarchy> hierarchies = dimension.getHierarchies();
+	    Hierarchy hierarchy = null;
+	    for (Hierarchy h : hierarchies) {
+		if (h.getUniqueName().equals(from.getString(3))) {
+		    hierarchy = h;
+		    break;
+		}
+	    }
+	    List<Level> levels = hierarchy.getLevels();
+	    for (Level level : levels) {
+		JSONObject s = new JSONObject();
+		s.put("caption", level.getCaption());
+		s.put("id", level.getUniqueName());
+		if (withProperties == true) {
+		    s.put("list-properties", this.getLevelProperties(level));
+		}
+		result.put(level.getDepth(), s);
+	    }
 	} catch (OlapException | NullPointerException e) {
-	    throw new Solap4pyException(ErrorType.BAD_REQUEST, "Invalid identifier");
+	    throw new Solap4pyException(ErrorType.BAD_REQUEST,
+		    "Invalid identifier");
 	} catch (JSONException e) {
 	    throw new Solap4pyException(ErrorType.UNKNOWN_ERROR,
 		    "An error occured while building json result");
@@ -327,79 +333,80 @@ public class Metadata {
 	    int granularity) throws Solap4pyException {
 	JSONObject result = new JSONObject();
 	try {
-	List<Cube> cubes = this.catalog.getSchemas().get(from.getString(0))
-		.getCubes();
-	Cube cube = null;
-	for (Cube c : cubes) {
-	    if (c.getUniqueName().equals(from.getString(1))) {
-		cube = c;
-		break;
-	    }
-	}
-	List<Dimension> dimensions = cube.getDimensions();
-	Dimension dimension = null;
-	for (Dimension d : dimensions) {
-	    if (d.getUniqueName().equals(from.getString(2))) {
-		dimension = d;
-		break;
-	    }
-	}
-	List<Hierarchy> hierarchies = dimension.getHierarchies();
-	Hierarchy hierarchy = null;
-	for (Hierarchy h : hierarchies) {
-	    if (h.getUniqueName().equals(from.getString(3))) {
-		hierarchy = h;
-		break;
-	    }
-	}
-	List<Level> levels = hierarchy.getLevels();
-	Level level = null;
-	for (Level l : levels) {
-	    if (l.getUniqueName().equals(from.getString(4))) {
-		level = l;
-		break;
-	    }
-	}
-	String current = null;
-	List<Member> tmp = level.getMembers();
-	List<Member> members = new LinkedList<Member>();
-	for (Member m : tmp) {
-	    if (m.getUniqueName().equals(current) == false) {
-		members.add(m);
-		current = m.getUniqueName();
-	    }
-	}
-
-	if (from.length() == 6) {
-	    for (Member member : members) {
-		if (member.getUniqueName().equals(from.getString(5))) {
-		    LinkedList<Member> memberArray = new LinkedList<Member>(
-			    Arrays.asList(member));
-		    for (int i = 0; i < granularity; i++) {
-			LinkedList<Member> list = new LinkedList<Member>();
-			for (Member m : memberArray) {
-			    list.addAll(m.getChildMembers());
-			}
-			memberArray = list;
-		    }
-		    members = memberArray;
+	    List<Cube> cubes = this.catalog.getSchemas().get(from.getString(0))
+		    .getCubes();
+	    Cube cube = null;
+	    for (Cube c : cubes) {
+		if (c.getUniqueName().equals(from.getString(1))) {
+		    cube = c;
 		    break;
 		}
 	    }
-	}
-	for (Member member : members) {
-	    JSONObject s = new JSONObject();
-	    s.put("caption", member.getCaption());
-	    if (from.getString(2).equals("[Measures]")) {
-		s.put("description", member.getDescription());
+	    List<Dimension> dimensions = cube.getDimensions();
+	    Dimension dimension = null;
+	    for (Dimension d : dimensions) {
+		if (d.getUniqueName().equals(from.getString(2))) {
+		    dimension = d;
+		    break;
+		}
 	    }
-	    if (withProperties == true) {
-		this.getMemberProperties(from, member, s);
+	    List<Hierarchy> hierarchies = dimension.getHierarchies();
+	    Hierarchy hierarchy = null;
+	    for (Hierarchy h : hierarchies) {
+		if (h.getUniqueName().equals(from.getString(3))) {
+		    hierarchy = h;
+		    break;
+		}
 	    }
-	    result.put(member.getUniqueName(), s);
-	}
+	    List<Level> levels = hierarchy.getLevels();
+	    Level level = null;
+	    for (Level l : levels) {
+		if (l.getUniqueName().equals(from.getString(4))) {
+		    level = l;
+		    break;
+		}
+	    }
+	    String current = null;
+	    List<Member> tmp = level.getMembers();
+	    List<Member> members = new LinkedList<Member>();
+	    for (Member m : tmp) {
+		if (m.getUniqueName().equals(current) == false) {
+		    members.add(m);
+		    current = m.getUniqueName();
+		}
+	    }
+
+	    if (from.length() == 6) {
+		for (Member member : members) {
+		    if (member.getUniqueName().equals(from.getString(5))) {
+			LinkedList<Member> memberArray = new LinkedList<Member>(
+				Arrays.asList(member));
+			for (int i = 0; i < granularity; i++) {
+			    LinkedList<Member> list = new LinkedList<Member>();
+			    for (Member m : memberArray) {
+				list.addAll(m.getChildMembers());
+			    }
+			    memberArray = list;
+			}
+			members = memberArray;
+			break;
+		    }
+		}
+	    }
+	    for (Member member : members) {
+		JSONObject s = new JSONObject();
+		s.put("caption", member.getCaption());
+		if (from.getString(2).equals("[Measures]")) {
+		    s.put("description", member.getDescription());
+		}
+		if (withProperties == true) {
+		    this.getMemberProperties(from, member, s);
+		}
+		result.put(member.getUniqueName(), s);
+	    }
 	} catch (OlapException | NullPointerException e) {
-	    throw new Solap4pyException(ErrorType.BAD_REQUEST, "Invalid identifier");
+	    throw new Solap4pyException(ErrorType.BAD_REQUEST,
+		    "Invalid identifier");
 	} catch (JSONException e) {
 	    throw new Solap4pyException(ErrorType.UNKNOWN_ERROR,
 		    "An error occured while building json result");
@@ -411,19 +418,20 @@ public class Metadata {
     private JSONObject getLevelProperties(Level level) throws Solap4pyException {
 	JSONObject result = new JSONObject();
 	try {
-	List<Property> properties = level.getProperties();
-	for (Property property : properties) {
-	    JSONObject s = new JSONObject();
-	    s.put("caption", property.getCaption());
-	    if (Metadata.USELESS_PROPERTIES.contains(property.getUniqueName()) == false) {
-		if (property.getCaption().substring(0, 4).equals("Geom")) {
-		    s.put("type", "Geometry");
-		} else {
-		    s.put("type", "Standard");
+	    List<Property> properties = level.getProperties();
+	    for (Property property : properties) {
+		JSONObject s = new JSONObject();
+		s.put("caption", property.getCaption());
+		if (Metadata.USELESS_PROPERTIES.contains(property
+			.getUniqueName()) == false) {
+		    if (property.getCaption().substring(0, 4).equals("Geom")) {
+			s.put("type", "Geometry");
+		    } else {
+			s.put("type", "Standard");
+		    }
+		    result.put(property.getUniqueName(), s);
 		}
-		result.put(property.getUniqueName(), s);
 	    }
-	}
 	} catch (JSONException e) {
 	    throw new Solap4pyException(ErrorType.UNKNOWN_ERROR,
 		    "An error occured while building json result");
@@ -434,21 +442,23 @@ public class Metadata {
     private void getMemberProperties(JSONArray from, Member member,
 	    JSONObject result) throws Solap4pyException {
 	try {
-	for (Property property : member.getProperties()) {
-	    if (Metadata.USELESS_PROPERTIES.contains(property.getUniqueName()) == false) {
-		if (property.getCaption().substring(0, 4).equals("Geom")) {
-		    result.put(
-			    property.getUniqueName(),
-			    this.getGeometry(from, member,
-				    property.getCaption()));
-		} else {
-		    result.put(property.getUniqueName(),
-			    member.getPropertyFormattedValue(property));
+	    for (Property property : member.getProperties()) {
+		if (Metadata.USELESS_PROPERTIES.contains(property
+			.getUniqueName()) == false) {
+		    if (property.getCaption().substring(0, 4).equals("Geom")) {
+			result.put(
+				property.getUniqueName(),
+				this.getGeometry(from, member,
+					property.getCaption()));
+		    } else {
+			result.put(property.getUniqueName(),
+				member.getPropertyFormattedValue(property));
+		    }
 		}
 	    }
-	}
 	} catch (OlapException | NullPointerException e) {
-	    throw new Solap4pyException(ErrorType.BAD_REQUEST, "Invalid identifier");
+	    throw new Solap4pyException(ErrorType.BAD_REQUEST,
+		    "Invalid identifier");
 	} catch (JSONException e) {
 	    throw new Solap4pyException(ErrorType.UNKNOWN_ERROR,
 		    "An error occured while building json result");
@@ -459,15 +469,16 @@ public class Metadata {
 	    String geometricProperty) throws Solap4pyException {
 	CellSet cellSet = null;
 	try {
-	OlapStatement statement = this.olapConnection.createStatement();
-	String nameMember = member.getUniqueName();
-	cellSet = statement
-		.executeOlapQuery("with member [Measures].[geo] as "
-			+ nameMember + ".Properties(\"" + geometricProperty
-			+ "\") select [Measures].[geo] ON COLUMNS from "
-			+ from.getString(1));
+	    OlapStatement statement = this.olapConnection.createStatement();
+	    String nameMember = member.getUniqueName();
+	    cellSet = statement
+		    .executeOlapQuery("with member [Measures].[geo] as "
+			    + nameMember + ".Properties(\"" + geometricProperty
+			    + "\") select [Measures].[geo] ON COLUMNS from "
+			    + from.getString(1));
 	} catch (OlapException | NullPointerException e) {
-	    throw new Solap4pyException(ErrorType.BAD_REQUEST, "Invalid identifier");
+	    throw new Solap4pyException(ErrorType.BAD_REQUEST,
+		    "Invalid identifier");
 	} catch (JSONException e) {
 	    throw new Solap4pyException(ErrorType.UNKNOWN_ERROR,
 		    "An error occured while building json result");
@@ -479,7 +490,7 @@ public class Metadata {
 	    SQLException, JSONException {
 
 	String param = "{ \"queryType\" : \"metadata\","
-		+ "\"data\" : { \"root\" : [\"wrong\"], \"withProperties\" : false, \"granularity\" : 1}}";
+		+ "\"data\" : { \"root\" : [\"Traffic\", \"[Traffic]\", \"[Zone]\", \"[Zone.Name]\", \"[Zone.Name].[Name0]\"], \"withProperties\" : false, \"granularity\" : 1}}";
 
 	Solap4py p = Solap4py.getSolap4Object();
 	JSONObject query = new JSONObject(param);
