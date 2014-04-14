@@ -50,12 +50,11 @@ public class Metadata {
 
     public JSONObject query(JSONObject query, JSONObject jsonResult)
 	    throws Solap4pyException {
-	JSONObject data = null;
 	JSONArray root = null;
 	boolean withProperties;
 
 	try {
-	    root = data.getJSONArray("root");
+	    root = query.getJSONArray("root");
 	} catch (JSONException e) {
 	    throw new Solap4pyException(ErrorType.BAD_REQUEST,
 		    "'root' field not specified or invalid");
@@ -77,7 +76,7 @@ public class Metadata {
 		break;
 	    case 4:
 		try {
-		    withProperties = data.getBoolean("withProperties");
+		    withProperties = query.getBoolean("withProperties");
 		} catch (JSONException e) {
 		    throw new Solap4pyException(ErrorType.BAD_REQUEST,
 			    "'withProperties' field not specified or invalid");
@@ -86,7 +85,7 @@ public class Metadata {
 		break;
 	    case 5:
 		try {
-		    withProperties = data.getBoolean("withProperties");
+		    withProperties = query.getBoolean("withProperties");
 		} catch (JSONException e) {
 		    throw new Solap4pyException(ErrorType.BAD_REQUEST,
 			    "'withProperties' field not specified or invalid");
@@ -96,14 +95,14 @@ public class Metadata {
 		break;
 	    case 6:
 		try {
-		    withProperties = data.getBoolean("withProperties");
+		    withProperties = query.getBoolean("withProperties");
 		} catch (JSONException e) {
 		    throw new Solap4pyException(ErrorType.BAD_REQUEST,
 			    "'withProperties' field not specified or invalid");
 		}
 		int granularity;
 		try {
-		    granularity = data.getInt("granularity");
+		    granularity = query.getInt("granularity");
 		} catch (JSONException e) {
 		    throw new Solap4pyException(ErrorType.BAD_REQUEST,
 			    "'granularity' field not specified or invalid");
@@ -483,8 +482,7 @@ public class Metadata {
     public static void main(String[] args) throws ClassNotFoundException,
 	    SQLException, JSONException {
 
-	String param = "{ \"queryType\" : \"metadata\","
-		+ "\"data\" : { \"root\" : [\"Trafficv\"]}}";
+	String param = "{ \"root\" : [\"Traffic\"]}";
 
 	Solap4py p = Solap4py.getSolap4Object();
 	JSONObject query = new JSONObject(param);
