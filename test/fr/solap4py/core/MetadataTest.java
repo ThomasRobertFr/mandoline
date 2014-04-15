@@ -94,12 +94,14 @@ public class MetadataTest {
         }
     }
 
-    @Test
-    public void testGetCubes() {
+    @Test (expected = Solap4pyException.class)
+    public void testGetCubes() throws Throwable {
 
-        String param = "{ \"queryType\" : \"metadata\"," + "\"data\" : { \"root\" : [\"Traffic\"]}}";
+        
 
         try {
+        	String param = "{ \"queryType\" : \"metadata\"," + "\"data\" : { \"root\" : [\"Traffic\"]}}";
+        	
             JSONObject query = new JSONObject(param);
             JSONObject data = query.getJSONObject("data");
             JSONArray root = data.getJSONArray("root");
@@ -117,14 +119,30 @@ public class MetadataTest {
         } catch (InvocationTargetException e) {
             e.printStackTrace();
         }
+        
+        
+        String param = "{ \"queryType\" : \"metadata\"," + "\"data\" : { \"root\" : []}}";
+        try {
+			JSONObject query = new JSONObject(param);
+			 JSONObject data = query.getJSONObject("data");
+	            JSONArray root = data.getJSONArray("root");
+
+	            JSONObject result = (JSONObject) (getCubes.invoke(metadata, root));
+		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+            throw e.getCause();
+        }
+        
+        
+        
     }
 
-    @Test
-    public void testGetDimensions() {
+    @Test (expected = Solap4pyException.class)
+    public void testGetDimensions() throws Throwable {
 
-        String param = "{ \"queryType\" : \"metadata\"," + "\"data\" : { \"root\" : [\"Traffic\", \"[Traffic]\"]}}";
+        
 
         try {
+        	String param = "{ \"queryType\" : \"metadata\"," + "\"data\" : { \"root\" : [\"Traffic\", \"[Traffic]\"]}}";
             JSONObject query = new JSONObject(param);
             JSONObject data = query.getJSONObject("data");
             JSONArray root = data.getJSONArray("root");
@@ -148,14 +166,37 @@ public class MetadataTest {
         } catch (InvocationTargetException e) {
             e.printStackTrace();
         }
+        
+        
+        try {
+        String param = "{ \"queryType\" : \"metadata\"," + "\"data\" : { \"root\" : [\"Traffic\", ]}}";
+        JSONObject query;
+		
+			query = new JSONObject(param);
+			
+			  JSONObject data = query.getJSONObject("data");
+		        JSONArray root = data.getJSONArray("root");
+
+		        JSONObject result = (JSONObject) (getDimensions.invoke(metadata, root));
+		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+            throw e.getCause();
+        }
+      
+        
+        
+        
+        
+        
+        
     }
 
-    @Test
-    public void testgetHierarchies() {
+    @Test (expected = Solap4pyException.class)
+    public void testgetHierarchies() throws Throwable {
 
-        String param = "{ \"queryType\" : \"metadata\"," + "\"data\" : { \"root\" : [\"Traffic\", \"[Traffic]\", \"[Zone]\"]}}";
 
         try {
+
+            String param = "{ \"queryType\" : \"metadata\"," + "\"data\" : { \"root\" : [\"Traffic\", \"[Traffic]\", \"[Zone]\"]}}";
             JSONObject query = new JSONObject(param);
             JSONObject data = query.getJSONObject("data");
             JSONArray root = data.getJSONArray("root");
@@ -174,14 +215,32 @@ public class MetadataTest {
         } catch (InvocationTargetException e) {
             e.printStackTrace();
         }
+        
+        
+
+        try {
+
+        String param = "{ \"queryType\" : \"metadata\"," + "\"data\" : { \"root\" : [\"Traffic\", \"[Traffic]\",]}}";
+        JSONObject query = new JSONObject(param);
+        JSONObject data = query.getJSONObject("data");
+        JSONArray root = data.getJSONArray("root");
+
+        JSONObject result = (JSONObject) (getHierarchies.invoke(metadata, root));
+		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+            throw e.getCause();
+        }
+        
+        
+        
     }
 
-    @Test
-    public void testGetLevels() {
+    @Test (expected = Solap4pyException.class)
+    public void testGetLevels() throws Throwable {
 
-        String param = "{ \"queryType\" : \"metadata\","
-                       + "\"data\" : { \"root\" : [\"Traffic\", \"[Traffic]\", \"[Zone]\", \"[Zone.Name]\", \"[Zone.Name].[Name0]\"], \"withProperties\" : false}}";
         try {
+        	
+        	String param = "{ \"queryType\" : \"metadata\","
+                    + "\"data\" : { \"root\" : [\"Traffic\", \"[Traffic]\", \"[Zone]\", \"[Zone.Name]\", \"[Zone.Name].[Name0]\"], \"withProperties\" : false}}";
             JSONObject query = new JSONObject(param);
             JSONObject data = query.getJSONObject("data");
             JSONArray root = data.getJSONArray("root");
@@ -211,6 +270,19 @@ public class MetadataTest {
         } catch (InvocationTargetException e) {
             e.printStackTrace();
         }
+  
+        try {
+        String param = "{ \"queryType\" : \"metadata\","
+                + "\"data\" : { \"root\" : [\"Traffic\", \"[Traffic]\", \"[Zone]\", 36416345, 251325], \"withProperties\" : false}}";
+        JSONObject query = new JSONObject(param);
+        JSONObject data = query.getJSONObject("data");
+        JSONArray root = data.getJSONArray("root");
+
+        JSONArray result = (JSONArray) (getLevels.invoke(metadata, root, false));
+        }catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+            throw e.getCause();
+        }
+        
     }
 
     @Test
