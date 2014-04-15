@@ -1,5 +1,7 @@
 package fr.solap4py.core;
 
+import java.sql.SQLException;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -22,11 +24,12 @@ final class JSONBuilder {
             hasRows = true;
         }
 
-        for (Position axis0 : cellSet.getAxes().get(Axis.COLUMNS.axisOrdinal()).getPositions()) {
-            if (hasRows) {
-                for (Position axis1 : cellSet.getAxes().get(Axis.ROWS.axisOrdinal()).getPositions()) {
+        if (hasRows) {
+            for (Position axis1 : cellSet.getAxes().get(Axis.ROWS.axisOrdinal()).getPositions()) {
+                JSONObject result = new JSONObject();
+                for (Position axis0 : cellSet.getAxes().get(Axis.COLUMNS.axisOrdinal()).getPositions()) {
+
                     final Cell cell = cellSet.getCell(axis0, axis1);
-                    JSONObject result = new JSONObject();
 
                     for (Member member : axis1.getMembers()) {
                         result.put(member.getHierarchy().getUniqueName(), member.getUniqueName());
@@ -39,23 +42,34 @@ final class JSONBuilder {
                             result.put(member.getUniqueName(), cell.getValue());
                         }
                     }
-                    results.put(result);
                 }
-            } else {
-                final Cell cell = cellSet.getCell(axis0);
-                JSONObject result = new JSONObject();
-
-                for (Member member : axis0.getMembers()) {
-                    if (cell.getValue() == null) {
-                        result.put(member.getUniqueName(), 0);
-                    } else {
-                        result.put(member.getUniqueName(), cell.getValue());
-                    }
-                }
-
                 results.put(result);
             }
+        } else {
+            JSONObject result = new JSONObject();
+            for (Position axis0 : cellSet.getAxes().get(Axis.COLUMNS.axisOrdinal()).getPositions()) {
+                final Cell cell = cellSet.getCell(axis0);
+
+                Member member = axis0.getMembers().get(0);
+                if (cell.getValue() == null) {
+                    result.put(member.getUniqueName(), 0);
+                } else {
+                    result.put(member.getUniqueName(), cell.getValue());
+                }
+
+            }
+            results.put(result);
+
         }
         return results;
+    }
+
+    public static void main(String[] args) throws ClassNotFoundException, SQLException {
+        Solap4py s = Solap4py.getSolap4Object();
+
+        String query = "{\"queryType\":\"data\",\"data\":{\"from\":\"[Traffic]\",\"onColumns\":[\"[Measures].[Goods Quantity]\",\"[Measures].[Max Quantity]\"],\"onRows\":{},\"where\":{}}}";
+
+        System.out.println(s.process(query));
+
     }
 }
