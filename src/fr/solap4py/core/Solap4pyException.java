@@ -1,8 +1,5 @@
 package fr.solap4py.core;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 enum ErrorType {
     BAD_REQUEST,
     NOT_SUPPORTED,
@@ -15,13 +12,13 @@ enum ErrorType {
 @SuppressWarnings("serial")
 public class Solap4pyException extends Exception {
 
-    private final String DESCRIPTION;
-    private final ErrorType TYPE;
+    private String description;
+    private ErrorType type;
 
     public Solap4pyException(ErrorType type, String description) {
         super(description);
-        this.TYPE = type;
-        this.DESCRIPTION = description == null ? "null" : description;
+        this.type = type;
+        this.description = description == null ? "null" : description;
 
     }
 
@@ -29,11 +26,8 @@ public class Solap4pyException extends Exception {
         this(type, exception.getMessage());
     }
 
-    public JSONObject getJSON() throws JSONException {
-        JSONObject objectJson = new JSONObject();
-        objectJson.put("error", TYPE.toString());
-        objectJson.put("data", DESCRIPTION);
-        return objectJson;
+    public String getJSON() {
+        return "{\"error\":\"" + type.toString() + "\",\"data\":\"" + description + "\"}";
     }
 
 }

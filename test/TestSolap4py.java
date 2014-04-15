@@ -59,8 +59,8 @@ public class TestSolap4py {
                                                                                                              .put("measure", true)))));
             String query = model.toString();
             System.out.println(query);
-            //String res = solap4py.select(query);
-            //System.out.println(res);
+            // String res = solap4py.select(query);
+            // System.out.println(res);
         } catch (Exception ex) {
             ex.printStackTrace();
         } finally {
