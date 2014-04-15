@@ -457,6 +457,7 @@ public class Metadata {
 
     public static void main(String[] args) throws ClassNotFoundException, SQLException, JSONException {
 
+
         String param = "{ \"root\" : [\"Traffic\"]}";
 
         Solap4py p = Solap4py.getSolap4Object();
@@ -469,6 +470,7 @@ public class Metadata {
         } catch (Solap4pyException e) {
             LOGGER.log(java.util.logging.Level.SEVERE, e.getMessage());
         }
+
     }
 
 }
