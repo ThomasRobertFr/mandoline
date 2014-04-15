@@ -121,7 +121,7 @@ public class Solap4py {
             CellSet cellSet = os.executeOlapQuery(sn);
             result = JSONBuilder.createJSONResponse(cellSet);
         } catch (OlapException oe) {
-            throw new Solap4pyException(ErrorType.SERVER_ERROR, oe);
+            throw new Solap4pyException(ErrorType.SERVER_ERROR, "Impossible to execute the query");
         }
 
         return result;
