@@ -59,6 +59,7 @@ public class IntegrationTest {
 	    String result = this.solap4py.process(query);
 	    assertTrue(result.equals("{\"error\":\"OK\",\"data\":[{\"[Measures].[Goods Quantity]\":0,\"[Time]\":\"[Time].[All Times].[1950]\"}]}"));
 	}
+
 }
 
 
