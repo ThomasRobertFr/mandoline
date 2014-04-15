@@ -1,5 +1,7 @@
 package fr.solap4py.core;
 
+import java.sql.SQLException;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -33,7 +35,11 @@ final class JSONBuilder {
                     }
 
                     for (Member member : axis0.getMembers()) {
-                        result.put(member.getUniqueName(), cell.getValue());
+                        if (cell.getValue() == null) {
+                            result.put(member.getUniqueName(), 0);
+                        } else {
+                            result.put(member.getUniqueName(), cell.getValue());
+                        }
                     }
                     results.put(result);
                 }
@@ -42,12 +48,25 @@ final class JSONBuilder {
                 JSONObject result = new JSONObject();
 
                 for (Member member : axis0.getMembers()) {
-                    result.put(member.getUniqueName(), cell.getValue());
+                    if (cell.getValue() == null) {
+                        result.put(member.getUniqueName(), 0);
+                    } else {
+                        result.put(member.getUniqueName(), cell.getValue());
+                    }
                 }
 
                 results.put(result);
             }
         }
         return results;
+    }
+
+    public static void main(String[] args) throws ClassNotFoundException, SQLException {
+        Solap4py s = Solap4py.getSolap4Object();
+
+        String query = "{\"queryType\":\"data\",\"data\":{\"from\":\"[Sales]\",\"onColumns\":[\"[Measures].[Unit Sales]\",\"[Measures].[Store Cost]\"],\"onRows\":{\"[Time].[Year]\":{\"members\":[\"[Time].[Year].[1997]\",\"[Time].[Year].[1998]\"],\"range\":false},\"[Store].[Store Country]\":{\"members\":[\"[Store].[Store Country].[USA]\",\"[Store].[Store Country].[Canada]\"],\"range\":false}},\"where\":{}}}";
+
+        System.out.println(s.process(query));
+
     }
 }
