@@ -22,7 +22,7 @@ public class IntegrationTest {
 
 	@After
 	public void tearDown() throws Exception {
-		olapConnection.close();
+		olapConnection.close();       
 	}
 
 	@Test
@@ -43,23 +43,23 @@ public class IntegrationTest {
 	public void testInvalidSchema() {
 	    String query = "{ \"queryType\" : \"metadata\", \"data\" : { \"root\" : [\"Trafficv\"]}}";
 	    String result = this.solap4py.process(query);
-	    assertTrue(result.equals("{ \"error\": \"BAD_REQUEST\", \"data\": \"Invalid schema identifier\"}"));
+	    assertTrue(result.equals("{\"error\":\"BAD_REQUEST\",\"data\":\"Invalid schema identifier\"}"));
 	}
 	
 	@Test
 	public void testRange() {
-	    String query = "{ \"queryType\" : \"data\", \"data\" : { \"from\":\"[Traffic]\", \"onColumns\":[\"[Measures].[Max Quantity]\"], \"onRows\":{\"[Time]\":{\"members\":[\"[Time].[All Times].[2000]\", \"[Time].[All Times].[2003]\"]}, \"range\":true}}}";
+	    String query = "{ \"queryType\" : \"data\", \"data\" : { \"from\":\"[Traffic]\", \"onColumns\":[\"[Measures].[Max Quantity]\"], \"onRows\":{\"[Time]\":{\"members\":[\"[Time].[All Times].[2000]\", \"[Time].[All Times].[2003]\"], \"range\":true}}}}";
 	    String result = this.solap4py.process(query);
-	    assertTrue(result.equals("{\"error\":\"OK\",\"data\":[{\"[Measures].[Max Quantity]\":[311121],\"[Time]\":[\"[Time].[All Times].[2000]\"]},{\"[Measures].[Max Quantity]\":[304574],\"[Time]\":[\"[Time].[All Times].[2001]\"]},{\"[Measures].[Max Quantity]\":[310543],\"[Time]\":[\"[Time].[All Times].[2002]\"]},{\"[Measures].[Max Quantity]\":[315811],\"[Time]\":[\"[Time].[All Times].[2003]\"]}]}"));
+	    assertTrue(result.equals("{\"error\":\"OK\",\"data\":[{\"[Measures].[Max Quantity]\":311121,\"[Time]\":\"[Time].[All Times].[2000]\"},{\"[Measures].[Max Quantity]\":304574,\"[Time]\":\"[Time].[All Times].[2001]\"},{\"[Measures].[Max Quantity]\":310543,\"[Time]\":\"[Time].[All Times].[2002]\"},{\"[Measures].[Max Quantity]\":315811,\"[Time]\":\"[Time].[All Times].[2003]\"}]}"));
 	}
 	
 	@Test
-	public void test() {
+	public void testNullMeasure() {
 	    String query = "{\"queryType\":\"data\",\"data\":{\"from\":\"[Traffic]\",\"onColumns\":[\"[Measures].[Goods Quantity]\"],\"onRows\":{\"[Time]\":{\"members\":[\"[Time].[All Times].[1950]\"], \"range\":false}}}}";
 	    String result = this.solap4py.process(query);
-	    assertTrue(result.equals("{\"error\":\"OK\",\"data\":[{\"[Measures].[Goods Quantity]\":0,\"[Time]\":[\"[Time].[All Times].[1950]\"]}]}"));
+	    assertTrue(result.equals("{\"error\":\"OK\",\"data\":[{\"[Measures].[Goods Quantity]\":0,\"[Time]\":\"[Time].[All Times].[1950]\"}]}"));
 	}
-	
+
 }
 
 
