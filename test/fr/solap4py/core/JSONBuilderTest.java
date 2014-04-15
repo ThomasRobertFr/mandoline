@@ -55,14 +55,13 @@ public class JSONBuilderTest {
 	public void testCreateJSONResponse() throws OlapException, JSONException {
 
 		JSONArray jsonArrayTest = JSONBuilder.createJSONResponse(cellSetTest);
-		JSONObject r1 = jsonArrayTest.getJSONObject(0);
-		JSONObject r2 = jsonArrayTest.getJSONObject(1);
-
-		assertTrue("The first dimension does not correspond",
-				r1.has("[Measures].[Goods Quantity]") && r1.has("[Time]"));
-		assertTrue("The second dimension does not correspond",
-				r2.has("[Measures].[Max Quantity]") && r2.has("[Time]"));
-
+	System.out.println(jsonArrayTest.toString());
+	JSONObject r1 = jsonArrayTest.getJSONObject(0);
+	System.out.println(r1.toString());
+	
+	assertTrue("The first dimension does not correspond",
+	r1.has("[Measures].[Goods Quantity]") && r1.has("[Time]"));
+	
 	}
 
 }
