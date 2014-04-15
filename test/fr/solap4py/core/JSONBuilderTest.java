@@ -26,10 +26,9 @@ public class JSONBuilderTest {
     public void setUp() throws Exception {
         solap4py = Solap4py.getSolap4Object();
         olapConnection = solap4py.getOlapConnection();
-
         String s = "{" + "onColumns:" + "[" + "\"[Measures].[Goods Quantity]\"," + "\"[Measures].[Max Quantity]\"" + "]," + " onRows:"
-                   + "{" + "\"[Time]\":{\"members\":[\"[2000]\"],\"range\":false} " + "}," + " where:" + "{"
-                   + "\"[Zone.Name]\":{\"members\":[\"[France]\"],\"range\":false} " + "}," + "from:" + "\"[Traffic]\"" + "}";
+                + "{" + "\"[Time]\":{\"members\":[\"[Time].[2000]\"],\"range\":false} " + "}," + " where:" + "{"
+                + "\"[Zone.Name]\":{\"members\":[\"[Zone.Name].[France]\"],\"range\":false} " + "}," + "from:" + "\"[Traffic]\"" + "}";
         inputTest = new JSONObject(s);
         selectNodeTest = MDXBuilder.createSelectNode(olapConnection, inputTest);
         os = olapConnection.createStatement();
