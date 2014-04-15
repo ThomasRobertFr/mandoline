@@ -413,6 +413,27 @@ public class MetadataTest {
 					result.getJSONObject("[Zone.Name].[All Zone.Names].[Spain]")
 							.has("Traffic Cube - Zone.Name Hierarchy - Name0 Level - Geom Property"));
 
+			param = "{ \"queryType\" : \"metadata\","
+                    + "\"data\" : { \"root\" : [\"Traffic\", \"[Traffic]\", \"[Zone]\", \"[Zone.Name]\", \"[Zone.Name].[Name0]\" ,   \"[Zone.Name].[All Zone.Names].[France]\" ] , \"withProperties\" : false, \"granularity\" : 1}}";
+            
+            root = new JSONObject(param).getJSONObject("data").getJSONArray("root");
+            
+            result = (JSONObject) (getMembers.invoke(metadata, root, false, 0));
+            assertTrue("the result does not only contains the France member", !result.has("[Zone.Name].[All Zone.Names].[Spain]") && result.has("[Zone.Name].[All Zone.Names].[France]"));
+            result = (JSONObject) (getMembers.invoke(metadata, root, false, 2));
+            assertTrue("the result does not only contains the children of France with a granularity 2",  result.has("[Zone.Name].[All Zone.Names].[France].[DÉPARTEMENTS D'OUTRE-MER].[Guyane]") && !result.has("[Zone.Name].[All Zone.Names].[France]"));
+            
+              param = "{ \"queryType\" : \"metadata\","
+                    + "\"data\" : { \"root\" : [\"Traffic\", \"[Traffic]\", \"[Measures]\", \"[Measures]\", \"[Measures].[MeasuresLevel]\"], \"withProperties\" : true, \"granularity\" : 1}}";
+           
+            
+            result = (JSONObject) (getMembers.invoke(metadata, new JSONObject(param).getJSONObject("data").getJSONArray("root"), true, 1));
+            
+            assertTrue(" the result does not contain the members corresponding to the different measures ", result.has("[Measures].[Goods Quantity]") && result.has("[Measures].[Max Quantity]"));
+			
+			
+			
+			
 		} catch (JSONException e) {
 			e.printStackTrace();
 		} catch (IllegalAccessException e) {
