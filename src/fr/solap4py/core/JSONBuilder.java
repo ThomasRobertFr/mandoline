@@ -13,9 +13,19 @@ import org.olap4j.Position;
 import org.olap4j.metadata.Member;
 
 final class JSONBuilder {
+
     private JSONBuilder() {
     }
 
+    
+    /**
+     * 
+     * @param cellSet The CellSet containing the response of a request sent. 
+     * @return the JsonArray containing the same information as in cellSet.
+     * @throws OlapException
+     * @throws JSONException
+     */
+    
     static JSONArray createJSONResponse(CellSet cellSet) throws OlapException, JSONException {
         JSONArray results = new JSONArray();
         boolean hasRows = false;
