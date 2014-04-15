@@ -482,18 +482,22 @@ public class Metadata {
     public static void main(String[] args) throws ClassNotFoundException,
 	    SQLException, JSONException {
 
-	String param = "{ \"root\" : [\"Traffic\"]}";
-
-	Solap4py p = Solap4py.getSolap4Object();
-	JSONObject query = new JSONObject(param);
-	Metadata m = new Metadata(p.getOlapConnection());
-	JSONObject result = new JSONObject();
-	try {
-	    result = m.query(query, result);
-	    // System.out.println(result.getJSONObject("data").getJSONObject("[Zone.Name].[All Zone.Names].[France]"));
-	    System.out.println(result);
-	} catch (Solap4pyException e) {
-	    System.out.println(e.getJSON());
-	}
+	String p1 = "{\"queryType\":\"metadata\",\"data\":{ \"root\" : [\"Traffic\"]}}";
+	String p2 = "{\"queryType\":\"metadata\",\"data\":{\"root\": [\"Traffic\", \"[Traffic]\", \"[Zone]\", \"[Zone.Name]\", \"[Zone.Name].[Name0]\"], \"withProperties\": false }}";
+	String p3 = "{ \"queryType\" : \"metadata\", \"data\" : { \"root\" : [\"Trafficv\"]}}";
+	String p4 = "{ \"queryType\" : \"data\", \"data\" : { \"from\":\"[Traffic]\", \"onColumns\":[\"[Measures].[Max Quantity]\"], \"onRows\":{\"[Time]\":{\"members\":[\"[Time].[All Times].[2000]\", \"[Time].[All Times].[2003]\"}, \"range\":true]}}}";
+	String p5 = "{\"queryType\":\"data\",\"data\":{\"from\":\"[Traffic]\",\"onColumns\":[\"[Measures].[Goods Quantity]\"],\"onRows\":{\"[Time]\":{\"members\":[\"[Time].[All Times].[1950]\"]}}}}";
+	
+//	Solap4py p = Solap4py.getSolap4Object();
+//	JSONObject query = new JSONObject(param);
+//	Metadata m = new Metadata(p.getOlapConnection());
+//	JSONObject result = new JSONObject();
+//	try {
+//	    result = m.query(query, result);
+//	    // System.out.println(result.getJSONObject("data").getJSONObject("[Zone.Name].[All Zone.Names].[France]"));
+//	    System.out.println(result);
+//	} catch (Solap4pyException e) {
+//	    System.out.println(e.getJSON());
+//	}
     }
 }
