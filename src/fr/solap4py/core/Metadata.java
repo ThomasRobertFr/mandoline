@@ -40,7 +40,10 @@ public class Metadata {
 					"DISPLAY_INFO", "VALUE"));
 	private static final Logger LOGGER = Logger.getLogger(Metadata.class
 			.getName());
-
+/**
+ * 
+ * @param connection
+ */
 	public Metadata(OlapConnection connection) {
 		try {
 			this.catalog = connection.getOlapCatalog();
@@ -49,7 +52,13 @@ public class Metadata {
 			LOGGER.log(java.util.logging.Level.SEVERE, e.getMessage());
 		}
 	}
-
+/**
+ * 
+ * @param query 
+ * @param jsonResult
+ * @return the response of the query
+ * @throws Solap4pyException
+ */
 	public JSONObject query(JSONObject query, JSONObject jsonResult)
 			throws Solap4pyException {
 		JSONArray root = null;
@@ -132,7 +141,11 @@ public class Metadata {
 		}
 		return jsonResult;
 	}
-
+/**
+ * 
+ * @return the schemas existing in the database
+ * @throws Solap4pyException
+ */
 	private JSONObject getSchemas() throws Solap4pyException {
 		List<Schema> schemas = null;
 		JSONObject result = new JSONObject();
@@ -156,7 +169,12 @@ public class Metadata {
 
 		return result;
 	}
-
+/**
+ * 
+ * @param from
+ * @return Names of the cubes existing in a schema.
+ * @throws Solap4pyException
+ */
 	private JSONObject getCubes(JSONArray from) throws Solap4pyException {
 		JSONObject result = new JSONObject();
 		try {
@@ -179,7 +197,12 @@ public class Metadata {
 		}
 		return result;
 	}
-
+/**
+ * 
+ * @param from
+ * @return the dimensions existing in the cube specified in from
+ * @throws Solap4pyException
+ */
 	private JSONObject getDimensions(JSONArray from) throws Solap4pyException {
 		JSONObject result = new JSONObject();
 		try {
@@ -246,7 +269,12 @@ public class Metadata {
 
 		return result;
 	}
-
+/**
+ * 
+ * @param from
+ * @return the hierarchies of a specific dimension specified in from
+ * @throws Solap4pyException
+ */
 	private JSONObject getHierarchies(JSONArray from) throws Solap4pyException {
 		JSONObject result = new JSONObject();
 		try {
@@ -285,7 +313,13 @@ public class Metadata {
 
 		return result;
 	}
-
+/**
+ * 
+ * @param from
+ * @param withProperties if it returns the properties of the levels
+ * @return the levels of specific hierarchy specified in from
+ * @throws Solap4pyException
+ */
 	private JSONArray getLevels(JSONArray from, boolean withProperties)
 			throws Solap4pyException {
 		JSONArray result = new JSONArray();
@@ -337,7 +371,14 @@ public class Metadata {
 
 		return result;
 	}
-
+/**
+ * 
+ * @param from
+ * @param withProperties if it returns the properties of the members
+ * @param granularity level of granularity to get the members
+ * @return the members of a specific level specified in from
+ * @throws Solap4pyException
+ */
 	private JSONObject getMembers(JSONArray from, boolean withProperties,
 			int granularity) throws Solap4pyException {
 		JSONObject result = new JSONObject();
@@ -425,7 +466,12 @@ public class Metadata {
 
 		return result;
 	}
-
+/**
+ * 
+ * @param level
+ * @return the property of level
+ * @throws Solap4pyException
+ */
 	private JSONObject getLevelProperties(Level level) throws Solap4pyException {
 		JSONObject result = new JSONObject();
 		try {
@@ -450,7 +496,13 @@ public class Metadata {
 		}
 		return result;
 	}
-
+/**
+ * 
+ * @param from
+ * @param member 
+ * @param result the member's property gotten
+ * @throws Solap4pyException
+ */
 	private void getMemberProperties(JSONArray from, Member member,
 			JSONObject result) throws Solap4pyException {
 		try {
@@ -478,7 +530,14 @@ public class Metadata {
 					"An error occured while building json result");
 		}
 	}
-
+/**
+ * 
+ * @param from
+ * @param member
+ * @param geometricProperty
+ * @return the geometry of member
+ * @throws Solap4pyException
+ */
 	private String getGeometry(JSONArray from, Member member,
 			String geometricProperty) throws Solap4pyException {
 		CellSet cellSet = null;
