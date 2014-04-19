@@ -79,7 +79,7 @@ final class JSONBuilder {
 
         String query = "{\"queryType\":\"data\",\"data\":{\"from\":\"[Traffic]\",\"onColumns\":[\"[Measures].[Goods Quantity]\",\"[Measures].[Max Quantity]\"],\"onRows\":{},\"where\":{}}}";
 
-        System.out.println(s.process(query));
+        System.out.println(new String(s.process(query.getBytes())));
 
     }
 }
