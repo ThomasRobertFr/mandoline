@@ -171,4 +171,37 @@ public class Solap4py {
         }
         return null;
     }
+    
+    
+    public static void main(String[] args) throws ClassNotFoundException, SQLException {
+        if (args.length() != 4) {
+            System.err.println("bla bla bla");
+            System.exit(1);
+        }
+        
+        Solap4py solap4py = new Solap4Py(args[0], args[1], args[2], args[3]);
+        ServerSocket server = new ServerSocket(5000); // TODO which port should we use ?
+        
+        while (true) {
+            final Socket client = server.accept();
+            new Thread() {
+                @Override
+                public void run() {
+                    try {
+                        BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
+                        PrintWriter out = new PrintWriter(client.getOutputStream());
+                        
+                        String query = in.readLine();
+                        String result = solap4py.process(query);
+                        
+                        out.print(result);
+                        out.flush();
+                        client.close();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+    }
 }
