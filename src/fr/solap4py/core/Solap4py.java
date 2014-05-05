@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -56,9 +57,13 @@ public class Solap4py {
      *            the input query in JSON format
      * @return the result of the query in JSON format
      */
-    public String process(String query) {
+    public byte[] process(byte[] byteQuery) {
         String result;
+        long startTime = System.nanoTime();
 
+        String query = new String(byteQuery, StandardCharsets.UTF_8);
+        System.out.println(query);
+        System.out.println("Time for converting input : " + (System.nanoTime() - startTime));
         try {
             try {
                 /* Here, we process the query */
@@ -84,8 +89,12 @@ public class Solap4py {
         } catch (Solap4pyException se) {
             result = se.getJSON();
         }
+        
+        System.out.println("Process time : " + (System.nanoTime() - startTime));
+        byte[] byteResult = result.getBytes(StandardCharsets.UTF_8);
+        System.out.println("Time for converting result : " + (System.nanoTime() - startTime));
 
-        return result;
+        return byteResult;
     }
 
     /**
@@ -161,5 +170,38 @@ public class Solap4py {
             }
         }
         return null;
+    }
+    
+    
+    public static void main(String[] args) throws ClassNotFoundException, SQLException {
+        if (args.length() != 4) {
+            System.err.println("bla bla bla");
+            System.exit(1);
+        }
+        
+        Solap4py solap4py = new Solap4Py(args[0], args[1], args[2], args[3]);
+        ServerSocket server = new ServerSocket(5000); // TODO which port should we use ?
+        
+        while (true) {
+            final Socket client = server.accept();
+            new Thread() {
+                @Override
+                public void run() {
+                    try {
+                        BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
+                        PrintWriter out = new PrintWriter(client.getOutputStream());
+                        
+                        String query = in.readLine();
+                        String result = solap4py.process(query);
+                        
+                        out.print(result);
+                        out.flush();
+                        client.close();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
     }
 }
