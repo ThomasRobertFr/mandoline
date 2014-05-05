@@ -134,8 +134,6 @@ public class MDXBuilderTest {
 		olapConnection.close();
 	}
 
-	@Rule
-	public ExpectedException thrown = ExpectedException.none();
 
 	@Test(expected = Solap4pyException.class)
 	public void testGetJSONCubeName() throws Throwable {
