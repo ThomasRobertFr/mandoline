@@ -56,6 +56,7 @@ public class Metadata {
     }
 
     /**
+     * Returns in a JSONObject the metadata indicated in query.
      * 
      * @param query
      * @param jsonResult
@@ -135,6 +136,7 @@ public class Metadata {
     }
 
     /**
+     * Returns all schemas of the database.
      * 
      * @return the schemas existing in the database
      * @throws Solap4pyException
@@ -162,6 +164,7 @@ public class Metadata {
     }
 
     /**
+     * Returns all cube's names from a schema specified in from. 
      * 
      * @param from
      * @return Names of the cubes existing in a schema.
@@ -188,7 +191,7 @@ public class Metadata {
     }
 
     /**
-     * 
+     * Returns the all the dimensions's names from a cube specified in from
      * @param from
      * @return the dimensions existing in the cube specified in from
      * @throws Solap4pyException
@@ -257,6 +260,7 @@ public class Metadata {
     }
 
     /**
+     * Returns all the hierarchies from a dimension specified in from.
      * 
      * @param from
      * @return the hierarchies of a specific dimension specified in from
@@ -299,6 +303,7 @@ public class Metadata {
     }
 
     /**
+     * Returns all the levels from a hierarchy specified in from, with its properties or not.
      * 
      * @param from
      * @param withProperties
@@ -355,7 +360,7 @@ public class Metadata {
     }
 
     /**
-     * 
+     *  Returns all the members' names from a hierarchy specified in from, with its properties or not.
      * @param from
      * @param withProperties
      *            if it returns the properties of the members
@@ -448,6 +453,7 @@ public class Metadata {
     }
 
     /**
+     * Returns the properties of a level.
      * 
      * @param level
      * @return the property of level
@@ -477,6 +483,7 @@ public class Metadata {
     }
 
     /**
+     * Returns the properties of a member.
      * 
      * @param from
      * @param member
@@ -505,7 +512,7 @@ public class Metadata {
     }
 
     /**
-     * 
+     * Returns a geometric property of a member.
      * @param from
      * @param member
      * @param geometricProperty
