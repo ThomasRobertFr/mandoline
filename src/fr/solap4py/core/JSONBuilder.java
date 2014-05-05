@@ -16,6 +16,7 @@ final class JSONBuilder {
     }
 
     /**
+     * Transforms a CellSet containing a request response into a JSONArray.
      * 
      * @param cellSet
      *            The CellSet containing the response of a request sent.
@@ -51,6 +52,14 @@ final class JSONBuilder {
         return results;
     }
 
+    /**
+     * Add inside result the contents of two axis.
+     * @param result
+     * @param cellSet
+     * @param axis0
+     * @param axis1
+     * @throws JSONException
+     */
     private static void addToResult(JSONObject result, CellSet cellSet, Position axis0, Position axis1) throws JSONException {
         final Cell cell = cellSet.getCell(axis0, axis1);
 
@@ -66,7 +75,13 @@ final class JSONBuilder {
             }
         }
     }
-
+  /**
+   * Add inside result the contents of one axis.
+   * @param result
+   * @param cellSet
+   * @param axis0
+   * @throws JSONException
+   */
     private static void addToResult(JSONObject result, CellSet cellSet, Position axis0) throws JSONException {
         final Cell cell = cellSet.getCell(axis0);
 
