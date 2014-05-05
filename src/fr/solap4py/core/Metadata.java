@@ -379,8 +379,8 @@ public class Metadata {
 			List<Member> tmp = level.getMembers();
 			List<Member> members = new LinkedList<Member>();
 			for (Member m : tmp) {
-				if (m.getUniqueName().equals(current) == false) {
-					members.add(m);
+				if (!m.getUniqueName().equals(current)) {
+				    members.add(m);
 					current = m.getUniqueName();
 				}
 			}
@@ -401,7 +401,7 @@ public class Metadata {
 						break;
 					}
 				}
-			}
+			} 
 			for (Member member : members) {
 				JSONObject s = new JSONObject();
 				s.put("caption", member.getCaption());
@@ -490,6 +490,7 @@ public class Metadata {
 							+ nameMember + ".Properties(\"" + geometricProperty
 							+ "\") select [Measures].[geo] ON COLUMNS from "
 							+ from.getString(1));
+
 		} catch (OlapException | NullPointerException e) {
 			LOGGER.log(java.util.logging.Level.SEVERE, e.getMessage());
 			throw new Solap4pyException(ErrorType.BAD_REQUEST,
@@ -505,8 +506,8 @@ public class Metadata {
 	public static void main(String[] args) throws ClassNotFoundException,
 			SQLException, JSONException {
 
-		String param = "{ \"root\" : [\"Traffic\"]}";
-
+		String param = "{ \"root\" : [\"Traffic\", \"[Traffic]\", \"[Zone]\", \"[Zone.Name]\", \"[Zone.Name].[Name0]\"], \"withProperties\":false, \"granularity\":0}";
+		long d = System.currentTimeMillis();
 		Solap4py p = Solap4py.getSolap4Object();
 		JSONObject query = new JSONObject(param);
 		Metadata m = new Metadata(p.getOlapConnection());
@@ -517,7 +518,7 @@ public class Metadata {
 		} catch (Solap4pyException e) {
 			LOGGER.log(java.util.logging.Level.SEVERE, e.getMessage());
 		}
-
+		System.out.println(System.currentTimeMillis() - d);
 	}
 
 }
