@@ -43,7 +43,7 @@ public class Metadata {
     private static final Logger LOGGER = Logger.getLogger(Metadata.class.getName());
 
     /**
-     * 
+     * Retrieve the catalog form the connection.
      * @param connection
      */
     public Metadata(OlapConnection connection) {
