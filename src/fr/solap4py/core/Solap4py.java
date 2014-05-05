@@ -198,7 +198,7 @@ public class Solap4py {
                         e.printStackTrace();
                     }
                 }
-            };
+            }.start();
         }
     }
 }
