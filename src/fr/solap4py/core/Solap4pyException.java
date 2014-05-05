@@ -1,14 +1,19 @@
 package fr.solap4py.core;
 
 enum ErrorType {
-    BAD_REQUEST, NOT_SUPPORTED, SERVER_ERROR, NO_HIERARCHY, DIMENSION_ID_COUNT, UNKNOWN_ERROR
+    BAD_REQUEST,
+    NOT_SUPPORTED,
+    SERVER_ERROR,
+    NO_HIERARCHY,
+    DIMENSION_ID_COUNT,
+    UNKNOWN_ERROR
 };
 
 @SuppressWarnings("serial")
 public class Solap4pyException extends Exception {
 
-    private String description;
-    private ErrorType type;
+    private final String description;
+    private final ErrorType type;
 
     public Solap4pyException(ErrorType type, String description) {
         super(description);
@@ -18,11 +23,10 @@ public class Solap4pyException extends Exception {
     }
 
     public Solap4pyException(ErrorType type, Exception exception) {
-	this(type, exception.getMessage());
+        this(type, exception.getMessage());
     }
 
     public String getJSON() {
         return "{\"error\":\"" + type.toString() + "\",\"data\":\"" + description + "\"}";
     }
-
 }

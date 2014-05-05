@@ -63,11 +63,6 @@ public class Solap4py {
      */
     public String process(String query) {
         String result;
-//        long startTime = System.nanoTime();
-
-//        String query = new String(byteQuery, StandardCharsets.UTF_8);
-//        System.out.println(query);
-//        System.out.println("Time for converting input : " + (System.nanoTime() - startTime));
         try {
             try {
                 /* Here, we process the query */
@@ -93,12 +88,7 @@ public class Solap4py {
         } catch (Solap4pyException se) {
             result = se.getJSON();
         }
-        
-//        System.out.println("Process time : " + (System.nanoTime() - startTime));
-//        byte[] byteResult = result.getBytes(StandardCharsets.UTF_8);
-//        System.out.println("Time for converting result : " + (System.nanoTime() - startTime));
 
-//        return byteResult;
         return result;
     }
 
@@ -176,11 +166,10 @@ public class Solap4py {
         }
         return null;
     }
-    
-    
+
     public static void main(String[] args) throws ClassNotFoundException, SQLException, IOException {
         final Solap4py solap4py = Solap4py.getSolap4Object();
-        ServerSocket server = new ServerSocket(25335); // TODO which port should we use ?
+        ServerSocket server = new ServerSocket(25336);
         while (true) {
             final Socket client = server.accept();
             new Thread() {
@@ -195,7 +184,7 @@ public class Solap4py {
                         out.flush();
                         client.close();
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        LOGGER.log(Level.SEVERE, e.getMessage());
                     }
                 }
             }.start();

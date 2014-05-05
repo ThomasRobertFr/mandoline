@@ -24,6 +24,7 @@ final class MDXBuilder {
     private static final String WHERE = "where";
     private static final String FROM = "from";
     private static final String MEMBERS = "members";
+    private static final String CUBE_NOT_SPECIFIED = "Cube not specified";
 
     MDXBuilder() {
     }
@@ -136,10 +137,10 @@ final class MDXBuilder {
             if (json.get(FROM) instanceof String) {
                 cubeJSON = json.getString(FROM);
                 if ("null".equals(cubeJSON) || cubeJSON == null || "".equals(cubeJSON) || "\"null\"".equals(cubeJSON)) {
-                    throw new Solap4pyException(ErrorType.BAD_REQUEST, "Cube not specified");
+                    throw new Solap4pyException(ErrorType.BAD_REQUEST, CUBE_NOT_SPECIFIED);
                 }
             } else {
-                throw new Solap4pyException(ErrorType.BAD_REQUEST, "Cube not specified");
+                throw new Solap4pyException(ErrorType.BAD_REQUEST, CUBE_NOT_SPECIFIED);
             }
         } catch (JSONException e) {
             throw new Solap4pyException(ErrorType.BAD_REQUEST, e);
