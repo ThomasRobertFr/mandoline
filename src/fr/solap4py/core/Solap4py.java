@@ -1,10 +1,14 @@
 package fr.solap4py.core;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -42,7 +46,7 @@ public class Solap4py {
     }
 
     /**
-     * Accessor to olapConnection attribute
+     * Accessor to the olapConnection attribute
      * 
      * @return the OlapConnection associated with this instance of Solap4py
      */
@@ -57,13 +61,8 @@ public class Solap4py {
      *            the input query in JSON format
      * @return the result of the query in JSON format
      */
-    public byte[] process(byte[] byteQuery) {
+    public String process(String query) {
         String result;
-        long startTime = System.nanoTime();
-
-        String query = new String(byteQuery, StandardCharsets.UTF_8);
-        System.out.println(query);
-        System.out.println("Time for converting input : " + (System.nanoTime() - startTime));
         try {
             try {
                 /* Here, we process the query */
@@ -89,12 +88,8 @@ public class Solap4py {
         } catch (Solap4pyException se) {
             result = se.getJSON();
         }
-        
-        System.out.println("Process time : " + (System.nanoTime() - startTime));
-        byte[] byteResult = result.getBytes(StandardCharsets.UTF_8);
-        System.out.println("Time for converting result : " + (System.nanoTime() - startTime));
 
-        return byteResult;
+        return result;
     }
 
     /**
@@ -136,6 +131,14 @@ public class Solap4py {
         return result;
     }
 
+    
+    /**
+     * Returns a Solap4py object initialize with a properties file.
+     * 
+     * @return Solap4py object
+     * @throws ClassNotFoundException
+     * @throws SQLException
+     */
     public static Solap4py getSolap4Object() throws ClassNotFoundException, SQLException {
         Properties prop = new Properties();
         InputStream input = null;
@@ -171,17 +174,10 @@ public class Solap4py {
         }
         return null;
     }
-    
-    
-    public static void main(String[] args) throws ClassNotFoundException, SQLException {
-        if (args.length() != 4) {
-            System.err.println("bla bla bla");
-            System.exit(1);
-        }
-        
-        Solap4py solap4py = new Solap4Py(args[0], args[1], args[2], args[3]);
-        ServerSocket server = new ServerSocket(5000); // TODO which port should we use ?
-        
+
+    public static void main(String[] args) throws ClassNotFoundException, SQLException, IOException {
+        final Solap4py solap4py = Solap4py.getSolap4Object();
+        ServerSocket server = new ServerSocket(25335);
         while (true) {
             final Socket client = server.accept();
             new Thread() {
@@ -190,18 +186,16 @@ public class Solap4py {
                     try {
                         BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
                         PrintWriter out = new PrintWriter(client.getOutputStream());
-                        
                         String query = in.readLine();
                         String result = solap4py.process(query);
-                        
                         out.print(result);
                         out.flush();
                         client.close();
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        LOGGER.log(Level.SEVERE, e.getMessage());
                     }
                 }
-            }
+            }.start();
         }
     }
 }

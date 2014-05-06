@@ -20,7 +20,7 @@
 	<target name="create_run_jar" depends="compile">
         <jar destfile="Solap4py.jar">
             <manifest>
-                <attribute name="Main-Class" value="fr.solap4py.core.Solap4pyEntryPoint"/>
+                <attribute name="Main-Class" value="fr.solap4py.core.Solap4py"/>
                 <attribute name="Class-Path" value="${classpath}"/>
             </manifest>
             <fileset dir="bin"/>

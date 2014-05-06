@@ -1,7 +1,5 @@
 package fr.solap4py.core;
 
-import java.sql.SQLException;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -17,15 +15,16 @@ final class JSONBuilder {
     private JSONBuilder() {
     }
 
-    
     /**
+     * Transforms a CellSet containing a request response into a JSONArray.
      * 
-     * @param cellSet The CellSet containing the response of a request sent. 
+     * @param cellSet
+     *            The CellSet containing the response of a request sent.
      * @return the JsonArray containing the same information as in cellSet.
      * @throws OlapException
      * @throws JSONException
      */
-    
+
     static JSONArray createJSONResponse(CellSet cellSet) throws OlapException, JSONException {
         JSONArray results = new JSONArray();
         boolean hasRows = false;
@@ -38,35 +37,14 @@ final class JSONBuilder {
             for (Position axis1 : cellSet.getAxes().get(Axis.ROWS.axisOrdinal()).getPositions()) {
                 JSONObject result = new JSONObject();
                 for (Position axis0 : cellSet.getAxes().get(Axis.COLUMNS.axisOrdinal()).getPositions()) {
-
-                    final Cell cell = cellSet.getCell(axis0, axis1);
-
-                    for (Member member : axis1.getMembers()) {
-                        result.put(member.getHierarchy().getUniqueName(), member.getUniqueName());
-                    }
-
-                    for (Member member : axis0.getMembers()) {
-                        if (cell.getValue() == null) {
-                            result.put(member.getUniqueName(), 0);
-                        } else {
-                            result.put(member.getUniqueName(), cell.getValue());
-                        }
-                    }
+                    addToResult(result, cellSet, axis0, axis1);
                 }
                 results.put(result);
             }
         } else {
             JSONObject result = new JSONObject();
             for (Position axis0 : cellSet.getAxes().get(Axis.COLUMNS.axisOrdinal()).getPositions()) {
-                final Cell cell = cellSet.getCell(axis0);
-
-                Member member = axis0.getMembers().get(0);
-                if (cell.getValue() == null) {
-                    result.put(member.getUniqueName(), 0);
-                } else {
-                    result.put(member.getUniqueName(), cell.getValue());
-                }
-
+                addToResult(result, cellSet, axis0);
             }
             results.put(result);
 
@@ -74,12 +52,45 @@ final class JSONBuilder {
         return results;
     }
 
-    public static void main(String[] args) throws ClassNotFoundException, SQLException {
-        Solap4py s = Solap4py.getSolap4Object();
+    /**
+     * Add inside result the contents of two axis.
+     * @param result
+     * @param cellSet
+     * @param axis0
+     * @param axis1
+     * @throws JSONException
+     */
+    private static void addToResult(JSONObject result, CellSet cellSet, Position axis0, Position axis1) throws JSONException {
+        final Cell cell = cellSet.getCell(axis0, axis1);
 
-        String query = "{\"queryType\":\"data\",\"data\":{\"from\":\"[Traffic]\",\"onColumns\":[\"[Measures].[Goods Quantity]\",\"[Measures].[Max Quantity]\"],\"onRows\":{},\"where\":{}}}";
+        for (Member member : axis1.getMembers()) {
+            result.put(member.getDimension().getUniqueName(), member.getUniqueName());
+        }
 
-        System.out.println(new String(s.process(query.getBytes())));
-
+        for (Member member : axis0.getMembers()) {
+            if (cell.getValue() == null) {
+                result.put(member.getUniqueName(), 0);
+            } else {
+                result.put(member.getUniqueName(), cell.getValue());
+            }
+        }
     }
+  /**
+   * Add inside result the contents of one axis.
+   * @param result
+   * @param cellSet
+   * @param axis0
+   * @throws JSONException
+   */
+    private static void addToResult(JSONObject result, CellSet cellSet, Position axis0) throws JSONException {
+        final Cell cell = cellSet.getCell(axis0);
+
+        Member member = axis0.getMembers().get(0);
+        if (cell.getValue() == null) {
+            result.put(member.getUniqueName(), 0);
+        } else {
+            result.put(member.getUniqueName(), cell.getValue());
+        }
+    }
+
 }

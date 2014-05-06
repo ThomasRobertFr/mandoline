@@ -24,11 +24,13 @@ final class MDXBuilder {
     private static final String WHERE = "where";
     private static final String FROM = "from";
     private static final String MEMBERS = "members";
+    private static final String CUBE_NOT_SPECIFIED = "Cube not specified";
 
     MDXBuilder() {
     }
 
     /**
+     * Creates a MDX request inside a SelectNode.
      * 
      * @param olapConnection
      *            Connection to the OLAP database.
@@ -73,6 +75,8 @@ final class MDXBuilder {
 
     /**
      * 
+     * Defines the clause where of the MDX request.
+     * 
      * @param olapConnection
      *            Connection to the OLAP database.
      * @param whereJSON
@@ -87,6 +91,7 @@ final class MDXBuilder {
     }
 
     /**
+     * Defines the clause on rows of the MDX request.
      * 
      * @param olapConnection
      *            Connection to the OLAP database.
@@ -103,6 +108,7 @@ final class MDXBuilder {
     }
 
     /**
+     * Initialize a SelectNode with only the clause from specified.
      * 
      * @param olapConnection
      *            Connection to the OLAP database.
@@ -122,7 +128,7 @@ final class MDXBuilder {
     }
 
     /**
-     * 
+     * Returns the cube's name from the json request.
      * @param json
      *            JSONObject containing the request from which we want to create
      *            the selectNode.
@@ -136,10 +142,10 @@ final class MDXBuilder {
             if (json.get(FROM) instanceof String) {
                 cubeJSON = json.getString(FROM);
                 if ("null".equals(cubeJSON) || cubeJSON == null || "".equals(cubeJSON) || "\"null\"".equals(cubeJSON)) {
-                    throw new Solap4pyException(ErrorType.BAD_REQUEST, "Cube not specified");
+                    throw new Solap4pyException(ErrorType.BAD_REQUEST, CUBE_NOT_SPECIFIED);
                 }
             } else {
-                throw new Solap4pyException(ErrorType.BAD_REQUEST, "Cube not specified");
+                throw new Solap4pyException(ErrorType.BAD_REQUEST, CUBE_NOT_SPECIFIED);
             }
         } catch (JSONException e) {
             throw new Solap4pyException(ErrorType.BAD_REQUEST, e);
@@ -149,6 +155,7 @@ final class MDXBuilder {
     }
 
     /**
+     * Defines the clause on columns of the MDX request.
      * 
      * @param olapConnection
      *            Connection to the OLAP database.
@@ -182,6 +189,7 @@ final class MDXBuilder {
     }
 
     /**
+     * Defines the clause on rows or where of the MDX request.
      * 
      * @param olapConnection
      *            Connection to the OLAP database
