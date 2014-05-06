@@ -55,7 +55,7 @@ final class JSONBuilder {
         final Cell cell = cellSet.getCell(axis0, axis1);
 
         for (Member member : axis1.getMembers()) {
-            result.put(member.getHierarchy().getUniqueName(), member.getUniqueName());
+            result.put(member.getDimension().getUniqueName(), member.getUniqueName());
         }
 
         for (Member member : axis0.getMembers()) {
