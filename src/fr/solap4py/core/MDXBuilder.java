@@ -30,6 +30,7 @@ final class MDXBuilder {
     }
 
     /**
+     * Creates a MDX request inside a SelectNode.
      * 
      * @param olapConnection
      *            Connection to the OLAP database.
@@ -74,6 +75,8 @@ final class MDXBuilder {
 
     /**
      * 
+     * Defines the clause where of the MDX request.
+     * 
      * @param olapConnection
      *            Connection to the OLAP database.
      * @param whereJSON
@@ -88,6 +91,7 @@ final class MDXBuilder {
     }
 
     /**
+     * Defines the clause on rows of the MDX request.
      * 
      * @param olapConnection
      *            Connection to the OLAP database.
@@ -104,6 +108,7 @@ final class MDXBuilder {
     }
 
     /**
+     * Initialize a SelectNode with only the clause from specified.
      * 
      * @param olapConnection
      *            Connection to the OLAP database.
@@ -123,7 +128,7 @@ final class MDXBuilder {
     }
 
     /**
-     * 
+     * Returns the cube's name from the json request.
      * @param json
      *            JSONObject containing the request from which we want to create
      *            the selectNode.
@@ -150,6 +155,7 @@ final class MDXBuilder {
     }
 
     /**
+     * Defines the clause on columns of the MDX request.
      * 
      * @param olapConnection
      *            Connection to the OLAP database.
@@ -183,6 +189,7 @@ final class MDXBuilder {
     }
 
     /**
+     * Defines the clause on rows or where of the MDX request.
      * 
      * @param olapConnection
      *            Connection to the OLAP database

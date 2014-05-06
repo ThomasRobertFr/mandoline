@@ -46,7 +46,7 @@ public class Solap4py {
     }
 
     /**
-     * Accessor to olapConnection attribute
+     * Accessor to the olapConnection attribute
      * 
      * @return the OlapConnection associated with this instance of Solap4py
      */
@@ -131,6 +131,14 @@ public class Solap4py {
         return result;
     }
 
+    
+    /**
+     * Returns a Solap4py object initialize with a properties file.
+     * 
+     * @return Solap4py object
+     * @throws ClassNotFoundException
+     * @throws SQLException
+     */
     public static Solap4py getSolap4Object() throws ClassNotFoundException, SQLException {
         Properties prop = new Properties();
         InputStream input = null;

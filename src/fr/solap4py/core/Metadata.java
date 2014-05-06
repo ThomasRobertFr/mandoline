@@ -43,7 +43,7 @@ public class Metadata {
     private static final Logger LOGGER = Logger.getLogger(Metadata.class.getName());
 
     /**
-     * 
+     * Retrieve the catalog form the connection.
      * @param connection
      */
     public Metadata(OlapConnection connection) {
@@ -56,6 +56,7 @@ public class Metadata {
     }
 
     /**
+     * Returns in a JSONObject the metadata indicated in query.
      * 
      * @param query
      * @param jsonResult
@@ -135,6 +136,7 @@ public class Metadata {
     }
 
     /**
+     * Returns all schemas of the database.
      * 
      * @return the schemas existing in the database
      * @throws Solap4pyException
@@ -162,6 +164,7 @@ public class Metadata {
     }
 
     /**
+     * Returns all cube's names from a schema specified in from. 
      * 
      * @param from
      * @return Names of the cubes existing in a schema.
@@ -188,7 +191,7 @@ public class Metadata {
     }
 
     /**
-     * 
+     * Returns the all the dimensions's names from a cube specified in from
      * @param from
      * @return the dimensions existing in the cube specified in from
      * @throws Solap4pyException
@@ -257,6 +260,7 @@ public class Metadata {
     }
 
     /**
+     * Returns all the hierarchies from a dimension specified in from.
      * 
      * @param from
      * @return the hierarchies of a specific dimension specified in from
@@ -299,6 +303,7 @@ public class Metadata {
     }
 
     /**
+     * Returns all the levels from a hierarchy specified in from, with its properties or not.
      * 
      * @param from
      * @param withProperties
@@ -335,13 +340,15 @@ public class Metadata {
             }
             List<Level> levels = hierarchy.getLevels();
             for (Level level : levels) {
-                JSONObject s = new JSONObject();
-                s.put("caption", level.getCaption());
-                s.put("id", level.getUniqueName());
-                if (withProperties == true) {
-                    s.put("list-properties", this.getLevelProperties(level));
-                }
-                result.put(level.getDepth(), s);
+        	if (!level.getCaption().equals("(All)")) {
+                    JSONObject s = new JSONObject();
+                    s.put("caption", level.getCaption());
+                    s.put("id", level.getUniqueName());
+                    if (withProperties == true) {
+                        s.put("list-properties", this.getLevelProperties(level));
+                    }
+                    result.put(level.getDepth(), s);
+        	}
             }
         } catch (OlapException | NullPointerException e) {
             LOGGER.log(java.util.logging.Level.SEVERE, e.getMessage());
@@ -355,7 +362,7 @@ public class Metadata {
     }
 
     /**
-     * 
+     *  Returns all the members' names from a hierarchy specified in from, with its properties or not.
      * @param from
      * @param withProperties
      *            if it returns the properties of the members
@@ -365,6 +372,9 @@ public class Metadata {
      * @throws Solap4pyException
      */
     private JSONObject getMembers(JSONArray from, boolean withProperties, int granularity) throws Solap4pyException {
+	long formatTime = 0;
+	long queryTime = 0;
+	long az = System.currentTimeMillis();
         JSONObject result = new JSONObject();
         try {
             List<Cube> cubes = this.catalog.getSchemas().get(from.getString(0)).getCubes();
@@ -408,7 +418,7 @@ public class Metadata {
                     current = m.getUniqueName();
                 }
             }
-
+            queryTime += System.currentTimeMillis() - az;
             if (from.length() == 6) {
                 for (Member member : members) {
                     if (member.getUniqueName().equals(from.getString(5))) {
@@ -425,14 +435,19 @@ public class Metadata {
                     }
                 }
             }
+            
             for (Member member : members) {
+        	long ti = System.currentTimeMillis();
                 JSONObject s = new JSONObject();
                 s.put("caption", member.getCaption());
                 if ("[Measures]".equals(from.getString(2))) {
                     s.put("description", member.getDescription());
                 }
+                formatTime += System.currentTimeMillis() - ti;
                 if (withProperties == true) {
+                    long time = System.currentTimeMillis();
                     this.getMemberProperties(from, member, s);
+                    queryTime += System.currentTimeMillis() - time;
                 }
                 result.put(member.getUniqueName(), s);
             }
@@ -443,11 +458,14 @@ public class Metadata {
             LOGGER.log(java.util.logging.Level.SEVERE, e.getMessage());
             throw new Solap4pyException(ErrorType.UNKNOWN_ERROR, "An error occured while building json result");
         }
-
+        
+        System.out.println("query " + queryTime);
+        System.out.println("format " + formatTime);
         return result;
     }
 
     /**
+     * Returns the properties of a level.
      * 
      * @param level
      * @return the property of level
@@ -477,6 +495,7 @@ public class Metadata {
     }
 
     /**
+     * Returns the properties of a member.
      * 
      * @param from
      * @param member
@@ -505,7 +524,7 @@ public class Metadata {
     }
 
     /**
-     * 
+     * Returns a geometric property of a member.
      * @param from
      * @param member
      * @param geometricProperty
@@ -517,6 +536,7 @@ public class Metadata {
         try {
             OlapStatement statement = this.olapConnection.createStatement();
             String nameMember = member.getUniqueName();
+            System.out.println(nameMember);
             cellSet = statement.executeOlapQuery("with member [Measures].[geo] as " + nameMember + ".Properties(\"" + geometricProperty
                                                  + "\") select [Measures].[geo] ON COLUMNS from " + from.getString(1));
 

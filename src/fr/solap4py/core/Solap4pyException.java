@@ -25,7 +25,10 @@ public class Solap4pyException extends Exception {
     public Solap4pyException(ErrorType type, Exception exception) {
         this(type, exception.getMessage());
     }
-
+/**
+ * 
+ * @return the exception in a String but written like a JSON. With the error type and its description.
+ */
     public String getJSON() {
         return "{\"error\":\"" + type.toString() + "\",\"data\":\"" + description + "\"}";
     }
