@@ -153,10 +153,10 @@ public class Metadata {
             }
         } catch (OlapException | NullPointerException e) {
             LOGGER.log(java.util.logging.Level.SEVERE, e.getMessage());
-            throw new Solap4pyException(ErrorType.UNKNOWN_ERROR, "An error occured while trying to retrieve schemas");
+            throw new Solap4pyException(ErrorType.BAD_REQUEST, "An error occured while trying to retrieve schemas");
         } catch (JSONException e) {
             LOGGER.log(java.util.logging.Level.SEVERE, e.getMessage());
-            throw new Solap4pyException(ErrorType.UNKNOWN_ERROR, "An error occured while building json result");
+            throw new Solap4pyException(ErrorType.BAD_REQUEST, "An error occured while building json result");
         }
 
         return result;
@@ -184,7 +184,7 @@ public class Metadata {
             throw new Solap4pyException(ErrorType.BAD_REQUEST, "Invalid schema identifier");
         } catch (JSONException e) {
             LOGGER.log(java.util.logging.Level.SEVERE, e.getMessage());
-            throw new Solap4pyException(ErrorType.UNKNOWN_ERROR, "An error occured while building json result");
+            throw new Solap4pyException(ErrorType.BAD_REQUEST, "An error occured while building json result");
         }
         return result;
     }
@@ -252,7 +252,7 @@ public class Metadata {
             throw new Solap4pyException(ErrorType.BAD_REQUEST, "Invalid identifier");
         } catch (JSONException e) {
             LOGGER.log(java.util.logging.Level.SEVERE, e.getMessage());
-            throw new Solap4pyException(ErrorType.UNKNOWN_ERROR, "An error occured while building json result");
+            throw new Solap4pyException(ErrorType.BAD_REQUEST, "An error occured while building json result");
         }
 
         return result;
@@ -295,7 +295,7 @@ public class Metadata {
             throw new Solap4pyException(ErrorType.BAD_REQUEST, "Invalid identifier");
         } catch (JSONException e) {
             LOGGER.log(java.util.logging.Level.SEVERE, e.getMessage());
-            throw new Solap4pyException(ErrorType.UNKNOWN_ERROR, "An error occured while building json result");
+            throw new Solap4pyException(ErrorType.BAD_REQUEST, "An error occured while building json result");
         }
 
         return result;
@@ -358,7 +358,7 @@ public class Metadata {
             throw new Solap4pyException(ErrorType.BAD_REQUEST, "Invalid identifier");
         } catch (JSONException e) {
             LOGGER.log(java.util.logging.Level.SEVERE, e.getMessage());
-            throw new Solap4pyException(ErrorType.UNKNOWN_ERROR, "An error occured while building json result");
+            throw new Solap4pyException(ErrorType.BAD_REQUEST, "An error occured while building json result");
         }
 
         return result;
@@ -451,7 +451,7 @@ public class Metadata {
             throw new Solap4pyException(ErrorType.BAD_REQUEST, "Invalid identifier");
         } catch (JSONException e) {
             LOGGER.log(java.util.logging.Level.SEVERE, e.getMessage());
-            throw new Solap4pyException(ErrorType.UNKNOWN_ERROR, "An error occured while building json result");
+            throw new Solap4pyException(ErrorType.BAD_REQUEST, "An error occured while building json result");
         }
         
         return result;
@@ -482,7 +482,7 @@ public class Metadata {
             }
         } catch (JSONException e) {
             LOGGER.log(java.util.logging.Level.SEVERE, e.getMessage());
-            throw new Solap4pyException(ErrorType.UNKNOWN_ERROR, "An error occured while building json result");
+            throw new Solap4pyException(ErrorType.BAD_REQUEST, "An error occured while building json result");
         }
         return result;
     }
@@ -512,7 +512,7 @@ public class Metadata {
             throw new Solap4pyException(ErrorType.BAD_REQUEST, "Invalid identifier");
         } catch (JSONException e) {
             LOGGER.log(java.util.logging.Level.SEVERE, e.getMessage());
-            throw new Solap4pyException(ErrorType.UNKNOWN_ERROR, "An error occured while building json result");
+            throw new Solap4pyException(ErrorType.BAD_REQUEST, "An error occured while building json result");
         }
     }
 
@@ -538,7 +538,7 @@ public class Metadata {
             throw new Solap4pyException(ErrorType.BAD_REQUEST, "Invalid identifier");
         } catch (JSONException e) {
             LOGGER.log(java.util.logging.Level.SEVERE, e.getMessage());
-            throw new Solap4pyException(ErrorType.UNKNOWN_ERROR, "An error occured while building json result");
+            throw new Solap4pyException(ErrorType.BAD_REQUEST, "An error occured while building json result");
         }
         return cellSet.getCell(0).getFormattedValue();
     }
