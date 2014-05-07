@@ -63,7 +63,7 @@ public class Metadata {
      * @return the response of the query
      * @throws Solap4pyException
      */
-    public JSONObject query(JSONObject query, JSONObject jsonResult) throws Solap4pyException {
+    public void query(JSONObject query, JSONObject jsonResult) throws Solap4pyException {
         JSONArray root = null;
         boolean withProperties;
 
@@ -132,7 +132,6 @@ public class Metadata {
             LOGGER.log(java.util.logging.Level.SEVERE, e.getMessage());
             throw new Solap4pyException(ErrorType.BAD_REQUEST, "An error occured while building json result");
         }
-        return jsonResult;
     }
 
     /**
@@ -552,7 +551,7 @@ public class Metadata {
         Metadata m = new Metadata(p.getOlapConnection());
         JSONObject result = new JSONObject();
         try {
-            result = m.query(query, result);
+            m.query(query, result);
             LOGGER.log(java.util.logging.Level.INFO, result.toString());
         } catch (Solap4pyException e) {
             LOGGER.log(java.util.logging.Level.SEVERE, e.getMessage());
