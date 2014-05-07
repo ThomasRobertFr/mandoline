@@ -304,7 +304,7 @@ public class Metadata {
 
     /**
      * Returns all the levels from a hierarchy specified in from, with its properties or not.
-     * 
+     *
      * @param from
      * @param withProperties
      *            if it returns the properties of the levels
@@ -478,7 +478,7 @@ public class Metadata {
                     } else {
                         s.put("type", "Standard");
                     }
-                    result.put(property.getCaption(), s);
+                    result.put(property.getName(), s);
                 }
             }
         } catch (JSONException e) {
@@ -502,9 +502,9 @@ public class Metadata {
             for (Property property : member.getProperties()) {
                 if (Metadata.USELESS_PROPERTIES.contains(property.getUniqueName()) == false) {
                     if ("Geom".equals(property.getCaption().substring(0, 4))) {
-                        result.put(property.getCaption(), this.getGeometry(from, member, property.getCaption()));
+                        result.put(property.getName(), this.getGeometry(from, member, property.getCaption()));
                     } else {
-                        result.put(property.getCaption(), member.getPropertyFormattedValue(property));
+                        result.put(property.getName(), member.getPropertyFormattedValue(property));
                     }
                 }
             }
