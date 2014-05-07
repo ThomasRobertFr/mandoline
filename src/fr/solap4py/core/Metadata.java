@@ -63,7 +63,7 @@ public class Metadata {
      * @return the response of the query
      * @throws Solap4pyException
      */
-    public void query(JSONObject query, JSONObject jsonResult) throws Solap4pyException {
+    public JSONObject query(JSONObject query, JSONObject jsonResult) throws Solap4pyException {
         JSONArray root = null;
         boolean withProperties;
 
@@ -132,6 +132,7 @@ public class Metadata {
             LOGGER.log(java.util.logging.Level.SEVERE, e.getMessage());
             throw new Solap4pyException(ErrorType.BAD_REQUEST, "An error occured while building json result");
         }
+        return jsonResult;
     }
 
     /**
@@ -331,20 +332,41 @@ public class Metadata {
                     current = m.getUniqueName();
                 }
             }
+
             if (from.length() == 6) {
-                for (Member member : members) {
-                    if (member.getUniqueName().equals(from.getString(5))) {
-                        List<Member> memberArray = new LinkedList<Member>(Arrays.asList(member));
-                        for (int i = 0; i < granularity; i++) {
-                            List<Member> list = new LinkedList<Member>();
-                            for (Member m : memberArray) {
-                                list.addAll(m.getChildMembers());
-                            }
-                            memberArray = list;
-                        }
-                        members = memberArray;
-                        break;
-                    }
+              	if(granularity == 0){ 
+              		
+            		JSONArray memberArray = from.getJSONArray(5);
+            		String memberName = null;
+            		List<Member> list = new LinkedList<Member>();
+              		for (Member member : tmp) {              	
+              			for (int i=0; i<memberArray.length(); i++) {
+              				
+	                		memberName = memberArray.getString(i);
+	                		
+	                		if( member.getUniqueName().equals(memberName) ){
+	                			list.add(member);
+	                		}
+	                	}
+	                	members = list;      
+              		}
+              	}
+              	else{
+
+              		for (Member member : members) {              	
+	                    if (member.getUniqueName().equals(from.getString(5))) {
+	                        List<Member> memberArray = new LinkedList<Member>(Arrays.asList(member));
+		                        for (int i = 0; i < granularity; i++) {
+		                            List<Member> list = new LinkedList<Member>();
+		                            for (Member m : memberArray) {
+		                                list.addAll(m.getChildMembers());
+		                            }
+		                            memberArray = list;
+		                        }
+	                        members = memberArray;
+	                        break;
+	                    }
+                	}
                 }
             }
             
@@ -380,7 +402,7 @@ public class Metadata {
             JSONObject s = new JSONObject();
             s.put("caption", property.getCaption());
             if (Metadata.USELESS_PROPERTIES.contains(property.getUniqueName()) == false) {
-                if ("Geom".equals(property.getCaption().substring(0, 4))) {
+                if ("Geometry".equals(property.getCaption())) {
                     s.put("type", "Geometry");
                 } else {
                     s.put("type", "Standard");
@@ -404,7 +426,7 @@ public class Metadata {
         try {
             for (Property property : member.getProperties()) {
                 if (Metadata.USELESS_PROPERTIES.contains(property.getUniqueName()) == false) {
-                    if ("Geom".equals(property.getCaption().substring(0, 4))) {
+                    if ("Geometry".equals(property.getCaption())) {
                         result.put(property.getUniqueName(), this.getGeometry(from, member, property.getCaption()));
                     } else {
                         result.put(property.getUniqueName(), member.getPropertyFormattedValue(property));
@@ -430,7 +452,7 @@ public class Metadata {
         try {
             OlapStatement statement = this.olapConnection.createStatement();
             String nameMember = member.getUniqueName();
-            System.out.println(nameMember);
+            
             cellSet = statement.executeOlapQuery("with member [Measures].[geo] as " + nameMember + ".Properties(\"" + geometricProperty
                                                  + "\") select [Measures].[geo] ON COLUMNS from " + from.getString(1));
         } catch (OlapException | NullPointerException e) {
@@ -523,13 +545,16 @@ public class Metadata {
     
     public static void main(String[] args) throws ClassNotFoundException, SQLException, JSONException {
 
-        String param = "{ \"root\" : [\"Traffic\", \"[Traffic]\", \"[Zone]\", \"[Zone.Name]\", \"[Zone.Name].[Name0]\"], \"withProperties\":false, \"granularity\":0}";
+
+
+        String param = " { \"root\" : [\"Traffic\", \"[Traffic]\", \"[Zone]\", \"[Zone.Name]\", \"[Zone.Name].[Name0]\", [\"[Zone.Name].[All Zone.Names].[France]\" , \"[Zone.Name].[All Zone.Names].[Spain]\" ] ], \"withProperties\":false, \"granularity\":0}}";
         Solap4py p = Solap4py.getSolap4Object();
+
         JSONObject query = new JSONObject(param);
         Metadata m = new Metadata(p.getOlapConnection());
         JSONObject result = new JSONObject();
         try {
-            m.query(query, result);
+            result = m.query(query, result);
             LOGGER.log(java.util.logging.Level.INFO, result.toString());
         } catch (Solap4pyException e) {
             LOGGER.log(java.util.logging.Level.SEVERE, e.getMessage());
