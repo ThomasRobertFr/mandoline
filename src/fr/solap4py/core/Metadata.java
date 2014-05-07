@@ -347,7 +347,11 @@ public class Metadata {
                     if (withProperties == true) {
                         s.put("list-properties", this.getLevelProperties(level));
                     }
-                    result.put(level.getDepth() - 1, s);
+                    if(level.getDepth() != 0) {
+                	result.put(level.getDepth() - 1, s);
+                    } else {
+                	result.put(level.getDepth(), s);
+                    }
         	}
             }
         } catch (OlapException | NullPointerException e) {
@@ -542,7 +546,7 @@ public class Metadata {
 
     public static void main(String[] args) throws ClassNotFoundException, SQLException, JSONException {
 
-        String param = "{ \"root\" : [\"Traffic\", \"[Traffic]\", \"[Zone]\", \"[Zone.Name]\", \"[Zone.Name].[Name0]\"], \"withProperties\":false, \"granularity\":0}";
+        String param = "{ \"root\" : [\"Traffic\", \"[Traffic]\", \"[Measures]\", \"[Measures]\"], \"withProperties\":false, \"granularity\":0}";
         Solap4py p = Solap4py.getSolap4Object();
         JSONObject query = new JSONObject(param);
         Metadata m = new Metadata(p.getOlapConnection());
