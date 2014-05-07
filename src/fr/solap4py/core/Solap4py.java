@@ -102,8 +102,8 @@ public class Solap4py {
      * @throws Solap4pyException
      * @throws OlapException
      */
-    private JSONObject explore(JSONObject query, JSONObject result) throws JSONException, Solap4pyException, OlapException {
-        return this.metadata.query(query, result);
+    private void explore(JSONObject query, JSONObject result) throws JSONException, Solap4pyException, OlapException {
+        this.metadata.query(query, result);
     }
 
     /**
