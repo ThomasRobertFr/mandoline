@@ -478,7 +478,7 @@ public class Metadata {
                     } else {
                         s.put("type", "Standard");
                     }
-                    result.put(property.getUniqueName(), s);
+                    result.put(property.getCaption(), s);
                 }
             }
         } catch (JSONException e) {
@@ -502,9 +502,9 @@ public class Metadata {
             for (Property property : member.getProperties()) {
                 if (Metadata.USELESS_PROPERTIES.contains(property.getUniqueName()) == false) {
                     if ("Geom".equals(property.getCaption().substring(0, 4))) {
-                        result.put(property.getUniqueName(), this.getGeometry(from, member, property.getCaption()));
+                        result.put(property.getCaption(), this.getGeometry(from, member, property.getCaption()));
                     } else {
-                        result.put(property.getUniqueName(), member.getPropertyFormattedValue(property));
+                        result.put(property.getCaption(), member.getPropertyFormattedValue(property));
                     }
                 }
             }
