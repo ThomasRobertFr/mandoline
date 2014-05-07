@@ -1,6 +1,7 @@
 package fr.solap4py.core;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -21,7 +22,6 @@ public class MetadataTest {
     private Solap4py solap4py;
     private OlapConnection olapConnection;
 
-    private JSONObject inputTest;
     private Metadata metadata;
 
     private Method query;
@@ -94,7 +94,7 @@ public class MetadataTest {
         }
     }
 
-    @Test(expected = Solap4pyException.class)
+    @Test (expected = JSONException.class)
     public void testGetCubes() throws Throwable {
 
         try {
@@ -131,7 +131,7 @@ public class MetadataTest {
 
     }
 
-    @Test(expected = Solap4pyException.class)
+    @Test(expected = JSONException.class)
     public void testGetDimensions() throws Throwable {
 
         try {
@@ -176,7 +176,7 @@ public class MetadataTest {
 
     }
 
-    @Test(expected = Solap4pyException.class)
+    @Test(expected = JSONException.class)
     public void testgetHierarchies() throws Throwable {
 
         try {
@@ -215,7 +215,7 @@ public class MetadataTest {
 
     }
 
-    @Test(expected = Solap4pyException.class)
+    @Test(expected = JSONException.class)
     public void testGetLevels() throws Throwable {
 
         try {
@@ -316,7 +316,7 @@ public class MetadataTest {
         }
     }
 
-    @Test//(expected = Solap4pyException.class)
+    @Test
     public void testGetMembers() throws Throwable {
 
         try {
