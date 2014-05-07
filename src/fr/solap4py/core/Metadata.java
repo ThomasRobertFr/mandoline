@@ -347,7 +347,7 @@ public class Metadata {
                     if (withProperties == true) {
                         s.put("list-properties", this.getLevelProperties(level));
                     }
-                    result.put(level.getDepth(), s);
+                    result.put(level.getDepth() - 1, s);
         	}
             }
         } catch (OlapException | NullPointerException e) {
@@ -372,9 +372,6 @@ public class Metadata {
      * @throws Solap4pyException
      */
     private JSONObject getMembers(JSONArray from, boolean withProperties, int granularity) throws Solap4pyException {
-	long formatTime = 0;
-	long queryTime = 0;
-	long az = System.currentTimeMillis();
         JSONObject result = new JSONObject();
         try {
             List<Cube> cubes = this.catalog.getSchemas().get(from.getString(0)).getCubes();
@@ -418,7 +415,6 @@ public class Metadata {
                     current = m.getUniqueName();
                 }
             }
-            queryTime += System.currentTimeMillis() - az;
             if (from.length() == 6) {
                 for (Member member : members) {
                     if (member.getUniqueName().equals(from.getString(5))) {
@@ -437,17 +433,13 @@ public class Metadata {
             }
             
             for (Member member : members) {
-        	long ti = System.currentTimeMillis();
                 JSONObject s = new JSONObject();
                 s.put("caption", member.getCaption());
                 if ("[Measures]".equals(from.getString(2))) {
                     s.put("description", member.getDescription());
                 }
-                formatTime += System.currentTimeMillis() - ti;
                 if (withProperties == true) {
-                    long time = System.currentTimeMillis();
                     this.getMemberProperties(from, member, s);
-                    queryTime += System.currentTimeMillis() - time;
                 }
                 result.put(member.getUniqueName(), s);
             }
@@ -459,8 +451,6 @@ public class Metadata {
             throw new Solap4pyException(ErrorType.UNKNOWN_ERROR, "An error occured while building json result");
         }
         
-        System.out.println("query " + queryTime);
-        System.out.println("format " + formatTime);
         return result;
     }
 
