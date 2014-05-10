@@ -1,3 +1,6 @@
+/**
+ * @author Alexandre Peltier
+ */
 package fr.solap4py.core;
 
 import static org.junit.Assert.assertEquals;

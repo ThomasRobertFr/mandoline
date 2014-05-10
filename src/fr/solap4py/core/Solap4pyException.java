@@ -1,3 +1,8 @@
+/**
+ * @author Cindy Roullet
+ * @author Ibrahim Daoudi
+ * @author Rémy Chevalier
+ */
 package fr.solap4py.core;
 
 enum ErrorType {

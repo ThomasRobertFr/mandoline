@@ -1,3 +1,7 @@
+/**
+ * @author Cindy Roullet
+ * @author Ibrahim Daoudi
+ */
 package fr.solap4py.core;
 
 import java.util.ArrayList;

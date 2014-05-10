@@ -1,3 +1,6 @@
+/**
+ * @author Cindy Roullet
+ */
 package fr.solap4py.core;
 
 import org.junit.runner.JUnitCore;

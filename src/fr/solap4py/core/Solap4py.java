@@ -1,3 +1,8 @@
+/**
+ * @author Ibrahim Daoudi
+ * @author Rémy Chevalier
+ * @author Pierre Depeyrot
+ */
 package fr.solap4py.core;
 
 import java.io.BufferedReader;
@@ -30,19 +35,12 @@ public class Solap4py {
     private Metadata metadata;
     private static final Logger LOGGER = Logger.getLogger(Solap4py.class.getName());
 
-    public Solap4py(String host, String port, String user, String passwd) throws ClassNotFoundException, SQLException {
-        try {
-            Class.forName("org.olap4j.driver.xmla.XmlaOlap4jDriver");
-            Connection connection = DriverManager.getConnection("jdbc:xmla:Server=http://" + user + ":" + passwd + "@" + host + ":" + port
-                                                                + "/geomondrian/xmla");
-            this.olapConnection = connection.unwrap(OlapConnection.class);
-            this.metadata = new Metadata(this.olapConnection);
-
-        } catch (ClassNotFoundException e) {
-            LOGGER.log(Level.SEVERE, e.getMessage());
-        } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, e.getMessage());
-        }
+    public Solap4py(String host, String port, String user, String passwd, String driverName) throws ClassNotFoundException, SQLException {
+        Class.forName(driverName);
+        Connection connection = DriverManager.getConnection("jdbc:xmla:Server=http://" + user + ":" + passwd + "@" + host + ":" + port
+                                                            + "/geomondrian/xmla");
+        this.olapConnection = connection.unwrap(OlapConnection.class);
+        this.metadata = new Metadata(this.olapConnection);
     }
 
     /**
@@ -131,7 +129,6 @@ public class Solap4py {
         return result;
     }
 
-    
     /**
      * Returns a Solap4py object initialize with a properties file.
      * 
@@ -159,8 +156,9 @@ public class Solap4py {
             String dbuser = prop.getProperty("dbuser");
             String dbpasswd = prop.getProperty("dbpasswd");
             String dbport = prop.getProperty("dbport");
+            String driverName = prop.getProperty("driverName");
 
-            return new Solap4py(dbhost, dbport, dbuser, dbpasswd);
+            return new Solap4py(dbhost, dbport, dbuser, dbpasswd, driverName);
         } catch (IOException ex) {
             LOGGER.log(Level.SEVERE, ex.getMessage());
         } finally {
@@ -175,28 +173,46 @@ public class Solap4py {
         return null;
     }
 
-    public static void main(String[] args) throws ClassNotFoundException, SQLException, IOException {
-        final Solap4py solap4py = Solap4py.getSolap4Object();
-        ServerSocket server = new ServerSocket(25335);
-        System.out.println("Solap4py-java Server started.");
-        while (true) {
-            final Socket client = server.accept();
-            new Thread() {
-                @Override
-                public void run() {
-                    try {
-                        BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
-                        PrintWriter out = new PrintWriter(client.getOutputStream());
-                        String query = in.readLine();
-                        String result = solap4py.process(query);
-                        out.print(result);
-                        out.flush();
-                        client.close();
-                    } catch (Exception e) {
-                        LOGGER.log(Level.SEVERE, e.getMessage());
-                    }
+    public static void main(String[] args) {
+        ServerSocket server = null;
+        try {
+            final Solap4py solap4py = Solap4py.getSolap4Object();
+            server = new ServerSocket(25335);
+            System.out.println("Solap4py-java Server started.");
+            while (true) {
+                try {
+                    final Socket client = server.accept();
+                    new Thread() {
+                        @Override
+                        public void run() {
+                            try {
+                                LOGGER.log(Level.INFO, "connection accepted");
+                                BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
+                                PrintWriter out = new PrintWriter(client.getOutputStream());
+                                String query = in.readLine();
+                                String result = solap4py.process(query);
+                                out.print(result);
+                                out.flush();
+                                client.close();
+                            } catch (Exception e) {
+                                LOGGER.log(Level.SEVERE, e.getMessage());
+                            }
+                        }
+                    }.start();
+                } catch (IOException acceptClientException) {
+                    LOGGER.log(Level.SEVERE, acceptClientException.getMessage());
                 }
-            }.start();
+            }
+        } catch (ClassNotFoundException | SQLException | IOException initException) {
+            LOGGER.log(Level.SEVERE, initException.getMessage());
+        } finally {
+            if (server != null) {
+                try {
+                    server.close();
+                } catch (IOException socketNotFoundException) {
+                    LOGGER.log(Level.SEVERE, socketNotFoundException.getMessage());
+                }
+            }
         }
     }
 }

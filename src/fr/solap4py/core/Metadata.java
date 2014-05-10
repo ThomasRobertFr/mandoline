@@ -1,3 +1,7 @@
+/**
+ * @author Rémy Chevalier
+ * @author Alexandre Peltier
+ */
 package fr.solap4py.core;
 
 import java.sql.SQLException;
