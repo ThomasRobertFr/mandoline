@@ -178,6 +178,7 @@ public class Solap4py {
     public static void main(String[] args) throws ClassNotFoundException, SQLException, IOException {
         final Solap4py solap4py = Solap4py.getSolap4Object();
         ServerSocket server = new ServerSocket(25335);
+        System.out.println("Solap4py-java Server started.");
         while (true) {
             final Socket client = server.accept();
             new Thread() {

@@ -1,0 +1,32 @@
+<ivy-module version="2.0">
+    <info organisation="westpic" module="Solap4py-java"/>
+
+    <configurations defaultconfmapping="compile->default">
+        <conf name="compile" description="Required to compile application"/>
+        <conf name="test"    description="Required for test only" extends="compile"/>
+        <conf name="build"   description="Build dependencies"/>
+		<conf name="runtime" description="Additional run-time dependencies" extends="compile"/>
+
+    </configurations>
+
+    <dependencies> 
+        <!-- compile dependencies -->
+		<dependency org="org.json" name="json" rev="20140107"/> 
+		<dependency org="org.json" name="json" rev="20140107"/> 
+		<dependency org="xerces" name="xercesImpl" rev="2.11.0"/>
+		<dependency org="org.olap4j" name="olap4j" rev="1.2.0"/>
+		<dependency org="org.olap4j" name="olap4j" rev="1.2.0-sources"/>
+		<dependency org="org.olap4j" name="olap4j-tck" rev="1.2.0"/>
+		<dependency org="org.olap4j" name="olap4j-xmla" rev="1.2.0"/>
+		
+        <!-- test dependencies -->
+        <dependency org="junit" name="junit" rev="4.11" conf="test->default"/>
+
+        <!-- build dependencies -->
+        <dependency org="org.jacoco" name="org.jacoco.ant" rev="0.6.3.201306030806" conf="build->default"/>
+
+        <!-- Global exclusions -->
+        <exclude org="org.apache.ant"/>
+    </dependencies>
+
+</ivy-module>
