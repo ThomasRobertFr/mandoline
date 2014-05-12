@@ -1,3 +1,6 @@
+/**
+ * @author Ibrahim Daoudi
+ */
 package fr.solap4py.core;
 
 import org.json.JSONArray;

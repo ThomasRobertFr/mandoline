@@ -1,0 +1,10 @@
+<ivysettings>
+	<settings defaultResolver="central" />
+	<resolvers>
+		<ibiblio name="central" m2compatible="true" />
+        <ibiblio name="pentaho" root="http://repository.pentaho.org/artifactory/pentaho/" m2compatible="true" />
+	</resolvers>
+	<modules>
+		<module organisation="org.olap4j" resolver="pentaho" />
+	</modules>
+</ivysettings>

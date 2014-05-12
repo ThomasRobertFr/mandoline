@@ -1,3 +1,6 @@
+/**
+ * @author Cindy Roullet
+ */
 package fr.solap4py.core;
 
 import static org.junit.Assert.assertEquals;
@@ -12,9 +15,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.olap4j.Axis;
 import org.olap4j.OlapConnection;
 import org.olap4j.mdx.SelectNode;
