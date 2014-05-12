@@ -330,7 +330,7 @@ public class Metadata {
             Level level = this.extractLevel(from, hierarchy);
             int depth = level.getDepth() + granularity;
             if (depth >= hierarchy.getLevels().size()) {
-        	throw new Solap4pyException(ErrorType.BAD_REQUEST, "Inexistant granularity");
+            	throw new Solap4pyException(ErrorType.BAD_REQUEST, "Inexistant granularity");
             }
             
             String current = null;
@@ -345,8 +345,13 @@ public class Metadata {
 
             if (from.length() == 6) {
               	if(granularity == 0){ 
-              		
-            		JSONArray memberArray = from.getJSONArray(5);
+              		JSONArray memberArray = null;
+              		if(from.get(5) instanceof JSONArray){
+              			memberArray = from.getJSONArray(5);              			
+              		}else{
+              			throw new Solap4pyException(ErrorType.BAD_REQUEST, "Invalid Array of identifiers");             			
+              		}
+            		 
             		String memberName = null;
             		List<Member> list = new LinkedList<Member>();
               		for (Member member : tmp) {              	
@@ -362,20 +367,24 @@ public class Metadata {
               		}
               	}
               	else{
-              		for (Member member : members) {              	
-	                    if (member.getUniqueName().equals(from.getString(5))) {
-	                        List<Member> memberArray = new LinkedList<Member>(Arrays.asList(member));
-		                        for (int i = 0; i < granularity; i++) {
-		                            List<Member> list = new LinkedList<Member>();
-		                            for (Member m : memberArray) {
-		                                list.addAll(m.getChildMembers());
-		                            }
-		                            memberArray = list;
-		                        }
-	                        members = memberArray;
-	                        break;
-	                    }
-                	}
+              		if((from.get(5) instanceof JSONArray)){
+              			throw new Solap4pyException(ErrorType.BAD_REQUEST, "Invalid Identifier"); 
+              		}else{
+	              		for (Member member : members) {              	
+		                    if (member.getUniqueName().equals(from.getString(5))) {
+		                        List<Member> memberArray = new LinkedList<Member>(Arrays.asList(member));
+			                        for (int i = 0; i < granularity; i++) {
+			                            List<Member> list = new LinkedList<Member>();
+			                            for (Member m : memberArray) {
+			                                list.addAll(m.getChildMembers());
+			                            }
+			                            memberArray = list;
+			                        }
+		                        members = memberArray;
+		                        break;
+		                    }
+	                	}
+              		}
                 }
             }
             
@@ -554,7 +563,7 @@ public class Metadata {
     
     public static void main(String[] args) throws ClassNotFoundException, SQLException, JSONException {
 	
-        String param = " { \"root\" : [\"Traffic\", \"[Traffic]\", \"[Zone]\", \"[Zone.Name]\", \"[Zone.Name].[Name0]\", \"[Zone.Name].[All Zone.Names].[France]\"], \"withProperties\":false, \"granularity\":3}}";
+        String param = " { \"root\" : [\"Traffic\", \"[Traffic]\", \"[Zone]\", \"[Zone.Name]\", \"[Zone.Name].[Name0]\", \"[Zone.Name].[All Zone.Names].[France]\"], \"withProperties\":false, \"granularity\":1}}";
         Solap4py p = Solap4py.getSolap4Object();
         JSONObject query = new JSONObject(param);
         Metadata m = new Metadata(p.getOlapConnection());
