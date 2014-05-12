@@ -141,7 +141,7 @@ public class Metadata {
      * @return the schemas existing in the database
      * @throws Solap4pyException
      */
-    private JSONObject getSchemas() throws Solap4pyException {
+    private JSONObject getSchemas() throws Solap4pyException, JSONException {
         List<Schema> schemas = null;
         JSONObject result = new JSONObject();
         try {
@@ -169,7 +169,7 @@ public class Metadata {
      * @return Names of the cubes existing in a schema.
      * @throws Solap4pyException
      */
-    private JSONObject getCubes(JSONArray from) throws Solap4pyException {
+    private JSONObject getCubes(JSONArray from) throws Solap4pyException, JSONException {
         JSONObject result = new JSONObject();
         try {
             List<Cube> cubes = this.catalog.getSchemas().get(from.getString(0)).getCubes();
@@ -181,9 +181,6 @@ public class Metadata {
         } catch (OlapException | NullPointerException e) {
             LOGGER.log(java.util.logging.Level.SEVERE, e.getMessage());
             throw new Solap4pyException(ErrorType.BAD_REQUEST, "Invalid schema identifier");
-        } catch (JSONException e) {
-            LOGGER.log(java.util.logging.Level.SEVERE, e.getMessage());
-            throw new Solap4pyException(ErrorType.BAD_REQUEST, "An error occured while building json result");
         }
         return result;
     }
@@ -194,7 +191,7 @@ public class Metadata {
      * @return the dimensions existing in the cube specified in from
      * @throws Solap4pyException
      */
-    private JSONObject getDimensions(JSONArray from) throws Solap4pyException {
+    private JSONObject getDimensions(JSONArray from) throws Solap4pyException, JSONException {
         JSONObject result = new JSONObject();
         try {
             Cube cube = this.extractCube(from);
@@ -241,9 +238,6 @@ public class Metadata {
         } catch (OlapException | NullPointerException e) {
             LOGGER.log(java.util.logging.Level.SEVERE, e.getMessage());
             throw new Solap4pyException(ErrorType.BAD_REQUEST, "Invalid identifier");
-        } catch (JSONException e) {
-            LOGGER.log(java.util.logging.Level.SEVERE, e.getMessage());
-            throw new Solap4pyException(ErrorType.BAD_REQUEST, "An error occured while building json result");
         }
         return result;
     }
@@ -255,7 +249,7 @@ public class Metadata {
      * @return the hierarchies of a specific dimension specified in from
      * @throws Solap4pyException
      */
-    private JSONObject getHierarchies(JSONArray from) throws Solap4pyException {
+    private JSONObject getHierarchies(JSONArray from) throws Solap4pyException, JSONException {
         JSONObject result = new JSONObject();
         try {
             Cube cube = this.extractCube(from);
@@ -270,10 +264,7 @@ public class Metadata {
         } catch (OlapException | NullPointerException e) {
             LOGGER.log(java.util.logging.Level.SEVERE, e.getMessage());
             throw new Solap4pyException(ErrorType.BAD_REQUEST, "Invalid identifier");
-        } catch (JSONException e) {
-            LOGGER.log(java.util.logging.Level.SEVERE, e.getMessage());
-            throw new Solap4pyException(ErrorType.BAD_REQUEST, "An error occured while building json result");
-        }
+        } 
         return result;
     }
 
@@ -286,7 +277,7 @@ public class Metadata {
      * @return the levels of specific hierarchy specified in from
      * @throws Solap4pyException
      */
-    private JSONArray getLevels(JSONArray from, boolean withProperties) throws Solap4pyException {
+    private JSONArray getLevels(JSONArray from, boolean withProperties) throws Solap4pyException, JSONException {
         JSONArray result = new JSONArray();
         try {
             Cube cube = this.extractCube(from);
@@ -312,9 +303,6 @@ public class Metadata {
         } catch (OlapException | NullPointerException e) {
             LOGGER.log(java.util.logging.Level.SEVERE, e.getMessage());
             throw new Solap4pyException(ErrorType.BAD_REQUEST, "Invalid identifier");
-        } catch (JSONException e) {
-            LOGGER.log(java.util.logging.Level.SEVERE, e.getMessage());
-            throw new Solap4pyException(ErrorType.BAD_REQUEST, "An error occured while building json result");
         }
         return result;
     }
@@ -329,7 +317,7 @@ public class Metadata {
      * @return the members of a specific level specified in from
      * @throws Solap4pyException
      */
-    private JSONObject getMembers(JSONArray from, boolean withProperties, int granularity) throws Solap4pyException {
+    private JSONObject getMembers(JSONArray from, boolean withProperties, int granularity) throws Solap4pyException, JSONException {
         JSONObject result = new JSONObject();
         try {
             Cube cube = this.extractCube(from);
@@ -398,9 +386,6 @@ public class Metadata {
         } catch (OlapException | NullPointerException e) {
             LOGGER.log(java.util.logging.Level.SEVERE, e.getMessage());
             throw new Solap4pyException(ErrorType.BAD_REQUEST, "Invalid identifier");
-        } catch (JSONException e) {
-            LOGGER.log(java.util.logging.Level.SEVERE, e.getMessage());
-            throw new Solap4pyException(ErrorType.BAD_REQUEST, "An error occured while building json result");
         }
         return result;
     }
@@ -411,7 +396,6 @@ public class Metadata {
      * @param level
      * @return the property of level
      * @throws Solap4pyException
-     * @throws JSONException 
      */
     private JSONObject getLevelProperties(Level level) throws Solap4pyException, JSONException {
         JSONObject result = new JSONObject();
@@ -427,7 +411,7 @@ public class Metadata {
                 }
                 result.put(property.getUniqueName(), s);
             }
-        } 
+        }
         return result;
     }
 
@@ -440,7 +424,7 @@ public class Metadata {
      *            the member's property gotten
      * @throws Solap4pyException
      */
-    private void getMemberProperties(JSONArray from, Member member, JSONObject result) throws Solap4pyException {
+    private void getMemberProperties(JSONArray from, Member member, JSONObject result) throws Solap4pyException, JSONException {
         try {
             for (Property property : member.getProperties()) {
                 if (Metadata.USELESS_PROPERTIES.contains(property.getUniqueName()) == false) {
@@ -454,9 +438,6 @@ public class Metadata {
         } catch (OlapException | NullPointerException e) {
             LOGGER.log(java.util.logging.Level.SEVERE, e.getMessage());
             throw new Solap4pyException(ErrorType.BAD_REQUEST, "Invalid identifier");
-        } catch (JSONException e) {
-            LOGGER.log(java.util.logging.Level.SEVERE, e.getMessage());
-            throw new Solap4pyException(ErrorType.BAD_REQUEST, "An error occured while building json result");
         }
     }
 
@@ -468,7 +449,7 @@ public class Metadata {
      * @return the geometry of member
      * @throws Solap4pyException
      */
-    private String getGeometry(JSONArray from, Member member, String geometricProperty) throws Solap4pyException {
+    private String getGeometry(JSONArray from, Member member, String geometricProperty) throws Solap4pyException, JSONException {
         CellSet cellSet = null;
         try {
             OlapStatement statement = this.olapConnection.createStatement();
@@ -479,9 +460,6 @@ public class Metadata {
         } catch (OlapException | NullPointerException e) {
             LOGGER.log(java.util.logging.Level.SEVERE, e.getMessage());
             throw new Solap4pyException(ErrorType.BAD_REQUEST, "Invalid identifier");
-        } catch (JSONException e) {
-            LOGGER.log(java.util.logging.Level.SEVERE, e.getMessage());
-            throw new Solap4pyException(ErrorType.BAD_REQUEST, "An error occured while building json result");
         }
         return cellSet.getCell(0).getFormattedValue();
     }
