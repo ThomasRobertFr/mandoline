@@ -561,19 +561,4 @@ public class Metadata {
         return level;
     }
     
-    
-    public static void main(String[] args) throws ClassNotFoundException, SQLException, JSONException {
-	
-        String param = " { \"root\" : [\"Traffic\", \"[Traffic]\", \"[Zone]\", \"[Zone.Name]\", \"[Zone.Name].[Name0]\", \"[Zone.Name].[All Zone.Names].[France]\"], \"withProperties\":false, \"granularity\":1}}";
-        Solap4py p = Solap4py.getSolap4Object();
-        JSONObject query = new JSONObject(param);
-        Metadata m = new Metadata(p.getOlapConnection());
-        JSONObject result = new JSONObject();
-        try {
-            result = m.query(query, result);
-            LOGGER.log(java.util.logging.Level.INFO, result.toString());
-        } catch (Solap4pyException e) {
-            LOGGER.log(java.util.logging.Level.SEVERE, e.getMessage());
-        }
-    }
-}
+ }

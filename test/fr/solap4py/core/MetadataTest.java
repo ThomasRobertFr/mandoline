@@ -243,8 +243,7 @@ public class MetadataTest {
             assertTrue("the third level does not retrieve his properties", result.getJSONObject(2).has("list-properties"));
 
 
-        } catch (JSONException e) {
-            e.printStackTrace();
+        
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         } catch (IllegalArgumentException e) {
@@ -367,16 +366,14 @@ public class MetadataTest {
                                && !result.has("[Zone.Name].[All Zone.Names].[France]"));
 
             param = "{ \"queryType\" : \"metadata\","
-                    + "\"data\" : { \"root\" : [\"Traffic\", \"[Traffic]\", \"[Measures]\", \"[Measures]\", \"[Measures].[MeasuresLevel]\"], \"withProperties\" : true, \"granularity\" : 1}}";
+                    + "\"data\" : { \"root\" : [\"Traffic\", \"[Traffic]\", \"[Measures]\", \"[Measures]\", \"[Measures].[MeasuresLevel]\"], \"withProperties\" : true}}";
 
-            result = (JSONObject) (getMembers.invoke(metadata, new JSONObject(param).getJSONObject("data").getJSONArray("root"), true, 1));
+            result = (JSONObject) (getMembers.invoke(metadata, new JSONObject(param).getJSONObject("data").getJSONArray("root"), true, 0));
 
             assertTrue(" the result does not contain the members corresponding to the different measures ",
                        result.has("[Measures].[Goods Quantity]") && result.has("[Measures].[Max Quantity]"));
 
             
-        } catch (JSONException e) {
-            e.printStackTrace();
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         } catch (IllegalArgumentException e) {
