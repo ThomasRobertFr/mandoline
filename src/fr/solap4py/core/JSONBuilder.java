@@ -1,5 +1,6 @@
 /**
  * @author Ibrahim Daoudi
+ * @version 1.02
  */
 package fr.solap4py.core;
 

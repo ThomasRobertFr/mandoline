@@ -1,5 +1,6 @@
 /**
- * @author Youri Portailler
+ * @author Rémy Chevalier
+ * @version 1.00
  */
 package fr.solap4py.core;
 

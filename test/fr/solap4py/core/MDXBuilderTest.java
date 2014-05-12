@@ -1,5 +1,6 @@
 /**
  * @author Cindy Roullet
+ * @version 1.01
  */
 package fr.solap4py.core;
 

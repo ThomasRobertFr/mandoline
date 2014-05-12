@@ -2,6 +2,7 @@
  * @author Ibrahim Daoudi
  * @author Rémy Chevalier
  * @author Pierre Depeyrot
+ * @version 1.02
  */
 package fr.solap4py.core;
 

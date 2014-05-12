@@ -2,6 +2,7 @@
  * @author Cindy Roullet
  * @author Ibrahim Daoudi
  * @author Rémy Chevalier
+ * @version 1.00
  */
 package fr.solap4py.core;
 
