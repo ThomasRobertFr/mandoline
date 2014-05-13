@@ -1,6 +1,10 @@
+/**
+ * @author Cindy Roullet
+ * @version 1.00
+ */
 package fr.solap4py.core;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 import org.json.JSONException;
 import org.json.JSONObject;

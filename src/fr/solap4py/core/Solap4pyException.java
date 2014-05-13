@@ -1,12 +1,18 @@
+/**
+ * @author Cindy Roullet
+ * @author Ibrahim Daoudi
+ * @author Rémy Chevalier
+ * @version 1.00
+ */
 package fr.solap4py.core;
 
 enum ErrorType {
     BAD_REQUEST,
     NOT_SUPPORTED,
-    SERVER_ERROR,
-    NO_HIERARCHY,
-    DIMENSION_ID_COUNT,
-    UNKNOWN_ERROR
+    SERVER_ERROR
+    //NO_HIERARCHY,
+    //DIMENSION_ID_COUNT,
+    //UNKNOWN_ERROR
 };
 
 @SuppressWarnings("serial")

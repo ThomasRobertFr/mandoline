@@ -1,3 +1,7 @@
+/**
+ * @author Rémy Chevalier
+ * @version 1.00
+ */
 package fr.solap4py.core;
 
 import static org.junit.Assert.assertTrue;
