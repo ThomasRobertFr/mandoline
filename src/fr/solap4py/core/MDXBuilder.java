@@ -1,0 +1,256 @@
+/**
+ * @author Cindy Roullet
+ * @author Ibrahim Daoudi
+ * @version 1.00
+ */
+package fr.solap4py.core;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.olap4j.Axis;
+import org.olap4j.OlapConnection;
+import org.olap4j.mdx.AxisNode;
+import org.olap4j.mdx.CallNode;
+import org.olap4j.mdx.IdentifierNode;
+import org.olap4j.mdx.ParseTreeNode;
+import org.olap4j.mdx.SelectNode;
+import org.olap4j.mdx.Syntax;
+import org.olap4j.mdx.parser.MdxParser;
+import org.olap4j.mdx.parser.MdxParserFactory;
+
+final class MDXBuilder {
+    private static final String ON_COLS = "onColumns";
+    private static final String ON_ROWS = "onRows";
+    private static final String WHERE = "where";
+    private static final String FROM = "from";
+    private static final String MEMBERS = "members";
+    private static final String CUBE_NOT_SPECIFIED = "Cube not specified";
+
+    MDXBuilder() {
+    }
+
+    /**
+     * Creates a MDX request inside a SelectNode.
+     * 
+     * @param olapConnection
+     *            Connection to the OLAP database.
+     * @param json
+     *            JSONObject containing the request from which we want to create
+     *            the selectNode.
+     * @return The selectNode created from the request contained in the
+     *         parameter json.
+     * @throws Solap4pyException
+     *             Exception that is thrown if the request in objectJSON is bad.
+     */
+    static SelectNode createSelectNode(OlapConnection olapConnection, JSONObject json) throws Solap4pyException {
+
+        SelectNode selectNodeRequest = initSelectNode(olapConnection, json);
+
+        try {
+            if (json.has(ON_COLS)) {
+                JSONArray onColumnsJSON = json.getJSONArray(ON_COLS);
+                setColumns(onColumnsJSON, selectNodeRequest);
+            } else {
+                setColumns(new JSONArray(), selectNodeRequest);
+            }
+
+            if (json.has(ON_ROWS) && json.getJSONObject(ON_ROWS).length() > 0) {
+                JSONObject onRowsJSON = json.getJSONObject(ON_ROWS);
+                setRows(onRowsJSON, selectNodeRequest);
+            }
+
+            if (json.has(WHERE)) {
+                JSONObject whereJSON = json.getJSONObject(WHERE);
+                setWhere(whereJSON, selectNodeRequest);
+            }
+
+        } catch (JSONException je) {
+            throw new Solap4pyException(ErrorType.BAD_REQUEST, je);
+        }
+        // solapExeption will be caught in the function execute()
+
+        return selectNodeRequest;
+
+    }
+
+    /**
+     * 
+     * Defines the clause where of the MDX request.
+     * 
+     * @param olapConnection
+     *            Connection to the OLAP database.
+     * @param whereJSON
+     *            JSONObject containing either data from the key "where".
+     * @param selectNodeRequest
+     *            selectNode on which the Axis FILTER is being set.
+     * @throws Solap4pyException
+     *             Exception that is thrown if the request in objectJSON is bad.
+     */
+    private static void setWhere(JSONObject whereJSON, SelectNode selectNodeRequest) throws Solap4pyException {
+        setRowsOrWhere(whereJSON, selectNodeRequest, false);
+    }
+
+    /**
+     * Defines the clause on rows of the MDX request.
+     * 
+     * @param olapConnection
+     *            Connection to the OLAP database.
+     * @param rowsJSON
+     *            JSONObject containing either data from the key "onRows".
+     * @param selectNodeRequest
+     *            selectNode on which the Axis ROWS is being set.
+     * @throws Solap4pyException
+     *             Exception that is thrown if the request in objectJSON is bad.
+     */
+    private static void setRows(JSONObject rowsJSON, SelectNode selectNodeRequest) throws Solap4pyException {
+
+        setRowsOrWhere(rowsJSON, selectNodeRequest, true);
+    }
+
+    /**
+     * Initialize a SelectNode with only the clause from specified.
+     * 
+     * @param olapConnection
+     *            Connection to the OLAP database.
+     * @param json
+     *            JSONObject containing the request from which we want to create
+     *            the selectNode.
+     * @return The selectNode initialize with its Cube and COLUMNS empty.
+     * @throws Solap4pyException
+     *             Exception that is thrown if the request in objectJSON is bad.
+     */
+    private static SelectNode initSelectNode(OlapConnection olapConnection, JSONObject json) throws Solap4pyException {
+        MdxParserFactory pFactory = olapConnection.getParserFactory();
+        MdxParser parser = pFactory.createMdxParser(olapConnection);
+
+        String cubeName = getJSONCubeName(json);
+        return parser.parseSelect("SELECT {} on COLUMNS FROM " + cubeName);
+    }
+
+    /**
+     * Returns the cube's name from the json request.
+     * @param json
+     *            JSONObject containing the request from which we want to create
+     *            the selectNode.
+     * @return The cube's name.
+     * @throws Solap4pyException
+     *             Exception that is thrown if the request in objectJSON is bad.
+     */
+    private static String getJSONCubeName(JSONObject json) throws Solap4pyException {
+        String cubeJSON;
+        try {
+            if (json.get(FROM) instanceof String) {
+                cubeJSON = json.getString(FROM);
+                if ("null".equals(cubeJSON) || cubeJSON == null || "".equals(cubeJSON) || "\"null\"".equals(cubeJSON)) {
+                    throw new Solap4pyException(ErrorType.BAD_REQUEST, CUBE_NOT_SPECIFIED);
+                }
+            } else {
+                throw new Solap4pyException(ErrorType.BAD_REQUEST, CUBE_NOT_SPECIFIED);
+            }
+        } catch (JSONException e) {
+            throw new Solap4pyException(ErrorType.BAD_REQUEST, e);
+        }
+
+        return cubeJSON;
+    }
+
+    /**
+     * Defines the clause on columns of the MDX request.
+     * 
+     * @param olapConnection
+     *            Connection to the OLAP database.
+     * @param jsonArrayColumns
+     *            JSONOArray containing data from the key "onColumns".
+     * @param selectNode
+     *            selectNode on which the Axis COLUMNS is being set according to
+     *            the parameter jsonArrayColumns.
+     * @throws Solap4pyException
+     *             Exception that is thrown if the request in objectJSON is bad.
+     */
+    private static void setColumns(JSONArray jsonArrayColumns, SelectNode selectNode) throws Solap4pyException {
+        List<ParseTreeNode> nodes = new ArrayList<ParseTreeNode>();
+
+        if (jsonArrayColumns.length() == 0) {
+            nodes.add(IdentifierNode.parseIdentifier("[Measures]"));
+        } else {
+            for (int i = 0; i < jsonArrayColumns.length(); i++) {
+                try {
+                    nodes.add(IdentifierNode.parseIdentifier(jsonArrayColumns.getString(i)));
+                } catch (JSONException e) {
+                    throw new Solap4pyException(ErrorType.BAD_REQUEST, e);
+                }
+            }
+        }
+
+        CallNode callNodeColumns = new CallNode(null, "{}", Syntax.Braces, nodes);
+
+        selectNode.getAxisList().get(Axis.COLUMNS.axisOrdinal()).setExpression(callNodeColumns);
+
+    }
+
+    /**
+     * Defines the clause on rows or where of the MDX request.
+     * 
+     * @param olapConnection
+     *            Connection to the OLAP database
+     * @param objectJSON
+     *            data containing either data from the key "onRows" or "where"
+     * @param selectNode
+     *            the selectNode on which the Axis FILTER or ROWS will be set
+     *            according to the data in objectJSON.
+     * @param onRows
+     *            boolean that specifies whether the Axis ROWS or FILTER is
+     *            being set in the function.
+     * @throws Solap4pyException
+     *             Exception that is thrown if the request in objectJSON is bad.
+     */
+    private static void setRowsOrWhere(JSONObject objectJSON, SelectNode selectNode, boolean onRows) throws Solap4pyException {
+
+        ParseTreeNode previous = null;
+        ParseTreeNode current = null;
+
+        Iterator<?> it = objectJSON.keys();
+        try {
+            while (it.hasNext()) {
+                String key = it.next().toString();
+                JSONObject hierarchyJSON = objectJSON.getJSONObject(key);
+                if (hierarchyJSON.getBoolean("range")) {
+                    JSONArray members = hierarchyJSON.getJSONArray(MEMBERS);
+                    if (members.length() == 2) {
+                        current = new CallNode(null, ":", Syntax.Infix, IdentifierNode.parseIdentifier(members.getString(0)),
+                                               IdentifierNode.parseIdentifier(members.getString(1)));
+                    } else {
+                        throw new Solap4pyException(ErrorType.BAD_REQUEST, "If range is true, two members are required.");
+                    }
+                } else {
+                    JSONArray membersArray = hierarchyJSON.getJSONArray(MEMBERS);
+                    List<ParseTreeNode> nodes = new ArrayList<ParseTreeNode>();
+
+                    for (int i = 0; i < membersArray.length(); i++) {
+
+                        nodes.add(IdentifierNode.parseIdentifier(membersArray.getString(i)));
+                    }
+                    current = new CallNode(null, "{}", Syntax.Braces, nodes);
+                }
+                if (previous != null) {
+                    current = new CallNode(null, "crossjoin", Syntax.Function, current, previous);
+                }
+                previous = current.deepCopy();
+            }
+            if (onRows) {
+                selectNode.getAxisList().add(new AxisNode(null, false, Axis.ROWS, null, previous));
+            } else {
+                selectNode.getFilterAxis().setExpression(previous);
+
+            }
+        } catch (JSONException je) {
+            throw new Solap4pyException(ErrorType.BAD_REQUEST, je);
+        }
+
+    }
+}

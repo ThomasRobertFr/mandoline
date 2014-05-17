@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="compile" name="Solap4py-java" xmlns:ivy="antlib:org.apache.ivy.ant">
+
+	<!--
+    ================
+    Build properties
+    ================
+    -->
+	<property file="build.properties" />
+
+	<!-- Sets the user/pass properties to "" if not set. Do not edit here. -->
+	<property name="proxy.user" value="" />
+	<property name="proxy.pass" value="" />
+
+	<!-- Proxy configuration, if needed -->
+	<target name="probe-proxy">
+		<condition property="proxy.enabled">
+			<and>
+				<isset property="proxy.host" />
+				<isset property="proxy.port" />
+				<matches pattern="[1-65535]" string="${proxy.port}" />
+			</and>
+		</condition>
+	</target>
+
+	<target name="proxy" depends="probe-proxy" if="proxy.enabled">
+		<setproxy proxyhost="${proxy.host}" proxyport="${proxy.port}" proxyuser="${proxy.user}" proxypassword="${proxy.pass}" nonproxyhosts="${non.proxy.host}" />
+	</target>
+
+	<!--
+    ===========
+    Build setup
+    ===========
+    -->
+	<target name="bootstrap" depends="proxy" description="Used to install the ivy task jar">
+		<mkdir dir="${ivy.jar.dir}" />
+		<get skipexisting="true" src="http://search.maven.org/remotecontent?filepath=org/apache/ivy/ivy/2.3.0/ivy-2.3.0.jar" dest="${ivy.jar.file}" usetimestamp="true" />
+	</target>
+
+	<target name="init-ivy" depends="bootstrap">
+		<path id="ivy.lib.path">
+			<fileset dir="${ivy.jar.dir}" includes="*.jar" />
+		</path>
+		<taskdef resource="org/apache/ivy/ant/antlib.xml" uri="antlib:org.apache.ivy.ant" classpathref="ivy.lib.path" />
+	</target>
+
+	<target name="resolve" depends="init-ivy" description="Download dependencies and setup classpath">
+		<ivy:resolve />
+		<ivy:report todir='${ivy.reports.dir}' graph='false' xml='false' />
+		<ivy:cachepath pathid="compile.path" conf="compile" />
+		<ivy:cachepath pathid="test.path" conf="test" />
+		<ivy:cachepath pathid="build.path" conf="build" />
+		<ivy:cachepath pathid="runtime.path" conf="runtime" />
+	</target>
+
+	<target name="init" depends="resolve" description="Create builds directories">
+		<mkdir dir="${classes.dir}" />
+		<mkdir dir="${test.classes.dir}" />
+		<mkdir dir="${test.reports.dir}" />
+	</target>
+
+	<!--
+    ===============
+    Compile targets
+    ===============
+    -->
+	<target name="compile" depends="init">
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" includeantruntime="false" debug="true" classpathref="compile.path" />
+	</target>
+
+	<target name="compile-tests" depends="compile">
+		<javac srcdir="${test.src.dir}" destdir="${test.classes.dir}" includeantruntime="false" debug="true">
+			<classpath>
+				<path refid="test.path" />
+				<pathelement path="${classes.dir}" />
+			</classpath>
+		</javac>
+	</target>
+
+	<!--
+    ============
+    Test targets
+    ============
+    -->
+	<target name="test" depends="compile-tests">
+		<taskdef uri="antlib:org.jacoco.ant" resource="org/jacoco/ant/antlib.xml" classpathref="build.path" />
+
+		<jacoco:coverage destfile="${build.dir}/jacoco.exec" xmlns:jacoco="antlib:org.jacoco.ant">
+			<junit haltonfailure="no" fork="true">
+				<classpath>
+					<path refid="test.path" />
+					<pathelement path="${classes.dir}" />
+					<pathelement path="${test.classes.dir}" />
+				</classpath>
+				<formatter type="plain" usefile="false" />
+				<formatter type="xml" />
+				<batchtest fork="yes" todir="${test.reports.dir}">
+					<fileset dir="${test.src.dir}">
+						<include name="**/*Test.java" />
+						<exclude name="**/AllTests.java" />
+					</fileset>
+				</batchtest>
+			</junit>
+		</jacoco:coverage>
+	</target>
+
+	<!--
+    =====================
+    Run targets
+    =====================
+    -->
+	<target name="run" depends="compile">
+		<echo message="Starting Solap4py-java Server..." />
+		<java classname="fr.solap4py.core.Solap4py">
+			<classpath>
+				<path refid="runtime.path" />
+				<pathelement location="${classes.dir}" />
+			</classpath>
+		</java>
+	</target>
+
+	<!--
+    =============
+    Clean targets
+    =============
+    -->
+	<target name="clean" depends="init-ivy">
+		<delete dir="${build.dir}" />
+	</target>
+
+	<target name="clean-all" depends="clean">
+		<ivy:cleancache />
+	</target>
+
+</project>
