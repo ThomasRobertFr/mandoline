@@ -235,8 +235,8 @@ final class MDXBuilder {
                     }
 
                     /* Prepare aggregation name */
-                    identifierWithMemberNode = IdentifierNode.parseIdentifier(members.getString(0));
-                    identifierWithMemberNode = identifierWithMemberNode.append(IdentifierParser.parseIdentifier("[&Co]").get(0));
+                    identifierWithMemberNode = IdentifierNode.parseIdentifier(key);
+                    identifierWithMemberNode = identifierWithMemberNode.append(IdentifierParser.parseIdentifier("[Aggregation]").get(0));
 
 
                     aggregation = new WithMemberNode(null, identifierWithMemberNode, new CallNode(null, "Aggregate", Syntax.Function, nodeForDice), Collections.<PropertyValueNode>emptyList());
@@ -281,5 +281,6 @@ final class MDXBuilder {
             throw new Solap4pyException(ErrorType.BAD_REQUEST, je);
         }
 
+        System.out.println(selectNode.toString());
     }
 }
