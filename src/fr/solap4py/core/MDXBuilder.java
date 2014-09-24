@@ -5,23 +5,20 @@
  */
 package fr.solap4py.core;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.olap4j.Axis;
 import org.olap4j.OlapConnection;
-import org.olap4j.mdx.AxisNode;
-import org.olap4j.mdx.CallNode;
-import org.olap4j.mdx.IdentifierNode;
-import org.olap4j.mdx.ParseTreeNode;
-import org.olap4j.mdx.SelectNode;
-import org.olap4j.mdx.Syntax;
+import org.olap4j.impl.IdentifierParser;
+import org.olap4j.mdx.*;
 import org.olap4j.mdx.parser.MdxParser;
 import org.olap4j.mdx.parser.MdxParserFactory;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 
 final class MDXBuilder {
     private static final String ON_COLS = "onColumns";
@@ -81,9 +78,7 @@ final class MDXBuilder {
     /**
      * 
      * Defines the clause where of the MDX request.
-     * 
-     * @param olapConnection
-     *            Connection to the OLAP database.
+     *
      * @param whereJSON
      *            JSONObject containing either data from the key "where".
      * @param selectNodeRequest
@@ -97,9 +92,7 @@ final class MDXBuilder {
 
     /**
      * Defines the clause on rows of the MDX request.
-     * 
-     * @param olapConnection
-     *            Connection to the OLAP database.
+     *
      * @param rowsJSON
      *            JSONObject containing either data from the key "onRows".
      * @param selectNodeRequest
@@ -161,9 +154,7 @@ final class MDXBuilder {
 
     /**
      * Defines the clause on columns of the MDX request.
-     * 
-     * @param olapConnection
-     *            Connection to the OLAP database.
+     *
      * @param jsonArrayColumns
      *            JSONOArray containing data from the key "onColumns".
      * @param selectNode
@@ -173,7 +164,7 @@ final class MDXBuilder {
      *             Exception that is thrown if the request in objectJSON is bad.
      */
     private static void setColumns(JSONArray jsonArrayColumns, SelectNode selectNode) throws Solap4pyException {
-        List<ParseTreeNode> nodes = new ArrayList<ParseTreeNode>();
+        List<ParseTreeNode> nodes = new ArrayList<>();
 
         if (jsonArrayColumns.length() == 0) {
             nodes.add(IdentifierNode.parseIdentifier("[Measures]"));
@@ -195,9 +186,7 @@ final class MDXBuilder {
 
     /**
      * Defines the clause on rows or where of the MDX request.
-     * 
-     * @param olapConnection
-     *            Connection to the OLAP database
+     *
      * @param objectJSON
      *            data containing either data from the key "onRows" or "where"
      * @param selectNode
@@ -212,30 +201,70 @@ final class MDXBuilder {
     private static void setRowsOrWhere(JSONObject objectJSON, SelectNode selectNode, boolean onRows) throws Solap4pyException {
 
         ParseTreeNode previous = null;
-        ParseTreeNode current = null;
+        ParseTreeNode current;
+        ParseTreeNode aggregation;
 
         Iterator<?> it = objectJSON.keys();
         try {
             while (it.hasNext()) {
                 String key = it.next().toString();
                 JSONObject hierarchyJSON = objectJSON.getJSONObject(key);
-                if (hierarchyJSON.getBoolean("range")) {
+                IdentifierNode identifierWithMemberNode = null;
+
+                /* Create a calculated with member if necessary */
+                if (hierarchyJSON.getBoolean("dice")) {
+                    JSONArray members = hierarchyJSON.getJSONArray(MEMBERS);
+
+                    ParseTreeNode nodeForDice;
+                    if (hierarchyJSON.getBoolean("range")) {
+                        if (members.length() == 2) {
+                            nodeForDice = new CallNode(null, ":", Syntax.Infix, IdentifierNode.parseIdentifier(members.getString(0)),
+                                    IdentifierNode.parseIdentifier(members.getString(1)));
+                        } else {
+                            throw new Solap4pyException(ErrorType.BAD_REQUEST, "If range is true, two members are required.");
+                        }
+                    } else {
+                        JSONArray membersArray = hierarchyJSON.getJSONArray(MEMBERS);
+                        List<ParseTreeNode> nodes = new ArrayList<>();
+
+                        for (int i = 0; i < membersArray.length(); i++) {
+
+                            nodes.add(IdentifierNode.parseIdentifier(membersArray.getString(i)));
+                        }
+                        nodeForDice = new CallNode(null, "{}", Syntax.Braces, nodes);
+                    }
+
+                    /* Prepare aggregation name */
+                    identifierWithMemberNode = IdentifierNode.parseIdentifier(members.getString(0));
+                    identifierWithMemberNode = identifierWithMemberNode.append(IdentifierParser.parseIdentifier("[&Co]").get(0));
+
+
+                    aggregation = new WithMemberNode(null, identifierWithMemberNode, new CallNode(null, "Aggregate", Syntax.Function, nodeForDice), Collections.<PropertyValueNode>emptyList());
+                    selectNode.getWithList().add(aggregation);
+                }
+
+                /* Create the "on columns" element */
+                if (hierarchyJSON.getBoolean("range") && !hierarchyJSON.getBoolean("dice")) {
                     JSONArray members = hierarchyJSON.getJSONArray(MEMBERS);
                     if (members.length() == 2) {
                         current = new CallNode(null, ":", Syntax.Infix, IdentifierNode.parseIdentifier(members.getString(0)),
-                                               IdentifierNode.parseIdentifier(members.getString(1)));
+                                IdentifierNode.parseIdentifier(members.getString(1)));
                     } else {
                         throw new Solap4pyException(ErrorType.BAD_REQUEST, "If range is true, two members are required.");
                     }
                 } else {
-                    JSONArray membersArray = hierarchyJSON.getJSONArray(MEMBERS);
-                    List<ParseTreeNode> nodes = new ArrayList<ParseTreeNode>();
+                    if (hierarchyJSON.getBoolean("dice")) {
+                        current = new CallNode(null, "{}", Syntax.Braces, identifierWithMemberNode);
+                    } else {
+                        JSONArray membersArray = hierarchyJSON.getJSONArray(MEMBERS);
+                        List<ParseTreeNode> nodes = new ArrayList<>();
 
-                    for (int i = 0; i < membersArray.length(); i++) {
+                        for (int i = 0; i < membersArray.length(); i++) {
 
-                        nodes.add(IdentifierNode.parseIdentifier(membersArray.getString(i)));
+                            nodes.add(IdentifierNode.parseIdentifier(membersArray.getString(i)));
+                        }
+                        current = new CallNode(null, "{}", Syntax.Braces, nodes);
                     }
-                    current = new CallNode(null, "{}", Syntax.Braces, nodes);
                 }
                 if (previous != null) {
                     current = new CallNode(null, "crossjoin", Syntax.Function, current, previous);
