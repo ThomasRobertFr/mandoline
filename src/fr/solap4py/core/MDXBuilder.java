@@ -212,7 +212,7 @@ final class MDXBuilder {
                 IdentifierNode identifierWithMemberNode = null;
 
                 /* Create a calculated with member if necessary */
-                if (hierarchyJSON.getBoolean("dice")) {
+                if (!hierarchyJSON.getBoolean("dice")) {
                     JSONArray members = hierarchyJSON.getJSONArray(MEMBERS);
 
                     ParseTreeNode nodeForDice;
@@ -253,7 +253,7 @@ final class MDXBuilder {
                         throw new Solap4pyException(ErrorType.BAD_REQUEST, "If range is true, two members are required.");
                     }
                 } else {
-                    if (hierarchyJSON.getBoolean("dice")) {
+                    if (!hierarchyJSON.getBoolean("dice")) {
                         current = new CallNode(null, "{}", Syntax.Braces, identifierWithMemberNode);
                     } else {
                         JSONArray membersArray = hierarchyJSON.getJSONArray(MEMBERS);
