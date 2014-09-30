@@ -4,14 +4,6 @@
  */
 package fr.solap4py.core;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.After;
@@ -19,7 +11,15 @@ import org.junit.Before;
 import org.junit.Test;
 import org.olap4j.Axis;
 import org.olap4j.OlapConnection;
+import org.olap4j.mdx.AxisNode;
+import org.olap4j.mdx.CallNode;
 import org.olap4j.mdx.SelectNode;
+import org.olap4j.mdx.WithMemberNode;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
+import static org.junit.Assert.*;
 
 public class MDXBuilderTest {
 
@@ -54,16 +54,16 @@ public class MDXBuilderTest {
         olapConnection = solap4py.getOlapConnection();
 
         String sBad = "{" + "onColumns:" + "[" + "\"[Measures].[Goods Quantity]\"," + "12" + "]," + " onRows:" + "{"
-                      + "\"[Time]\":{\"members\":[\"[2000]\"],\"range\":true} " + "}," + " where:" + "{"
-                      + "sqldkfjglqejg:{qrgqf:[qzefqzef],\"range\":false} " + "}," + "from:" + "\"\"" + "}";
+                + "\"[Time]\":{\"members\":[\"[2000]\"],\"range\":true,\"dice\":true} " + "}," + " where:" + "{"
+                + "sqldkfjglqejg:{qrgqf:[qzefqzef],\"range\":false, \"dice\":true} " + "}," + "from:" + "\"\"" + "}";
 
         String sBad2 = "{" + "onColumns:" + "[" + "\"[Measures].[Goods Quantity]\"," + "12" + "]," + " onRows:" + "{"
-                       + "1354:{strhsz:[s],\"range\":false} " + "}," + " where:" + "{"
-                       + "\"[Zone.Name]\":{\"members\":[\"[France]\"],\"range\":false} " + "}," + "from:" + "\"\"" + "}";
+                + "1354:{strhsz:[s],\"range\":false, \"dice\":true } " + "}," + " where:" + "{"
+                + "\"[Zone.Name]\":{\"members\":[\"[France]\"],\"range\":false,\"dice\":true } " + "}," + "from:" + "\"\"" + "}";
 
         String s = "{" + "onColumns:" + "[" + "\"[Measures].[Goods Quantity]\"," + "\"[Measures].[Max Quantity]\"" + "]," + " onRows:"
-                   + "{" + "\"[Time]\":{\"members\":[\"[2000]\"],\"range\":false} " + "}," + " where:" + "{"
-                   + "\"[Zone.Name]\":{\"members\":[\"[France]\"],\"range\":false} " + "}," + "from:" + "\"[Traffic]\"" + "}";
+                + "{" + "\"[Time]\":{\"members\":[\"[2000]\"],\"range\":false,\"dice\":false} " + "}," + " where:" + "{"
+                + "\"[Zone.Name]\":{\"members\":[\"[France]\"],\"range\":false,\"dice\":true} " + "}," + "from:" + "\"[Traffic]\"" + "}";
         inputTest = new JSONObject(s);
         inputTest2 = new JSONObject(sBad);
         inputTest3 = new JSONObject(sBad2);
@@ -197,6 +197,16 @@ public class MDXBuilderTest {
             String whereAfter = selectNodeTest.getFilterAxis().getExpression().toString();
             assertNotNull("WHERE did not set", whereAfter);
 
+            /* where clause contains dice=true and onRows clause contains dice=false */
+            /*
+             The whith member axis should contain an aggregation of the members in the onRows clause
+             that should be displayed on axis 1
+             and the where axis should contain a set with the only member in the where clause
+            */
+            assertEquals("With list contains an aggregation", "Aggregate", ((CallNode) ((WithMemberNode) selectNodeTest.getWithList().get(0)).getExpression()).getOperatorName());
+            assertEquals("Rows axis should contain [Time].[Aggregation]", "[Time].[Aggregation]", ((CallNode) ((AxisNode) selectNodeTest.getAxisList().get(Axis.ROWS.axisOrdinal())).getExpression()).getArgList().get(0).toString());
+            assertEquals("Where axis should contain a set", "{}", ((CallNode) selectNodeTest.getFilterAxis().getExpression()).getOperatorName());
+
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
         } catch (IllegalAccessException e) {
@@ -209,7 +219,7 @@ public class MDXBuilderTest {
         try {
             selectNodeTest = (SelectNode) (initSelectNode.invoke(null, olapConnection, inputTest));
             setColumns.invoke(null, columnsTest, selectNodeTest);
-            setRowsOrWhere.invoke(null, rowsTest2, selectNodeTest, true);
+            setRowsOrWhere.invoke(null, rowsTest3, selectNodeTest, true);
         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 
             throw e.getCause();
