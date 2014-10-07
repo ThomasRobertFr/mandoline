@@ -1,23 +1,35 @@
 solap4py-java
 =============
 
-Java application needed by [solap4py](https://github.com/loganalysis/solap4py)
+Solap4py-java is a java server that provides a simple `JSON` API to GeoMondrian. To install it (ubuntu 14.04):
 
-Make sure you configure the "config.dist" file with your database configuration.
+    # Install build tools
+    sudo apt-get install ant
+    sudo apt-get install openjdk-7-jdk
 
-It works as a server application, you simply have to execute `ant run` command and the server starts. Then, you can use Solap4py to request [GeoMondrian](http://www.spatialytics.org/fr/projets/geomondrian/).
+    # Retrieve the source
+    git clone https://github.com/loganalysis/solap4py-java.git
+
+Now, you should edit the config.dist file to add your GeoMondrian's connection information to have something like this:
+
+    #Configuration of the database
+    dbhost=localhost
+    dbport=8080
+    # Name of the Xmla Olap4j Driver
+    driverName=org.olap4j.driver.xmla.XmlaOlap4jDriver
+
+If your GeoMondrian is installed locally and listens on the port 8080 (for example if installed on a local tomcat).
+
+You can now build and run the application:
+
+    # Make sure the JAVA_HOME is set to the Java 7 JDK:
+    export JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64/
+
+    # Build and run the application
+    ant run
 
 ## Proxy
-In order to compile, `ant` download external libraries on maven repositories.
-If you are under a proxy, you have to uncomment and configure the proxy block in [build.properties](https://github.com/Westpic/solap4py-java/blob/develop/build.properties).
-
-## Dependencies
-
-This application use [olap4j](https://github.com/olap4j/olap4j) to interact with GeoMondrian. So you need a GeoMondrian server installed.
-
-## Roadmap
-
-This application aims to provide access to GeoMondrian for [our custom GeoNode](https://github.com/loganalysis/geonode) in order to display geographic business intelligence data.
-
-We are not currently trying to make this application available for an other purpose. If you want to get involved and help, please contact us !
+In order to compile, `ant` needs to download external libraries on maven repositories.
+If you are behind a proxy, you have to uncomment and configure the proxy block in [build.properties](https://github.com/loganalysis/solap4py-java/blob/master/build.properties)
+with your proxy settings.
 
