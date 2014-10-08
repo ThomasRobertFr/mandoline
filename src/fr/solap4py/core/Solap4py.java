@@ -6,22 +6,6 @@
  */
 package fr.solap4py.core;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -31,6 +15,16 @@ import org.olap4j.OlapException;
 import org.olap4j.OlapStatement;
 import org.olap4j.mdx.SelectNode;
 
+import java.io.*;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public class Solap4py {
 	private OlapConnection olapConnection;
 	private Metadata metadata;
@@ -38,11 +32,11 @@ public class Solap4py {
 			.getName());
 
 	public Solap4py(String host, String port, String user, String passwd,
-			String driverName) throws ClassNotFoundException, SQLException {
+			String driverName, String geomondrianName) throws ClassNotFoundException, SQLException {
 		Class.forName(driverName);
 		Connection connection = DriverManager
 				.getConnection("jdbc:xmla:Server=http://" + user + ":" + passwd
-						+ "@" + host + ":" + port + "/geomondrian/xmla");
+						+ "@" + host + ":" + port + "/" + geomondrianName + "/xmla");
 		this.olapConnection = connection.unwrap(OlapConnection.class);
 		this.metadata = new Metadata(this.olapConnection);
 	}
@@ -174,8 +168,9 @@ public class Solap4py {
 			String dbpasswd = prop.getProperty("dbpasswd");
 			String dbport = prop.getProperty("dbport");
 			String driverName = prop.getProperty("driverName");
+            String geomondrianName = prop.getProperty("geomondrianName");
 
-			return new Solap4py(dbhost, dbport, dbuser, dbpasswd, driverName);
+			return new Solap4py(dbhost, dbport, dbuser, dbpasswd, driverName, geomondrianName);
 		} catch (IOException ex) {
 			LOGGER.log(Level.SEVERE, ex.getMessage());
 		} finally {
