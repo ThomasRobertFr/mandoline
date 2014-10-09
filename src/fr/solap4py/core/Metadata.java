@@ -5,14 +5,6 @@
  */
 package fr.solap4py.core;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.logging.Logger;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -20,14 +12,10 @@ import org.olap4j.CellSet;
 import org.olap4j.OlapConnection;
 import org.olap4j.OlapException;
 import org.olap4j.OlapStatement;
-import org.olap4j.metadata.Catalog;
-import org.olap4j.metadata.Cube;
-import org.olap4j.metadata.Dimension;
-import org.olap4j.metadata.Hierarchy;
-import org.olap4j.metadata.Level;
-import org.olap4j.metadata.Member;
-import org.olap4j.metadata.Property;
-import org.olap4j.metadata.Schema;
+import org.olap4j.metadata.*;
+
+import java.util.*;
+import java.util.logging.Logger;
 
 public class Metadata {
 
@@ -228,7 +216,7 @@ public class Metadata {
 						break;
 
 					case "OTHER":
-						Iterator<Property> i = dimension.getHierarchies().get(1)
+						Iterator<Property> i = dimension.getHierarchies().get(0)
 						                                .getLevels().get(1)
 						                                .getMembers().get(0)
 						                                .getProperties()
