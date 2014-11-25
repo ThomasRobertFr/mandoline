@@ -166,6 +166,8 @@ public class Metadata {
 
 	/**
 	 * Returns all cube's names from a schema specified in from.
+	 * The resulting JSON contains a caption key which is the name XML attribute of the mondrian schema,
+	 * and a description key which is the caption XML attribute of the mondrian schema.
 	 *
 	 * @param from
 	 * @return Names of the cubes existing in a schema.
@@ -177,7 +179,8 @@ public class Metadata {
 			List<Cube> cubes = this.catalog.getSchemas().get(from.getString(0)).getCubes();
 			for (Cube cube : cubes) {
 				JSONObject s = new JSONObject();
-				s.put("caption", cube.getCaption());
+				s.put("caption", cube.getName());
+				s.put("description", cube.getCaption());
 				result.put(cube.getUniqueName(), s);
 			}
 		} catch (OlapException | NullPointerException e) {
@@ -204,15 +207,10 @@ public class Metadata {
 				switch (dimension.getDimensionType().toString()) {
 					case "TIME":
 						s.put("type", "Time");
-						s.put("caption", dimension.getCaption());
-						result.put(dimension.getUniqueName(), s);
 						break;
 
 					case "MEASURE":
 						s.put("type", "Measure");
-						s.put("caption", dimension.getCaption());
-						result.put(dimension.getUniqueName(), s);
-
 						break;
 
 					case "OTHER":
@@ -221,7 +219,6 @@ public class Metadata {
 						                                .getMembers().get(0)
 						                                .getProperties()
 						                                .iterator();
-
 						String type = "Standard";
 						while (i.hasNext()) {
 							if ("Geom".equals(i.next().getCaption().substring(0, 4))) {
@@ -229,18 +226,16 @@ public class Metadata {
 								break;
 							}
 						}
-
 						s.put("type", type);
-						s.put("caption", dimension.getCaption());
-						result.put(dimension.getUniqueName(), s);
 						break;
 
 					default:
 						s.put("type", "Standard");
-						s.put("caption", dimension.getCaption());
-						result.put(dimension.getUniqueName(), s);
 						break;
 				}
+				s.put("caption", dimension.getName());
+				s.put("description", dimension.getCaption());
+				result.put(dimension.getUniqueName(), s);
 			}
 		} catch (OlapException | NullPointerException e) {
 			LOGGER.log(java.util.logging.Level.SEVERE, e.getMessage());
@@ -265,7 +260,8 @@ public class Metadata {
 			List<Hierarchy> hierarchies = dimension.getHierarchies();
 			for (Hierarchy hierarchy : hierarchies) {
 				JSONObject s = new JSONObject();
-				s.put("caption", hierarchy.getCaption());
+				s.put("caption", hierarchy.getName());
+				s.put("description", hierarchy.getCaption());
 				result.put(hierarchy.getUniqueName(), s);
 			}
 		} catch (OlapException | NullPointerException e) {
@@ -295,7 +291,8 @@ public class Metadata {
 			for (Level level : levels) {
 				if (!level.getCaption().equals("(All)")) {
 					JSONObject s = new JSONObject();
-					s.put("caption", level.getCaption());
+					s.put("caption", level.getName());
+					s.put("description", level.getCaption());
 					s.put("id", level.getUniqueName());
 					if (withProperties == true) {
 						s.put("list-properties", this.getLevelProperties(level));
@@ -392,9 +389,9 @@ public class Metadata {
 
 			for (Member member : members) {
 				JSONObject s = new JSONObject();
-				s.put("caption", member.getCaption());
+				s.put("caption", member.getName());
 				if ("[Measures]".equals(from.getString(2))) {
-					s.put("description", member.getDescription());
+					s.put("description", member.getCaption());
 				}
 				if (withProperties == true) {
 					this.getMemberProperties(from, member, s);
@@ -420,9 +417,10 @@ public class Metadata {
 		List<Property> properties = level.getProperties();
 		for (Property property : properties) {
 			JSONObject s = new JSONObject();
-			s.put("caption", property.getCaption());
+			s.put("caption", property.getName());
+			s.put("description", property.getCaption());
 			if (Metadata.USELESS_PROPERTIES.contains(property.getUniqueName()) == false) {
-				if ("Geometry".equals(property.getCaption())) {
+				if ("Geometry".equals(property.getName())) {
 					s.put("type", "Geometry");
 				} else {
 					s.put("type", "Standard");
@@ -446,8 +444,8 @@ public class Metadata {
 		try {
 			for (Property property : member.getProperties()) {
 				if (Metadata.USELESS_PROPERTIES.contains(property.getUniqueName()) == false) {
-					if ("Geometry".equals(property.getCaption())) {
-						result.put(property.getName(), this.getGeometry(from, member, property.getCaption()));
+					if ("Geometry".equals(property.getName())) {
+						result.put(property.getName(), this.getGeometry(from, member, property.getName()));
 					} else {
 						result.put(property.getName(), member.getPropertyFormattedValue(property));
 					}
