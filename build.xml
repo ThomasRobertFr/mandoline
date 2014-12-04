@@ -135,6 +135,28 @@
 
     <!--
     =====================
+    Packaging in a deb
+    =====================
+    -->
+    <target name="package" depends="jar">
+        <taskdef name="deb" classname="org.vafer.jdeb.ant.DebAntTask"/>
+        <copy todir="${build.dir}/deb/control">
+            <fileset dir="src/deb/control"/>
+            <filterset begintoken="[[" endtoken="]]">
+                <filter token="version" value="${version}"/>
+                <filter token="description" value="${description}"/>
+                <filter token="name" value="${ant.project.name}"/>
+            </filterset>
+        </copy>
+        <deb destfile="${build.dir}/${ant.project.name}.deb" control="${build.dir}/deb/control" verbose="true">
+            <data src="${dist.jar}" type="file">
+                <mapper type="perm" prefix="/usr/share/jdeb/lib"/>
+            </data>
+        </deb>
+    </target>
+
+    <!--
+    =====================
     Run targets
     =====================
     -->
