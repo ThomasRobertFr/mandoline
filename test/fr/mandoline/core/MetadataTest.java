@@ -2,7 +2,7 @@
  * @author Alexandre Peltier
  * @version 1.02
  */
-package fr.solap4py.core;
+package fr.mandoline.core;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -23,7 +23,7 @@ import static org.junit.Assert.assertTrue;
 
 public class MetadataTest {
 
-    private Solap4py solap4py;
+    private Mandoline mandoline;
     private OlapConnection olapConnection;
 
     private Metadata metadata;
@@ -42,8 +42,8 @@ public class MetadataTest {
     @Before
     public void setUp() throws Exception {
 
-        solap4py = Solap4py.getSolap4Object();
-        olapConnection = solap4py.getOlapConnection();
+        mandoline = Mandoline.getMandolineObject();
+        olapConnection = mandoline.getOlapConnection();
 
         metadata = new Metadata(olapConnection);
 

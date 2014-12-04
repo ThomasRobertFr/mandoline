@@ -2,7 +2,7 @@
  * @author Cindy Roullet
  * @version 1.00
  */
-package fr.solap4py.core;
+package fr.mandoline.core;
 
 import org.junit.runner.JUnitCore;
 import org.junit.runner.Result;

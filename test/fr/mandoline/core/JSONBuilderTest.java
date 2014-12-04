@@ -2,7 +2,7 @@
  * @author Cindy Roullet
  * @version 1.00
  */
-package fr.solap4py.core;
+package fr.mandoline.core;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -19,7 +19,7 @@ import org.olap4j.mdx.SelectNode;
 import static org.junit.Assert.assertTrue;
 
 public class JSONBuilderTest {
-    private Solap4py solap4py;
+    private Mandoline mandoline;
     private OlapConnection olapConnection;
     private JSONObject inputTest;
     private SelectNode selectNodeTest;
@@ -28,8 +28,8 @@ public class JSONBuilderTest {
 
     @Before
     public void setUp() throws Exception {
-        solap4py = Solap4py.getSolap4Object();
-        olapConnection = solap4py.getOlapConnection();
+        mandoline = Mandoline.getMandolineObject();
+        olapConnection = mandoline.getOlapConnection();
         String s = "{" + "onColumns:" + "[" + "\"[Measures].[Goods Quantity]\"," + "\"[Measures].[Max Quantity]\"" + "]," + " onRows:"
                 + "{" + "\"[Time]\":{\"members\":[\"[Time].[2000]\"],\"range\":false,\"dice\":false} " + "}," + " where:" + "{"
                 + "\"[Zone.Name]\":{\"members\":[\"[Zone.Name].[France]\"],\"range\":false,\"dice\":true} " + "}," + "from:" + "\"[Traffic]\"" + "}";

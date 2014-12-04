@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project default="compile" name="Solap4py-java" xmlns:ivy="antlib:org.apache.ivy.ant">
+<project default="compile" name="Mandoline" xmlns:ivy="antlib:org.apache.ivy.ant">
 
 	<!--
     ================
@@ -110,8 +110,8 @@
     =====================
     -->
 	<target name="run" depends="compile">
-		<echo message="Starting Solap4py-java Server..." />
-		<java classname="fr.solap4py.core.Solap4py">
+		<echo message="Starting Mandoline Server..." />
+		<java classname="fr.mandoline.core.Mandoline">
 			<classpath>
 				<path refid="runtime.path" />
 				<pathelement location="${classes.dir}" />

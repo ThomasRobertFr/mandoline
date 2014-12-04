@@ -2,7 +2,7 @@
  * @author Ibrahim Daoudi
  * @version 1.02
  */
-package fr.solap4py.core;
+package fr.mandoline.core;
 
 import org.json.JSONArray;
 import org.json.JSONException;

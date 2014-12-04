@@ -1,14 +1,14 @@
-solap4py-java
+mandoline
 =============
 
-Solap4py-java is a java server that provides a simple `JSON` API to GeoMondrian. To install it (ubuntu 14.04):
+Mandoline is a java server that provides a simple `JSON` API to GeoMondrian. To install it (ubuntu 14.04):
 
     # Install build tools
     sudo apt-get install ant
     sudo apt-get install openjdk-7-jdk
 
     # Retrieve the source
-    git clone https://github.com/loganalysis/solap4py-java.git
+    git clone https://github.com/loganalysis/mandoline.git
 
 Now, you should edit the config.dist file to add your GeoMondrian's connection information to have something like this:
 
@@ -30,6 +30,6 @@ You can now build and run the application:
 
 ## Proxy
 In order to compile, `ant` needs to download external libraries on maven repositories.
-If you are behind a proxy, you have to uncomment and configure the proxy block in [build.properties](https://github.com/loganalysis/solap4py-java/blob/master/build.properties)
+If you are behind a proxy, you have to uncomment and configure the proxy block in [build.properties](https://github.com/loganalysis/mandoline/blob/master/build.properties)
 with your proxy settings.
 

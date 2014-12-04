@@ -2,7 +2,7 @@
  * @author Cindy Roullet
  * @version 1.01
  */
-package fr.solap4py.core;
+package fr.mandoline.core;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -23,7 +23,7 @@ import static org.junit.Assert.*;
 
 public class MDXBuilderTest {
 
-    private Solap4py solap4py;
+    private Mandoline mandoline;
     private OlapConnection olapConnection;
     private JSONObject inputTest;
     private JSONObject inputTest2;
@@ -50,8 +50,8 @@ public class MDXBuilderTest {
 
     @Before
     public void setUp() throws Exception {
-        solap4py = Solap4py.getSolap4Object();
-        olapConnection = solap4py.getOlapConnection();
+        mandoline = Mandoline.getMandolineObject();
+        olapConnection = mandoline.getOlapConnection();
 
         String sBad = "{" + "onColumns:" + "[" + "\"[Measures].[Goods Quantity]\"," + "12" + "]," + " onRows:" + "{"
                 + "\"[Time]\":{\"members\":[\"[2000]\"],\"range\":true,\"dice\":true} " + "}," + " where:" + "{"
@@ -105,7 +105,7 @@ public class MDXBuilderTest {
         olapConnection.close();
     }
 
-    @Test(expected = Solap4pyException.class)
+    @Test(expected = MandolineException.class)
     public void testGetJSONCubeName() throws Throwable {
         String cubeNameTest;
         try {
@@ -118,7 +118,7 @@ public class MDXBuilderTest {
 
         // thrown.expectMessage("Cube not specified");
         try {
-            // thrown.expect(Solap4pyException.class );
+            // thrown.expect(MandolineException.class );
             String cubeName2 = (String) (getJSONCubeName.invoke(null, inputTest2));
         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
             throw e.getCause();
@@ -126,7 +126,7 @@ public class MDXBuilderTest {
 
     }
 
-    @Test(expected = Solap4pyException.class)
+    @Test(expected = MandolineException.class)
     public void testInitSelectNode() throws Throwable {
 
         try {
@@ -147,7 +147,7 @@ public class MDXBuilderTest {
 
     }
 
-    @Test(expected = Solap4pyException.class)
+    @Test(expected = MandolineException.class)
     public void testSetColumns() throws Throwable {
 
         try {
@@ -181,7 +181,7 @@ public class MDXBuilderTest {
 
     }
 
-    @Test(expected = Solap4pyException.class)
+    @Test(expected = MandolineException.class)
     public void testSetRowsOrWhere() throws Throwable {
         try {
             SelectNode selectNodeTest = (SelectNode) (initSelectNode.invoke(null, olapConnection, inputTest));
@@ -227,7 +227,7 @@ public class MDXBuilderTest {
 
     }
 
-    @Test(expected = Solap4pyException.class)
+    @Test(expected = MandolineException.class)
     public void testSetRows() throws Throwable {
         try {
             SelectNode selectNodeTest = (SelectNode) (initSelectNode.invoke(null, olapConnection, inputTest));
@@ -257,7 +257,7 @@ public class MDXBuilderTest {
 
     }
 
-    @Test(expected = Solap4pyException.class)
+    @Test(expected = MandolineException.class)
     public void testSetWhere() throws Throwable {
         try {
             SelectNode selectNodeTest = (SelectNode) (initSelectNode.invoke(null, olapConnection, inputTest));
@@ -303,7 +303,7 @@ public class MDXBuilderTest {
             String whereAfter = selectNodeTest.getFilterAxis().getExpression().toString();
             assertNotNull("WHERE did not set", whereAfter);
 
-        } catch (Solap4pyException e) {
+        } catch (MandolineException e) {
             e.printStackTrace();
         }
 

@@ -3,7 +3,7 @@
  * @author Ibrahim Daoudi
  * @version 1.00
  */
-package fr.solap4py.core;
+package fr.mandoline.core;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -41,10 +41,10 @@ final class MDXBuilder {
 	 *            the selectNode.
 	 * @return The selectNode created from the request contained in the
 	 *         parameter json.
-	 * @throws Solap4pyException
+	 * @throws MandolineException
 	 *             Exception that is thrown if the request in objectJSON is bad.
 	 */
-	static SelectNode createSelectNode(OlapConnection olapConnection, JSONObject json) throws Solap4pyException {
+	static SelectNode createSelectNode(OlapConnection olapConnection, JSONObject json) throws MandolineException {
 
 		SelectNode selectNodeRequest = initSelectNode(olapConnection, json);
 
@@ -67,7 +67,7 @@ final class MDXBuilder {
 			}
 
 		} catch (JSONException je) {
-			throw new Solap4pyException(ErrorType.BAD_REQUEST, je);
+			throw new MandolineException(ErrorType.BAD_REQUEST, je);
 		}
 		// solapExeption will be caught in the function execute()
 
@@ -82,10 +82,10 @@ final class MDXBuilder {
 	 *            JSONObject containing either data from the key "where".
 	 * @param selectNodeRequest
 	 *            selectNode on which the Axis FILTER is being set.
-	 * @throws Solap4pyException
+	 * @throws MandolineException
 	 *             Exception that is thrown if the request in objectJSON is bad.
 	 */
-	private static void setWhere(JSONObject whereJSON, SelectNode selectNodeRequest) throws Solap4pyException {
+	private static void setWhere(JSONObject whereJSON, SelectNode selectNodeRequest) throws MandolineException {
 		setRowsOrWhere(whereJSON, selectNodeRequest, false);
 	}
 
@@ -96,10 +96,10 @@ final class MDXBuilder {
 	 *            JSONObject containing either data from the key "onRows".
 	 * @param selectNodeRequest
 	 *            selectNode on which the Axis ROWS is being set.
-	 * @throws Solap4pyException
+	 * @throws MandolineException
 	 *             Exception that is thrown if the request in objectJSON is bad.
 	 */
-	private static void setRows(JSONObject rowsJSON, SelectNode selectNodeRequest) throws Solap4pyException {
+	private static void setRows(JSONObject rowsJSON, SelectNode selectNodeRequest) throws MandolineException {
 		setRowsOrWhere(rowsJSON, selectNodeRequest, true);
 	}
 
@@ -112,10 +112,10 @@ final class MDXBuilder {
 	 *            JSONObject containing the request from which we want to create
 	 *            the selectNode.
 	 * @return The selectNode initialize with its Cube and COLUMNS empty.
-	 * @throws Solap4pyException
+	 * @throws MandolineException
 	 *             Exception that is thrown if the request in objectJSON is bad.
 	 */
-	private static SelectNode initSelectNode(OlapConnection olapConnection, JSONObject json) throws Solap4pyException {
+	private static SelectNode initSelectNode(OlapConnection olapConnection, JSONObject json) throws MandolineException {
 		MdxParserFactory pFactory = olapConnection.getParserFactory();
 		MdxParser parser = pFactory.createMdxParser(olapConnection);
 
@@ -129,22 +129,22 @@ final class MDXBuilder {
 	 *            JSONObject containing the request from which we want to create
 	 *            the selectNode.
 	 * @return The cube's name.
-	 * @throws Solap4pyException
+	 * @throws MandolineException
 	 *             Exception that is thrown if the request in objectJSON is bad.
 	 */
-	private static String getJSONCubeName(JSONObject json) throws Solap4pyException {
+	private static String getJSONCubeName(JSONObject json) throws MandolineException {
 		String cubeJSON;
 		try {
 			if (json.get(FROM) instanceof String) {
 				cubeJSON = json.getString(FROM);
 				if ("null".equals(cubeJSON) || cubeJSON == null || "".equals(cubeJSON) || "\"null\"".equals(cubeJSON)) {
-					throw new Solap4pyException(ErrorType.BAD_REQUEST, CUBE_NOT_SPECIFIED);
+					throw new MandolineException(ErrorType.BAD_REQUEST, CUBE_NOT_SPECIFIED);
 				}
 			} else {
-				throw new Solap4pyException(ErrorType.BAD_REQUEST, CUBE_NOT_SPECIFIED);
+				throw new MandolineException(ErrorType.BAD_REQUEST, CUBE_NOT_SPECIFIED);
 			}
 		} catch (JSONException e) {
-			throw new Solap4pyException(ErrorType.BAD_REQUEST, e);
+			throw new MandolineException(ErrorType.BAD_REQUEST, e);
 		}
 
 		return cubeJSON;
@@ -158,10 +158,10 @@ final class MDXBuilder {
 	 * @param selectNode
 	 *            selectNode on which the Axis COLUMNS is being set according to
 	 *            the parameter jsonArrayColumns.
-	 * @throws Solap4pyException
+	 * @throws MandolineException
 	 *             Exception that is thrown if the request in objectJSON is bad.
 	 */
-	private static void setColumns(JSONArray jsonArrayColumns, SelectNode selectNode) throws Solap4pyException {
+	private static void setColumns(JSONArray jsonArrayColumns, SelectNode selectNode) throws MandolineException {
 		List<ParseTreeNode> nodes = new ArrayList<>();
 
 		if (jsonArrayColumns.length() == 0) {
@@ -171,7 +171,7 @@ final class MDXBuilder {
 				try {
 					nodes.add(IdentifierNode.parseIdentifier(jsonArrayColumns.getString(i)));
 				} catch (JSONException e) {
-					throw new Solap4pyException(ErrorType.BAD_REQUEST, e);
+					throw new MandolineException(ErrorType.BAD_REQUEST, e);
 				}
 			}
 		}
@@ -193,10 +193,10 @@ final class MDXBuilder {
 	 * @param onRows
 	 *            boolean that specifies whether the Axis ROWS or FILTER is
 	 *            being set in the function.
-	 * @throws Solap4pyException
+	 * @throws MandolineException
 	 *             Exception that is thrown if the request in objectJSON is bad.
 	 */
-	private static void setRowsOrWhere(JSONObject objectJSON, SelectNode selectNode, boolean onRows) throws Solap4pyException {
+	private static void setRowsOrWhere(JSONObject objectJSON, SelectNode selectNode, boolean onRows) throws MandolineException {
 
 		ParseTreeNode previous = null;
 		ParseTreeNode current;
@@ -221,7 +221,7 @@ final class MDXBuilder {
 								IdentifierNode.parseIdentifier(members.getString(1))
 							);
 						} else {
-							throw new Solap4pyException(ErrorType.BAD_REQUEST, "If range is true, two members are required.");
+							throw new MandolineException(ErrorType.BAD_REQUEST, "If range is true, two members are required.");
 						}
 					} else {
 						JSONArray membersArray = hierarchyJSON.getJSONArray(MEMBERS);
@@ -254,7 +254,7 @@ final class MDXBuilder {
 							IdentifierNode.parseIdentifier(members.getString(1))
 						);
 					} else {
-						throw new Solap4pyException(ErrorType.BAD_REQUEST, "If range is true, two members are required.");
+						throw new MandolineException(ErrorType.BAD_REQUEST, "If range is true, two members are required.");
 					}
 				} else {
 					if (!hierarchyJSON.getBoolean("dice")) {
@@ -281,7 +281,7 @@ final class MDXBuilder {
 
 			}
 		} catch (JSONException je) {
-			throw new Solap4pyException(ErrorType.BAD_REQUEST, je);
+			throw new MandolineException(ErrorType.BAD_REQUEST, je);
 		}
 
 		System.out.println(selectNode.toString());

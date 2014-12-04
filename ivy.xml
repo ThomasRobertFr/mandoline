@@ -1,5 +1,5 @@
 <ivy-module version="2.0">
-    <info organisation="westpic" module="Solap4py-java"/>
+    <info organisation="loganalysis" module="Mandoline"/>
 
     <configurations defaultconfmapping="compile->default">
         <conf name="compile" description="Required to compile application"/>

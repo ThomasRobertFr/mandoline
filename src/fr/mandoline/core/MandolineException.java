@@ -4,7 +4,7 @@
  * @author Rémy Chevalier
  * @version 1.00
  */
-package fr.solap4py.core;
+package fr.mandoline.core;
 
 enum ErrorType {
 	BAD_REQUEST,
@@ -16,19 +16,19 @@ enum ErrorType {
 };
 
 @SuppressWarnings("serial")
-public class Solap4pyException extends Exception {
+public class MandolineException extends Exception {
 
 	private final String description;
 	private final ErrorType type;
 
-	public Solap4pyException(ErrorType type, String description) {
+	public MandolineException(ErrorType type, String description) {
 		super(description);
 		this.type = type;
 		this.description = description == null ? "null" : description;
 
 	}
 
-	public Solap4pyException(ErrorType type, Exception exception) {
+	public MandolineException(ErrorType type, Exception exception) {
 		this(type, exception.getMessage());
 	}
 

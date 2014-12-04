@@ -4,7 +4,7 @@
  * @author Pierre Depeyrot
  * @version 1.02
  */
-package fr.solap4py.core;
+package fr.mandoline.core;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -25,13 +25,13 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class Solap4py {
+public class Mandoline {
 	private OlapConnection olapConnection;
 	private Metadata metadata;
-	private static final Logger LOGGER = Logger.getLogger(Solap4py.class
+	private static final Logger LOGGER = Logger.getLogger(Mandoline.class
 			.getName());
 
-	public Solap4py(String host, String port, String user, String passwd,
+	public Mandoline(String host, String port, String user, String passwd,
 			String driverName, String geomondrianName) throws ClassNotFoundException, SQLException {
 		Class.forName(driverName);
 		Connection connection = DriverManager
@@ -44,7 +44,7 @@ public class Solap4py {
 	/**
 	 * Accessor to the olapConnection attribute
 	 * 
-	 * @return the OlapConnection associated with this instance of Solap4py
+	 * @return the OlapConnection associated with this instance of Mandoline
 	 */
 	public OlapConnection getOlapConnection() {
 		return this.olapConnection;
@@ -74,14 +74,14 @@ public class Solap4py {
 				if ("metadata".equals(function)) {
 					this.explore(jsonQuery.getJSONObject("data"), jsonResult);
 				} else {
-					throw new Solap4pyException(ErrorType.NOT_SUPPORTED,
+					throw new MandolineException(ErrorType.NOT_SUPPORTED,
 							"The query type " + function
 									+ " is not currently supported.");
 				}
 			}
 			result = jsonResult.toString();
 
-		} catch (Solap4pyException se) {
+		} catch (MandolineException se) {
 			result = se.getJSON();
 		}
 
@@ -95,10 +95,10 @@ public class Solap4py {
 	 *            a JSON object which indicates which metadata we want to get
 	 * @return the result of the query in JSON format
 	 * @throws JSONException
-	 * @throws Solap4pyException
+	 * @throws MandolineException
 	 * @throws OlapException
 	 */
-	private void explore(JSONObject query, JSONObject result) throws Solap4pyException {
+	private void explore(JSONObject query, JSONObject result) throws MandolineException {
 		this.metadata.query(query, result);
 	}
 
@@ -108,10 +108,10 @@ public class Solap4py {
 	 * @param jsonObject
 	 *            a JSON text which indicates which data we want to select
 	 * @return the result of the query in JSON format
-	 * @throws Solap4pyException
+	 * @throws MandolineException
 	 * @throws JSONException
 	 */
-	private JSONArray execute(JSONObject jsonObject) throws Solap4pyException, JSONException {
+	private JSONArray execute(JSONObject jsonObject) throws MandolineException, JSONException {
 		JSONArray result = new JSONArray();
 
 		SelectNode sn = MDXBuilder.createSelectNode(olapConnection, jsonObject);
@@ -121,20 +121,20 @@ public class Solap4py {
 			CellSet cellSet = os.executeOlapQuery(sn);
 			result = JSONBuilder.createJSONResponse(cellSet);
 		} catch (OlapException oe) {
-			throw new Solap4pyException(ErrorType.SERVER_ERROR, "Impossible to execute the query");
+			throw new MandolineException(ErrorType.SERVER_ERROR, "Impossible to execute the query");
 		}
 
 		return result;
 	}
 
 	/**
-	 * Returns a Solap4py object initialize with a properties file.
+	 * Returns a Mandoline object initialize with a properties file.
 	 * 
-	 * @return Solap4py object
+	 * @return Mandoline object
 	 * @throws ClassNotFoundException
 	 * @throws SQLException
 	 */
-	public static Solap4py getSolap4Object() throws ClassNotFoundException, SQLException {
+	public static Mandoline getMandolineObject() throws ClassNotFoundException, SQLException {
 		Properties prop = new Properties();
 		InputStream input = null;
 
@@ -157,7 +157,7 @@ public class Solap4py {
 			String driverName = prop.getProperty("driverName");
             String geomondrianName = prop.getProperty("geomondrianName");
 
-			return new Solap4py(dbhost, dbport, dbuser, dbpasswd, driverName, geomondrianName);
+			return new Mandoline(dbhost, dbport, dbuser, dbpasswd, driverName, geomondrianName);
 		} catch (IOException ex) {
 			LOGGER.log(Level.SEVERE, ex.getMessage());
 		} finally {
@@ -175,9 +175,9 @@ public class Solap4py {
 	public static void main(String[] args) {
 		ServerSocket server = null;
 		try {
-			final Solap4py solap4py = Solap4py.getSolap4Object();
+			final Mandoline mandoline = Mandoline.getMandolineObject();
 			server = new ServerSocket(25335);
-			System.out.println("Solap4py-java Server started.");
+			System.out.println("Mandoline Server started.");
 			while (true) {
 				try {
 					final Socket client = server.accept();
@@ -195,7 +195,7 @@ public class Solap4py {
 									client.getOutputStream()
 								);
 								String query = in.readLine();
-								String result = solap4py.process(query);
+								String result = mandoline.process(query);
 								out.print(result);
 								out.flush();
 								client.close();
