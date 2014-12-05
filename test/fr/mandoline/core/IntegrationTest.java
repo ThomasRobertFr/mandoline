@@ -32,7 +32,7 @@ public class IntegrationTest {
     public void testSchemas() {
         String query = "{\"queryType\":\"metadata\",\"data\":{ \"root\" :[\"Traffic\"]}}";
         String result = this.mandoline.process(query);
-        assertTrue(result.equals("{\"error\":\"OK\",\"data\":{\"[Traffic]\":{\"caption\":\"Traffic\"}}}"));
+        assertTrue(result.equals("{\"error\":\"OK\",\"data\":{\"[Traffic]\":{\"description\":\"Traffic\",\"caption\":\"Traffic\"}}}"));
     }
 
     @Test
@@ -45,9 +45,7 @@ public class IntegrationTest {
     @Test
     public void testInvalidSchema() {
         String query = "{ \"queryType\" : \"metadata\", \"data\" : { \"root\" : [\"Trafficv\"]}}";
-        System.out.println(query);
         String result = this.mandoline.process(query);
-        System.out.println(result);
         assertTrue(result.equals("{\"error\":\"BAD_REQUEST\",\"data\":\"Invalid schema identifier\"}"));
     }
 

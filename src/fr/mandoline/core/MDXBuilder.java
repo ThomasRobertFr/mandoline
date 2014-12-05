@@ -283,7 +283,5 @@ final class MDXBuilder {
 		} catch (JSONException je) {
 			throw new MandolineException(ErrorType.BAD_REQUEST, je);
 		}
-
-		System.out.println(selectNode.toString());
 	}
 }
