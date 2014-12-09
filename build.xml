@@ -119,7 +119,7 @@
     <target name="jar" depends="compile">
         <ivy:retrieve pattern="${dist.dir}/lib/[artifact].[ext]"/>
 
-        <jar destfile="${dist.dir}/temp_mandoline.jar" basedir="${build.dir}/classes" filesetmanifest="skip">
+        <jar destfile="${dist.dir}/temp_solap4py-java.jar" basedir="${build.dir}/classes" filesetmanifest="skip">
             <zipgroupfileset dir="dist/lib" includes="*.jar" />
 
             <manifest>
@@ -128,10 +128,10 @@
         </jar>
 
         <zip destfile="${dist.dir}/${jar.name}">
-            <zipfileset src="${dist.dir}/temp_mandoline.jar" excludes="META-INF/*.SF, META-INF/*.DSA, META-INF/*.RSA"/>
+            <zipfileset src="${dist.dir}/temp_solap4py-java.jar" excludes="META-INF/*.SF, META-INF/*.DSA, META-INF/*.RSA"/>
         </zip>
 
-        <delete file="${dist.dir}/temp_mandoline.jar"/>
+        <delete file="${dist.dir}/temp_solap4py-java.jar"/>
     </target>
 
     <!--
@@ -141,8 +141,8 @@
     -->
     <target name="package" depends="jar">
         <taskdef name="deb" classpathref="build.path" classname="org.vafer.jdeb.ant.DebAntTask"/>
-        <copy todir="${build.dir}/deb/control">
-            <fileset dir="src/deb/control"/>
+        <copy todir="${dist.dir}/deb/control">
+            <fileset dir="${src.dir}/deb/control"/>
             <filterset begintoken="[[" endtoken="]]">
                 <filter token="version" value="${version}"/>
                 <filter token="description" value="${description}"/>
@@ -150,9 +150,15 @@
                 <filter token="maintainer" value="${maintainer}"/>
             </filterset>
         </copy>
-        <deb destfile="${build.dir}/${ant.project.name}.deb" control="${build.dir}/deb/control" verbose="true">
-            <data src="${dist.dir}/${dist.jar}" type="file">
-                <mapper type="perm" prefix="/usr/share/jdeb/lib"/>
+        <deb destfile="${dist.dir}/${ant.project.name}.deb" control="${dist.dir}/deb/control">
+            <data src="${dist.dir}/${jar.name}"  type="file">
+                <mapper type="perm" prefix="/usr/share/solap4py-java/lib"/>
+            </data>
+            <data src="config.dist" dst="config.properties" type="file" conffile="true">
+                <mapper type="perm" prefix="/etc"/>
+            </data>
+            <data src="solap4py-java.conf" type="file" conffile="true">
+                <mapper type="perm" prefix="/etc/init"/>
             </data>
         </deb>
     </target>
