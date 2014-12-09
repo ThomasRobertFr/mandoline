@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project default="compile" name="Mandoline" xmlns:ivy="antlib:org.apache.ivy.ant">
+<project default="compile" name="mandoline" xmlns:ivy="antlib:org.apache.ivy.ant">
 
     <!--
     ================
@@ -119,7 +119,7 @@
     <target name="jar" depends="compile">
         <ivy:retrieve pattern="${dist.dir}/lib/[artifact].[ext]"/>
 
-        <jar destfile="${dist.dir}/temp_solap4py-java.jar" basedir="${build.dir}/classes" filesetmanifest="skip">
+        <jar destfile="${dist.dir}/temp_mandoline.jar" basedir="${build.dir}/classes" filesetmanifest="skip">
             <zipgroupfileset dir="dist/lib" includes="*.jar" />
 
             <manifest>
@@ -128,10 +128,10 @@
         </jar>
 
         <zip destfile="${dist.dir}/${jar.name}">
-            <zipfileset src="${dist.dir}/temp_solap4py-java.jar" excludes="META-INF/*.SF, META-INF/*.DSA, META-INF/*.RSA"/>
+            <zipfileset src="${dist.dir}/temp_mandoline.jar" excludes="META-INF/*.SF, META-INF/*.DSA, META-INF/*.RSA"/>
         </zip>
 
-        <delete file="${dist.dir}/temp_solap4py-java.jar"/>
+        <delete file="${dist.dir}/temp_mandoline.jar"/>
     </target>
 
     <!--
@@ -152,12 +152,12 @@
         </copy>
         <deb destfile="${dist.dir}/${ant.project.name}.deb" control="${dist.dir}/deb/control">
             <data src="${dist.dir}/${jar.name}"  type="file">
-                <mapper type="perm" prefix="/usr/share/solap4py-java/lib"/>
+                <mapper type="perm" prefix="/usr/share/mandoline/lib"/>
             </data>
-            <data src="config.dist" dst="config.properties" type="file" conffile="true">
+            <data src="config.dist" dst="mandoline.properties" type="file" conffile="true">
                 <mapper type="perm" prefix="/etc"/>
             </data>
-            <data src="solap4py-java.conf" type="file" conffile="true">
+            <data src="mandoline.conf" type="file" conffile="true">
                 <mapper type="perm" prefix="/etc/init"/>
             </data>
         </deb>
@@ -170,7 +170,7 @@
     -->
 	<target name="run" depends="compile">
 		<echo message="Starting Mandoline Server..." />
-		<java classname="fr.mandoline.core.Mandoline">
+		<java classname="${main.class}">
 			<classpath>
 				<path refid="runtime.path" />
 				<pathelement location="${classes.dir}" />

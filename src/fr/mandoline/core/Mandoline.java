@@ -139,11 +139,16 @@ public class Mandoline {
 		InputStream input = null;
 
 		try {
-			File f1 = new File("config.properties");
+            File f1 = new File("mandoline.properties");
 			if (f1.exists() && !f1.isDirectory()) {
 				input = new FileInputStream(f1);
 			} else {
-				input = new FileInputStream("config.dist");
+                f1 = new File("config.properties");
+                if (f1.exists() && !f1.isDirectory()) {
+                    input = new FileInputStream(f1);
+                } else {
+                    input = new FileInputStream("config.dist");
+                }
 			}
 
 			// load a properties file
