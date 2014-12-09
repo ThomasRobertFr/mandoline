@@ -2,5 +2,6 @@
 dbhost=localhost
 dbport=8080
 geomondrianName=geomondrian
-# Name of the Xmla Olap4j Driver
-driverName=org.olap4j.driver.xmla.XmlaOlap4jDriver
+
+# Port on which mandoline will listen
+listenPort=25335
